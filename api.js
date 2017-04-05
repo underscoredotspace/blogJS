@@ -32,6 +32,12 @@ routes.post('/new', (req, res) => {
       if (err || valid != true || !verified) {
         res.status(401).json({err: err, valid: valid, verified: verified}) 
       } else {
+        var newPost = {
+          title: req.body.blogpost.title,
+          content: req.body.blogpost.content,
+          date: new Date()
+        }
+        db.collection('blog').insert(newPost)
         res.json({posted: true})
       }
     })
