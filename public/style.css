@@ -1,0 +1,80 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
+@import url(https://fonts.googleapis.com/css?family=Quicksand);
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css);
+
+html {
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box; }
+
+body {
+  background-color: #404246; 
+  color: #dddddd;}
+
+*, *:before, *:after {
+  box-sizing: inherit; }
+
+html, body, div, select {
+  padding: 0;
+  margin: 0; }
+
+body, input {
+  -webkit-font-smoothing: antialiased;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
+}
+
+a, a:active, a:visited {
+  color: hotpink;
+  text-decoration: none;
+}
+
+a:hover {
+  color: pink;
+}
+
+p {
+  margin-top: 5px;
+}
+
+h2 {
+  margin: 5px 0 0 0;
+}
+
+.part {
+ margin: 3px 3px 0 3px;
+ padding: 5px;
+ background-color: #222426;
+}
+
+#blog-frame {
+  display: flex; 
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: #404246;
+}
+
+#blog-header {
+ font-family: 'Quicksand', sans-serif;
+ font-size: 36px;
+ text-align: center;
+ padding: 20px 10px;
+  line-height: 40px;
+}
+
+.blog-post {
+  text-align: justify;
+  margin-bottom: 5px;
+}
+
+.blog-post-footer {
+  font-family: 'Quicksand', sans-serif;
+  margin-bottom: 5px;
+}
+
+ .newpost-content {
+   width: 75vw;
+   height: 300px;
+ }
