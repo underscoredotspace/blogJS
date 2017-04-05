@@ -1,0 +1,14 @@
+<div class="blog-post part"><form>
+	<input ng-model="blogpost.title" class="newpost-title"><br>
+	<textarea ng-model="blogpost.content" class="newpost-content"></textarea><br>
+	<label>Enter OTP:</label><input ng-model="otpcode">
+	<button type="submit" ng-click="submitPost()">Submit</button></form>
+</div>
+
+<div class="blog-post part">
+	<h2>{{blogpost.title}}</h2>
+    <div ng-bind-html="blogpost.content|createHTMLParas:true"></div>
+	<div class="blog-post-footer">
+	  <b><a href="/#!new">{{blogpost.on}}</a></b>
+	</div>
+</div>
