@@ -2,6 +2,7 @@ var OTP = require('otp.js')
 var GA = OTP.googleAuthenticator
 var db = require('./mongo')
 var bcrypt = require('bcrypt')
+var lastCode = null
 
 var newSecret = (cb) => {
   bcrypt.hash(process.env.GA_PASS, 5, (err, hash) => {
@@ -46,25 +47,30 @@ var getCode = (cb) =>{
 }
 
 var checkCode = (code, cb) => {
-  getSecret((err, secret, verified) => {
-    if (err) {
-      cb(err)
-    } else {
-      var delta = GA.verify(code, secret)
-      if (delta && Math.abs(delta.delta) <= 1) {
-        cb(null, true, verified)
+  if (code==lastCode) {
+    cb('Wait for next code')
+  } else {
+    getSecret((err, secret, verified) => {
+      if (err) {
+        cb(err)
       } else {
-        cb(null, false)
+        var delta = GA.verify(code, secret)
+        if (delta && Math.abs(delta.delta) <= 1) {
+          lastCode = code
+          cb(null, true, verified)
+        } else {
+          cb(null, false)
+        }
       }
-    }
-  })
+    })
+  }
 }
 
 var qrCode = (cb) => {
   var user = process.env.USER || 'ampersand', org = process.env.ORG || 'colon.underscore.space'
   getSecret((err, secret) => {
     if (err) {
-      cb(err, null)
+      cb(err)
     } else {
       cb(null, GA.qrCode(user, org, secret))
     }

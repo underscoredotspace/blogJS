@@ -25,12 +25,12 @@ body, input {
 }
 
 a, a:active, a:visited {
-  color: hotpink;
+  color: rgb(181, 255, 107);
   text-decoration: none;
 }
 
 a:hover {
-  color: pink;
+  color: hotpink;
 }
 
 p {
@@ -39,6 +39,10 @@ p {
 
 h2 {
   margin: 5px 0 0 0;
+}
+
+label {
+  padding-right: 10px;
 }
 
 .part {
@@ -61,7 +65,17 @@ h2 {
  font-size: 36px;
  text-align: center;
  padding: 20px 10px;
-  line-height: 40px;
+}
+
+#blog-menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.blog-menu-item {
+  width: 33%;
+  text-align: center;
 }
 
 .blog-post {
@@ -78,3 +92,8 @@ h2 {
    width: 75vw;
    height: 300px;
  }
+
+SVG {
+  background: white;
+  margin-bottom: 5px;
+}

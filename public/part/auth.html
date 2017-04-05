@@ -1,0 +1,14 @@
+<div class="part">
+  <div ng-show="step==1">
+    <label>Enter Admin Code</label>
+    <input type="text" ng-model="adminCode">
+    <button ng-click="getQR()">Submit</button>
+  </div>
+  
+  <div ng-show="step==2">
+    <div class="qr" ng-bind-html="qr"></div>
+    <label>Enter Next Code</label>
+    <input type="text" ng-model="gaCode">
+    <button ng-click="verify()">Submit</button>
+  </div>
+</div>

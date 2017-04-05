@@ -14,6 +14,10 @@ window.angular.module('colonApp', ['ngRoute'])
         templateUrl: 'part/newpost.html',
         controller: 'colonNewPost'
     })
+  .when('/setup/', {
+        templateUrl: 'part/auth.html',
+        controller: 'colonAuth'
+    })
     .otherwise({redirectTo:'/'});
 })
 
@@ -63,6 +67,40 @@ window.angular.module('colonApp', ['ngRoute'])
         headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
           console.log(res)
+    }, function(err) {
+        console.log(err.data)
+    });
+  }
+})
+
+.controller('colonAuth', function($scope, $routeParams, $http, $sce) {
+  $scope.step = 1
+  
+  $scope.getQR = function() {
+    $http({
+      url: '/api/QR',
+      method: "POST",
+      data: {code: $scope.adminCode},
+      headers: {'Content-Type': 'application/json'}
+    }).then(function(res) {
+      console.log(res)
+      if (res.data.hasOwnProperty('qr')) {
+        $scope.qr = $sce.trustAsHtml(res.data.qr)
+        $scope.step = 2
+      }
+    }, function(err) {
+        console.log(err.data)
+    });
+  }
+  
+  $scope.verify = function() {
+    $http({
+      url: '/api/verify',
+      method: "POST",
+      data: {code: $scope.gaCode},
+      headers: {'Content-Type': 'application/json'}
+    }).then(function(res) {
+      console.log(res)
     }, function(err) {
         console.log(err.data)
     });

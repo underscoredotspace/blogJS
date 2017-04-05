@@ -16,7 +16,11 @@
 <body data-ng-app="colonApp">
   <div id="blog-frame">
     <div id="blog-header">colon dot underscore dot space</div> 
-    <div id="blog-menu" class="part"><a href="/#!/new">New</a></div>
+    <div id="blog-menu" class="part">
+      <a href="/#!" class="blog-menu-item">Home</a>
+      <a href="/#!/new" class="blog-menu-item">New</a>
+      <a href="/#!/setup" class="blog-menu-item">Setup</a>
+    </div>
     <div ng-view></div>
   </div>
 </body>
