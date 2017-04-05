@@ -53,7 +53,7 @@ window.angular.module('colonApp', ['ngRoute'])
     var newPost = {
         title:  $scope.blogpost.title,
         content:    $filter('createHTMLParas')($scope.blogpost.content, false),
-        otpcode:    $scope.otpcode
+        code:    $scope.otpcode
     };
     console.log(newPost.content)
     $http({
@@ -63,8 +63,8 @@ window.angular.module('colonApp', ['ngRoute'])
         headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
           console.log(res)
-    }, function(err, res) {
-        console.log(err);
+    }, function(err) {
+        console.log(err.data)
     });
   }
 })

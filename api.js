@@ -1,5 +1,7 @@
-var routes = require('express').Router();
+var routes = require('express').Router()
 var db = require('./mongo')
+var auth = require("./auth.js")
+const otpRegEx = /^[0-9]{6}$/
 
 routes.get('/latest/:count', (req, res) => {
   var countRegEx = /^[0-9]{0,2}$/
@@ -24,29 +26,55 @@ routes.get('/latest', (req, res) => {
 })
 
 routes.post('/new', (req, res) => {
-  console.log(req.body.blogpost)
-  res.json(req.body.blogpost)
-  // db.collection('blog').insert({test:req.body.blogpost}, (err, data) => {
-  //   if (err) {
-  //     res.json({err: err})
-  //   } else {
-  //     res.json({data: data})
-  //   }
-  // })
+  console.log(req.body)
+  if(otpRegEx.test(req.body.blogpost.code)) {
+    auth.checkCode(req.body.blogpost.code, (err, valid, verified) => {
+      if (err || valid != true || !verified) {
+        res.status(401).json({err: err, valid: valid, verified: verified}) 
+      } else {
+        res.json({posted: true})
+      }
+    })
+  } else {
+    res.status(401).json({err: 'invalid code'})
+  }
+})
+
+routes.post('/qr', (req, res) => {
+  if (otpRegEx.test(req.body.code)) {
+    auth.checkCode(req.body.code, (err, valid, verified) => {
+      if (err || valid != true || verified) {
+        res.status(401).json({err: err, valid: valid, verified: verified}) 
+      } else {
+        auth.qrCode((err, qr) => {
+          if (err) {
+            res.status(500).json({err: err})
+          } else {
+            res.json({qr: qr})
+          }
+        })
+      }
+    })
+  } else {
+    res.status(401).json({err: 'invalid code'})
+  }
+})
+
+routes.post('/verify', (req, res) => {
+  if (otpRegEx.test(req.body.code)) {
+    auth.checkCode(req.body.code, (err, valid) => {
+      if (valid) {
+        db.collection('admin').update({}, {$set: {verified: true}})
+      }
+      res.status(401).json({err: err, valid: valid})
+    })
+  } else {
+    res.status(401).json({err: 'invalid code'})
+  }
+})
+
+routes.use((req, res) => {
+  res.sendStatus(404)
 })
 
 module.exports = routes
-
-/*
-	// This is the blog serving API for mongodb
-	router.Path("/blog/latest/{count:[0-9]{0,2}}").HandlerFunc(mongo.getBlogHandler).Methods("GET")
-	router.Path("/blog/{id:[0-9a-z]{24}}/{count:[0-9]{0,2}}").HandlerFunc(mongo.getBlogHandler).Methods("GET")
-	router.Path("/blog/new").HandlerFunc(mongo.newBlogHandler).Methods("POST")
-
-	// Routes alled /admin just now, but handle initial registration, and subsequent verifications for new posts
-	router.Path("/admin/v/{username}/{code:[0-9]{6,6}}").HandlerFunc(mongo.verify).Methods("GET")
-	router.Path("/admin/r/{username}").HandlerFunc(mongo.register).Methods("GET")
-
-	// Serving of static files
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./client/")))
-*/
