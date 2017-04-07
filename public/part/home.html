@@ -1,6 +1,6 @@
 <div class="blog-post part" data-ng-repeat="blogpost in blogposts | orderBy:'-Postedat'">
-	<h2>{{blogpost.Title}}</h2>
-	<p data-ng-repeat="paragraph in blogpost.Content track by $index">{{paragraph}}</p>
+	<h2>{{blogpost.title}}</h2>
+  <div ng-bind-html="blogpost.content|createHTMLParas:true"></div>
 	<div class="blog-post-footer">
 		<b><a href="#" data-ng-href="{{'/#!/post/'+blogpost.ID}}">{{blogpost.on}}</a></b>
 	</div>
