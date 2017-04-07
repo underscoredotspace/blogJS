@@ -24,13 +24,6 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     // listen for requests :)
     var listener = app.listen(process.env.PORT, function () {
       console.log('Your app is listening on port ' + listener.address().port)
-      require('./auth').getCode((err, code) => {
-        if (err) {
-          console.error('Error getting admin code:', err)
-        } else {
-          console.log('Your admin code is:', code)
-        }
-      })
     });
   }
 })

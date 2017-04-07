@@ -1,4 +1,5 @@
 <div class="part">
+  <p ng-show="message" ng-bind="message"></p>
   <div ng-show="step==1">
     <label>Enter Admin Code</label>
     <input type="text" ng-model="adminCode">
@@ -10,5 +11,10 @@
     <label>Enter Next Code</label>
     <input type="text" ng-model="gaCode">
     <button ng-click="verify()">Submit</button>
+  </div>
+  
+  <div ng-show="step==3">
+    <h1>Success!</h1>
+    <p>You're now registered and can start blogging</p>
   </div>
 </div>

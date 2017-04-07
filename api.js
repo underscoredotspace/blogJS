@@ -25,29 +25,42 @@ routes.get('/latest', (req, res) => {
   res.redirect('/api/latest/1')
 })
 
-routes.post('/new', (req, res) => {
-  console.log(req.body)
-  if(otpRegEx.test(req.body.blogpost.code)) {
-    auth.checkCode(req.body.blogpost.code, (err, valid, verified) => {
-      if (err || valid != true || !verified) {
-        res.status(401).json({err: err, valid: valid, verified: verified}) 
+routes.get('/adminCode', (req, res) => {
+  auth.getCode((err, code) => {
+      if (err) {
+        console.error('Error getting admin code:', err)
       } else {
-        var newPost = {
-          title: req.body.blogpost.title,
-          content: req.body.blogpost.content,
-          date: new Date()
-        }
-        db.collection('blog').insert(newPost)
-        res.json({posted: true})
+        console.log('Your admin code is:', code)
       }
     })
+  res.sendStatus(200)
+})
+
+routes.use((req, res, next) => {
+  if(otpRegEx.test(req.body.code)) {
+    next()
   } else {
-    res.status(401).json({err: 'invalid code'})
+    res.status(401).json({err: 'Invalid code'})
   }
 })
 
+routes.post('/new', (req, res) => {
+  auth.checkCode(req.body.code, (err, valid, verified) => {
+    if (err || valid != true || !verified) {
+      res.status(401).json({err: err, valid: valid, verified: verified}) 
+    } else {
+      var newPost = {
+        title: req.body.blogpost.title,
+        content: req.body.blogpost.content,
+        date: new Date()
+      }
+      db.collection('blog').insert(newPost)
+      res.json({posted: true})
+    }
+  })
+})
+
 routes.post('/qr', (req, res) => {
-  if (otpRegEx.test(req.body.code)) {
     auth.checkCode(req.body.code, (err, valid, verified) => {
       if (err || valid != true || verified) {
         res.status(401).json({err: err, valid: valid, verified: verified}) 
@@ -61,22 +74,19 @@ routes.post('/qr', (req, res) => {
         })
       }
     })
-  } else {
-    res.status(401).json({err: 'invalid code'})
-  }
 })
 
 routes.post('/verify', (req, res) => {
-  if (otpRegEx.test(req.body.code)) {
-    auth.checkCode(req.body.code, (err, valid) => {
-      if (valid) {
-        db.collection('admin').update({}, {$set: {verified: true}})
-      }
-      res.status(401).json({err: err, valid: valid})
-    })
-  } else {
-    res.status(401).json({err: 'invalid code'})
-  }
+  auth.checkCode(req.body.code, (err, valid) => {
+    console.log(valid)
+    if (valid) {
+      db.collection('admin').update({}, {$set: {verified: true}})
+    }
+    if (err || !valid) {
+      res.status(401)
+    }
+    res.json({err: err, valid: valid})
+  })
 })
 
 routes.use((req, res) => {
