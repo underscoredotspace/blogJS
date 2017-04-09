@@ -3,13 +3,7 @@
 @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css);
 
 html {
-  height: 100vh;
-  width: 100vw;
   box-sizing: border-box; }
-
-body {
-  background-color: #404246; 
-  color: #dddddd;}
 
 *, *:before, *:after {
   box-sizing: inherit; }
@@ -18,14 +12,28 @@ html, body, div, select {
   padding: 0;
   margin: 0; }
 
-body, input {
+body {
+  background-color: #222426; 
+  color: whitesmoke;
+  margin: 0 10px;}
+
+body, input, code {
   -webkit-font-smoothing: antialiased;
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 16px;
 }
 
+code {
+  display: block;
+  color: black;
+  padding: 5px;
+  font-size: 90%;
+  border: 2px silver solid;
+  background: whitesmoke;
+}
+
 a, a:active, a:visited {
-  color: rgb(181, 255, 107);
+  color: springgreen;
   text-decoration: none;
 }
 
@@ -33,12 +41,12 @@ a:hover {
   color: hotpink;
 }
 
-p {
-  margin-top: 5px;
-}
-
 h2 {
   margin: 5px 0 0 0;
+}
+
+p {
+  margin-top: 0;
 }
 
 label {
@@ -47,17 +55,13 @@ label {
 
 .part {
  margin: 3px 3px 0 3px;
- padding: 5px;
- background-color: #222426;
+ padding: 5px 20px;
 }
 
 #blog-frame {
   display: flex; 
   flex-direction: column;
   flex-shrink: 0;
-  height: 100vh;
-  width: 100vw;
-  background-color: #404246;
 }
 
 #blog-header {
@@ -88,9 +92,12 @@ label {
   margin-bottom: 5px;
 }
 
+.newpost-title, .newpost-content  {
+  width: 100%;
+}
  .newpost-content {
-   width: 75vw;
-   height: 300px;
+   height: 30%;
+   margin: 5px 0;
  }
 
 SVG {

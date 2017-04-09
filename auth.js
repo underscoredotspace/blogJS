@@ -61,7 +61,6 @@ var checkCode = (code, cb) => {
         cb(err)
       } else {
         var delta = GA.verify(code, secret)
-        console.log(code, secret)
         if (delta && Math.abs(delta.delta) <= 1) {
           lastCode = code
           cb(null, true, verified)
@@ -79,7 +78,6 @@ var qrCode = (cb) => {
     if (err) {
       cb(err)
     } else {
-      console.log(secret)
       cb(null, GA.qrCode(user, org, secret))
     }
   })

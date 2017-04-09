@@ -78,7 +78,6 @@ routes.post('/qr', (req, res) => {
 
 routes.post('/verify', (req, res) => {
   auth.checkCode(req.body.code, (err, valid) => {
-    console.log(valid)
     if (valid) {
       db.collection('admin').update({}, {$set: {verified: true}})
     }

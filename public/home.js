@@ -1,7 +1,36 @@
-window.angular.module('colonApp', ['ngRoute'])
+window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
 
-.config(function($routeProvider) {
-    $routeProvider
+.config(($showdownProvider, $routeProvider) => {
+  window.showdown.extension('codehighlight', function() {
+    function htmlunencode(text) {
+      return (
+        text
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+        );
+    }
+    return [
+      {
+        type: 'output',
+        filter: function (text, converter, options) {
+          // use new shodown's regexp engine to conditionally parse codeblocks
+          var left  = '<code\\b[^>]*>',
+              right = '</code>',
+              flags = 'g',
+              replacement = function (wholeMatch, match, left, right) {
+                // unescape match to prevent double escaping
+                match = htmlunencode(match);
+                return left + window.hljs.highlightAuto(match).value + right;
+              };
+          return window.showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags);
+        }
+      }
+    ];
+  });
+  $showdownProvider.loadExtension('codehighlight')
+
+  $routeProvider
     .when('/', {
         templateUrl: 'part/home.html',
         controller: 'colonHome'
@@ -56,7 +85,7 @@ window.angular.module('colonApp', ['ngRoute'])
   $scope.submitPost = function() {
     var blogpost = {
       title: $scope.blogpost.title,
-      content: $filter('createHTMLParas')($scope.blogpost.content, false)
+      content: $scope.blogpost.content
     }
     $http({
         url: '/api/new',
@@ -80,7 +109,7 @@ window.angular.module('colonApp', ['ngRoute'])
     $scope.message = 'Check the server console to get your setup code'
   }, function(err) {
     console.log(err.data)
-    $scope.message = 'Error getting setup code. '
+    $scope.message = 'Error getting setup code.'
   });
   
   $scope.step = 1
@@ -89,7 +118,7 @@ window.angular.module('colonApp', ['ngRoute'])
     $http({
       url: '/api/QR',
       method: "POST",
-      data: {code: $scope.adminCode},
+      data: {code: $scope.setupCode},
       headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
       console.log(res.data)
@@ -123,7 +152,7 @@ window.angular.module('colonApp', ['ngRoute'])
       $scope.gaCode = null
       $scope.step = 3
     }, function(err) {
-      $scope.message = 'Error verifying code. Try again with the next one. If this doesn\'t work, delete the admin collection in the database to start again'
+      $scope.message = 'Error verifying code. Try again with the next one. If this still doesn\'t work, delete the admin collection in the database and start again'
       console.log(err.data)
     })
   }

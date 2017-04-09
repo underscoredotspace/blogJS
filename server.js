@@ -2,6 +2,11 @@
 var express = require('express')
 var app = express()
 
+if (!process.env.MONGO_ADDR) {
+  console.error('Environment variable \'MONGO_ADDR\' point to your mongodb')
+  process.exit(1)
+}
+
 require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
   if (err) {
     console.error(err)
@@ -16,6 +21,7 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     app.set('json spaces', 2)
     app.use('/api', require('./api'))
     app.use(express.static('public'))
+    app.use('/node_modules', express.static('node_modules'));
 
     app.use((req, res) => {
       res.sendStatus(404)
