@@ -1,12 +1,19 @@
 var OTP = require('otp.js')
 var GA = OTP.googleAuthenticator
 var db = require('./mongo')
+var crypto = require('crypto')
 var bcrypt = require('bcrypt')
 var lastCode = null
 
 var newSecret = (cb) => {
-  bcrypt.hash(process.env.GA_PASS, 5, (err, hash) => {
-    cb(err, hash)
+  crypto.randomBytes(256, (err, buf) => {
+    if (err) {
+      cb(err)
+    } else {
+      bcrypt.hash(buf.toString(), 5, (err, hash) => {
+        cb(err, GA.encode(hash))
+      })
+    }
   })
 }
 
@@ -16,22 +23,21 @@ var getSecret = (cb) => {
       cb('too many records in admin collection')
     } else {
       if (data.length==0) {
-        //set up the key
         newSecret((err, secret) => {
           if (err) {
             cb(err)
           } else {
             db.collection('admin').insert({secret: secret, verified: false}) 
-            cb(null, GA.encode(secret), false)
+            cb(null, secret, false)
           }
         })
       } else {
         if (data[0].hasOwnProperty('secret') && data[0].hasOwnProperty('verified') && data[0].secret) {
-          cb(null, GA.encode(data[0].secret), data[0].verified)  
+          cb(null, data[0].secret, data[0].verified)  
         } else {
           cb('problem with admin record', null)
         }
-      }
+      };
     }
   })
 }
@@ -67,7 +73,7 @@ var checkCode = (code, cb) => {
 }
 
 var qrCode = (cb) => {
-  var user = process.env.USER || 'ampersand', org = process.env.ORG || 'colon.underscore.space'
+  var user = 'user', org = 'blog'
   getSecret((err, secret) => {
     if (err) {
       cb(err)

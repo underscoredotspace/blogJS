@@ -7,8 +7,5 @@
 
 <div class="blog-post part">
 	<h2>{{blogpost.title}}</h2>
-    <div ng-bind-html="blogpost.content|createHTMLParas:true"></div>
-	<div class="blog-post-footer">
-	  <b><a href="/#!new">{{blogpost.on}}</a></b>
-	</div>
+  <div markdown-to-html="blogpost.content"></div>
 </div>

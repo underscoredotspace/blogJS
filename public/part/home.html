@@ -1,7 +1,4 @@
 <div class="blog-post part" data-ng-repeat="blogpost in blogposts | orderBy:'-Postedat'">
 	<h2>{{blogpost.title}}</h2>
-  <div ng-bind-html="blogpost.content|createHTMLParas:true"></div>
-	<div class="blog-post-footer">
-		<b><a href="#" data-ng-href="{{'/#!/post/'+blogpost.ID}}">{{blogpost.on}}</a></b>
-	</div>
+  <div markdown-to-html="blogpost.content"></div>
 </div>

@@ -1,6 +1,7 @@
-# First Run Process
-- Decide what this looks like
-
 # New Posts
 
-- 
+- Save to localStorage
+
+# Home
+
+- Post date with permalink to post
