@@ -1,31 +1,33 @@
 <html>
 <head>
-    <!-- Browser set up -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, minimal-ui">
-    <link rel="icon" href="https://cdn.glitch.com/2ebbf8d6-8762-4ea2-ae2d-97679fa390c0%2Ffavicon.ico?1491384838208" type="image/icon">
-    <title>colon dot underscore dot space</title>
+  <!-- Browser set up -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, minimal-ui">
+  <link rel="icon" href="https://cdn.glitch.com/2ebbf8d6-8762-4ea2-ae2d-97679fa390c0%2Ffavicon.ico?1491384838208" type="image/icon">
+  <title>colon dot underscore dot space</title>
 
-    <!-- Styles & Scripts -->
-    <link href="style.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-route.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-sanitize.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.3/showdown.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
-    <script src="/node_modules/ng-showdown/dist/ng-showdown.min.js"></script>
-    <script src="home.js"></script>
+  <!-- Styles & Scripts -->
+  <link href="style.css" rel="stylesheet" type="text/css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-route.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-sanitize.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.3/showdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css" rel="stylesheet" type="text/css">
+  <script src="/node_modules/ng-showdown/dist/ng-showdown.min.js"></script>
+
+  <script src="home.js"></script>
 </head>
 
 <body data-ng-app="colonApp">
   <div id="blog-frame">
     <div id="blog-header">colon dot underscore dot space</div> 
-<!--     <div id="blog-menu" class="part">
-      <a href="/#!" class="blog-menu-item">Home</a>
+    <div id="blog-menu" class="part">
+      <a href="/#!/about" class="blog-menu-item">About</a>
+      <a href="/#!/home" class="blog-menu-item">Home</a>
       <a href="/#!/new" class="blog-menu-item">New</a>
-      <a href="/#!/setup" class="blog-menu-item">Setup</a>
-    </div> -->
+    </div>
     <div ng-view></div>
   </div>
 </body>

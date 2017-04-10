@@ -3,7 +3,7 @@ var express = require('express')
 var app = express()
 
 if (!process.env.MONGO_ADDR) {
-  console.error('Environment variable \'MONGO_ADDR\' point to your mongodb')
+  console.error('Environment variable \'MONGO_ADDR\' must point to your mongodb')
   process.exit(1)
 }
 

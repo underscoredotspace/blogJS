@@ -1,4 +1,5 @@
-var MongoClient = require('mongodb').MongoClient
+const mongodb = require('mongodb')
+const MongoClient = mongodb.MongoClient
 
 var state = {
   db: null,
@@ -21,3 +22,5 @@ exports.collection = function(collectionName) {
     return state.db.collection(collectionName)
   }
 }
+
+exports.ObjectId = mongodb.ObjectId

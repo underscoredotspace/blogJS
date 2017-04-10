@@ -15,30 +15,47 @@ html, body, div, select {
 body {
   background-color: #222426; 
   color: whitesmoke;
-  margin: 0 10px;}
+  margin: 0 30px;}
 
-body, input, code {
+body, input, code, textarea {
   -webkit-font-smoothing: antialiased;
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 16px;
 }
 
-code {
+pre {
   display: block;
+  whitespace: pre;
   color: black;
-  padding: 5px;
-  font-size: 90%;
-  border: 2px silver solid;
-  background: whitesmoke;
+  padding: 5px 10px;
+/*   border: 2px silver solid; */
+  background: #f6f8fa;
+  overflow: auto;
+}
+
+code {
+  font-size: 85%;
+  display: inline;
+  background: #f6f8fa;
+  color: black;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+code::before, code::after {
+  content: "\00a0";
+}
+
+pre code::before, pre code::after {
+  content: "";
 }
 
 a, a:active, a:visited {
-  color: springgreen;
+  color: hotpink;
   text-decoration: none;
 }
 
 a:hover {
-  color: hotpink;
+  color: springgreen;
 }
 
 h2 {
@@ -49,8 +66,18 @@ p {
   margin-top: 0;
 }
 
-label {
-  padding-right: 10px;
+button {
+  line-height: 1em;
+}
+
+textarea, input {
+  padding: 3px 6px;
+  background: #404246;
+  border: none;
+  color: whitesmoke;
+}
+textarea:focus, input:focus {
+  outline: solid 1px hotpink;
 }
 
 .part {
@@ -87,18 +114,23 @@ label {
   margin-bottom: 5px;
 }
 
-.blog-post-footer {
+.blog-post-date {
   font-family: 'Quicksand', sans-serif;
-  margin-bottom: 5px;
+  font-size: 75%;
+}
+
+.blog-post-date::before {
+  content: "Posted on "
 }
 
 .newpost-title, .newpost-content  {
   width: 100%;
 }
- .newpost-content {
-   height: 30%;
-   margin: 5px 0;
- }
+
+.newpost-content {
+ height: 30%;
+ margin: 5px 0;
+}
 
 SVG {
   background: white;

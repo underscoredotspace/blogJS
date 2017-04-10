@@ -31,7 +31,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   $showdownProvider.loadExtension('codehighlight')
 
   $routeProvider
-    .when('/', {
+    .when('/home', {
         templateUrl: 'part/home.html',
         controller: 'colonHome'
     })
@@ -47,7 +47,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
         templateUrl: 'part/auth.html',
         controller: 'colonAuth'
     })
-    .otherwise({redirectTo:'/'});
+    .otherwise({redirectTo:'/home'});
 })
 
 .controller('colonHome', function($scope, $http){
@@ -63,23 +63,23 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     });
 })
 .controller('colonPost', function($scope, $routeParams, $http){
-    $http.get('/blog/' + $routeParams.id + '/1')
-    .then(function(res) {
-        $scope.blogposts = res.data
-    }, function(res) {
-        console.log(res);
-    });
+  $http.get('/api/post/' + $routeParams.id)
+  .then(function(res) {
+     if (res.status==204) {
+          console.log('no posts yet!')
+      } else {
+          $scope.blogposts = res.data
+      }
+  }, function(res) {
+      console.log(res);
+  });
 })
 
-.controller('colonNewPost', function($scope, $http, $filter, niceDate) {
+.controller('colonNewPost', function($scope, $http, $filter) {
   console.log('new post')
-  var d = new Date()
   $scope.blogpost = {
-    title:  "Post Title is Nice",
-    author:   "ampersand",
-    category:   "meta",
-    content:    "",
-    on: niceDate(d)
+    title:  "",
+    content:    ""
   }
   
   $scope.submitPost = function() {
@@ -100,7 +100,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   }
 })
 
-.controller('colonAuth', function($scope, $routeParams, $http, $sce) {
+.controller('colonAuth', function($scope, $http, $sce) {
   $http({
     url: '/api/adminCode',
     method: "GET"
@@ -157,29 +157,8 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     })
   }
 })
-
-.filter('createHTMLParas', ($sce) => {
-  return function(content, trust) {
-    var output = ''
-    var paras = content.replace('\n\n', '\n').split('\n')
-    paras.forEach((para, ndx) => {
-      if (para.trim().length!=0) {
-        if (ndx != paras.length - 1) {
-          para += '</p><p>'
-        }
-        output += para
-      }
-    })
-
-    if (trust) {
-      return $sce.trustAsHtml('<p>' + output + '</p>')
-    } else {
-      return '<p>' + output + '</p>'
-    }
-  }
-})
   
-.service('niceDate', function() {
+.filter('niceDate', function() {
   return function(d) {
     var options = {year: 'numeric', month: 'long', day: 'numeric'}
     var today  = new Date(d)
