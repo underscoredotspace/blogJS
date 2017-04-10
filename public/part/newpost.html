@@ -1,7 +1,7 @@
-<div class="blog-post part"><form>
-	<input ng-model="blogpost.title" class="newpost-title"><br>
-	<textarea ng-model="blogpost.content" class="newpost-content"></textarea><br>
-	<label>Enter OTP:</label><input ng-model="otpcode">
+<div class="blog-post part" ng-hide="hideEditor"><form>
+	<input placeholder="Heading" ng-model="blogpost.title" class="newpost-title"><br>
+	<textarea placeholder="Post Text" ng-model="blogpost.content" class="newpost-content"></textarea><br>
+	<input placeholder="OTP Code" ng-model="otpcode">
 	<button type="submit" ng-click="submitPost()">Submit</button></form>
 </div>
 

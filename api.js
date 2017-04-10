@@ -25,6 +25,20 @@ routes.get('/latest', (req, res) => {
   res.redirect('/api/latest/1')
 })
 
+routes.get('/post/:id', (req, res) => {
+  db.collection('blog').find({'_id': db.ObjectId(req.params.id)}).toArray((err, data) => {
+    if (err) {
+      res.status(500).json(err)
+    }
+    if (data.length==0) {
+      res.status(204).json({err:'no matches'})
+    } else {
+      res.json(data)
+    }
+  })
+})
+
+
 routes.get('/adminCode', (req, res) => {
   auth.getCode((err, code) => {
       if (err) {
