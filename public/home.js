@@ -2,101 +2,167 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
 
 .config(($showdownProvider, $routeProvider) => {
   window.showdown.extension('codehighlight', function() {
-    function htmlunencode(text) {
-      return (
-        text
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-        );
-    }
+    const htmlunencode = (text) => text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     return [
       {
         type: 'output',
         filter: function (text, converter, options) {
-          // use new shodown's regexp engine to conditionally parse codeblocks
+          // use new showdown's regexp engine to conditionally parse codeblocks
           var left  = '<code\\b[^>]*>',
               right = '</code>',
               flags = 'g',
               replacement = function (wholeMatch, match, left, right) {
                 // unescape match to prevent double escaping
-                match = htmlunencode(match);
-                return left + window.hljs.highlightAuto(match).value + right;
-              };
-          return window.showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags);
+                match = htmlunencode(match)
+                return left + window.hljs.highlightAuto(match).value + right
+              }
+          return window.showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags)
         }
       }
-    ];
-  });
+    ]
+  })
+  
   $showdownProvider.loadExtension('codehighlight')
 
   $routeProvider
-    .when('/home', {
-        templateUrl: 'part/home.html',
-        controller: 'colonHome'
-    })
-    .when('/post/:id', {
-        templateUrl: 'part/home.html',
-        controller: 'colonPost'
-    })
+  .when('/about', {
+    template: '<div class="part"><h2>TODO</h2></div>',
+    controller: 'about'
+  })
+  .when('/home', {
+    templateUrl: 'part/home.html',
+    controller: 'colonHome'
+  })
+  .when('/post/:id', {
+    templateUrl: 'part/home.html',
+    controller: 'colonPost'
+  })
   .when('/new', {
-        templateUrl: 'part/newpost.html',
-        controller: 'colonNewPost'
-    })
+    templateUrl: 'part/newpost.html',
+    controller: 'colonNewPost'
+  })
+  .when('/login', {
+    templateUrl: 'part/login.html',
+    controller: 'login'
+  })
+  .when('/logout', {
+    template: '<div class="part">Logging out...</div>',
+    controller: 'logout'
+  })
   .when('/setup/', {
-        templateUrl: 'part/auth.html',
-        controller: 'colonAuth'
+    templateUrl: 'part/auth.html',
+    controller: 'colonAuth'
+  })
+  .otherwise({redirectTo:'/home'})
+})
+
+.controller('about', function() {})
+
+.controller('blog', function($scope, $http) {
+  $http.get('/api/loggedin')
+  .then(function(res) {
+    $scope.loggedin = res.data.loggedin
+  }, function(res) {
+    console.error(res)
+    $scope.loggedin = false
+  })
+})
+
+.controller('logout', function($scope, $http, $location) {
+  if (!$scope.$parent.loggedin) {
+    $location.path('/home')
+  } else {
+    $http.get('/api/logout')
+    .then(function(res) {
+      $scope.$parent.loggedin = false
+      $location.path('/home')
+    }, function(res) {
+      console.error(res)
+      $scope.$parent.loggedin = false
+      $location.path('/home')
     })
-    .otherwise({redirectTo:'/home'});
+  }
 })
 
 .controller('colonHome', function($scope, $http){
     $http.get('/api/latest/5')
     .then(function(res) {
         if (res.status==204) {
-            console.log('no posts yet!')
+          console.warn('no posts yet!')
+          $scope.blogposts = [{
+            title: 'Welcome',
+            content: 'This is your blog. Make a [post](/#!/new). ',
+            date: new Date()
+          }]
         } else {
             $scope.blogposts = res.data
         }
     }, function(res) {
-        console.log(res);
-    });
+        console.error(res)
+    })
 })
-.controller('colonPost', function($scope, $routeParams, $http){
+.controller('colonPost', function($scope, $routeParams, $http, $location){
   $http.get('/api/post/' + $routeParams.id)
   .then(function(res) {
      if (res.status==204) {
-          console.log('no posts yet!')
+        console.info('Post doesn\'t exist')
+       $location.path('/home')
       } else {
           $scope.blogposts = res.data
       }
   }, function(res) {
-      console.log(res);
-  });
+      console.error(res)
+  })
 })
 
-.controller('colonNewPost', function($scope, $http, $filter) {
-  console.log('new post')
-  $scope.blogpost = {
-    title:  "",
-    content:    ""
-  }
-  
-  $scope.submitPost = function() {
-    var blogpost = {
-      title: $scope.blogpost.title,
-      content: $scope.blogpost.content
+.controller('colonNewPost', function($scope, $http, $filter, $location) {
+  if (!$scope.$parent.loggedin) {
+    $location.path('/login')
+  } else {
+    $scope.blogpost = {
+      title:  "",
+      content:    "",
+      date: new Date()
     }
-    $http({
-        url: '/api/new',
-        method: "POST",
-        data: {blogpost: blogpost, code: $scope.otpcode},
-        headers: {'Content-Type': 'application/json'}
-    }).then(function(res) {
-        console.log(res.data)
-    }, function(err) {
-        console.log(err.data)
-    });
+
+    $scope.submitPost = function() {
+      var blogpost = {
+        title: $scope.blogpost.title,
+        content: $scope.blogpost.content
+      }
+      $http({
+          url: '/api/new',
+          method: "POST",
+          data: {blogpost: blogpost},
+          headers: {'Content-Type': 'application/json'}
+      }).then(function(res) {
+        if(res.data.hasOwnProperty('ID')) {
+          $location.path('/post/'+ res.data.ID)
+        }
+      }, function(err) {
+          console.error(err.data)
+      })
+    }
+  }
+})
+
+.controller('login', function($scope, $http, $location) {
+  if ($scope.$parent.loggedin) {
+    $location.path('/home')
+  } else {
+    $scope.login = () => {
+      $http({
+          url: '/api/login',
+          method: "POST",
+          data: {code: $scope.gaCode},
+          headers: {'Content-Type': 'application/json'}
+      }).then(function(res) {
+          $scope.$parent.loggedin = true
+          $location.path('/home')
+      }, function(err) {
+          console.error(err.data)
+      })
+    }
   }
 })
 
@@ -105,12 +171,11 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     url: '/api/adminCode',
     method: "GET"
   }).then(function(res) {
-    console.log(res.data)
     $scope.message = 'Check the server console to get your setup code'
   }, function(err) {
-    console.log(err.data)
+    console.error(err.data)
     $scope.message = 'Error getting setup code.'
-  });
+  })
   
   $scope.step = 1
   
@@ -121,7 +186,6 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
       data: {code: $scope.setupCode},
       headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
-      console.log(res.data)
       if (res.data.hasOwnProperty('qr')) {
         $scope.qr = $sce.trustAsHtml(res.data.qr)
         $scope.message = 'Scan the QR code with Google Authenticator and input the code to verify'
@@ -135,8 +199,8 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
       } else {
         $scope.message = 'Error getting QR code. Restart blog on the server and come back to this page to generate a new setup code' 
       }
-      console.log(err.data)
-    });
+      console.error(err.data)
+    })
   }
   
   $scope.verify = function() {
@@ -146,14 +210,13 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
       data: {code: $scope.gaCode},
       headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
-      console.log(res.data)
       $scope.qr = null
       $scope.message = null
       $scope.gaCode = null
       $scope.step = 3
     }, function(err) {
       $scope.message = 'Error verifying code. Try again with the next one. If this still doesn\'t work, delete the admin collection in the database and start again'
-      console.log(err.data)
+      console.error(err.data)
     })
   }
 })
@@ -163,5 +226,16 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     var options = {year: 'numeric', month: 'long', day: 'numeric'}
     var today  = new Date(d)
     return today.toLocaleDateString("en-GB",options)
+  }
+})
+
+.directive('a', function() {
+  return {
+    restrict: 'E', 
+    link: (scope, element, attribs) => {
+      element.bind('mouseup', () => {
+        element.blur()
+      })
+    }
   }
 })
