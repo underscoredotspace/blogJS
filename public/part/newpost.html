@@ -1,11 +1,11 @@
 <div class="blog-post part" ng-hide="hideEditor"><form>
 	<input placeholder="Heading" ng-model="blogpost.title" class="newpost-title"><br>
 	<textarea placeholder="Post Text" ng-model="blogpost.content" class="newpost-content"></textarea><br>
-	<input placeholder="OTP Code" ng-model="otpcode">
-	<button type="submit" ng-click="submitPost()">Submit</button></form>
-</div>
+	<button type="submit" ng-click="submitPost()">Submit</button>
+</form></div>
 
 <div class="blog-post part">
 	<h2>{{blogpost.title}}</h2>
   <div markdown-to-html="blogpost.content"></div>
+  <div class="blog-post-date"><a href="/#!/new">{{blogpost.date|niceDate}}</a></div>
 </div>

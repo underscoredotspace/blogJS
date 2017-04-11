@@ -3,6 +3,15 @@ var db = require('./mongo')
 var auth = require("./auth.js")
 const otpRegEx = /^[0-9]{6}$/
 
+routes.get('/logout', (req, res) => {
+  res.clearCookie('qqBlog')
+  res.json({loggedin: false})
+})
+
+routes.get('/loggedin', (req, res) => {
+  res.json({loggedin: !(!req.signedCookies.qqBlog)})
+})
+
 routes.get('/latest/:count', (req, res) => {
   var countRegEx = /^[0-9]{0,2}$/
   if (!countRegEx.test(req.params.count) || Number(req.params.count)>20) {
@@ -38,43 +47,67 @@ routes.get('/post/:id', (req, res) => {
   })
 })
 
+routes.post('/login', (req, res) => {
+  if(otpRegEx.test(req.body.code)) {
+    auth.checkCode(req.body.code, (err, valid, verified) => {
+      if (err || valid != true || !verified) {
+        res.status(401).json({err: err, valid: valid, verified: verified}) 
+      } else {
+        res.cookie('qqBlog', true, { maxAge: 1000 * 60 * 60, signed: true })
+        res.json({loggedin: true})
+      }
+    })
+  } else {
+    res.status(401).json({err: 'Invalid code'})
+  }
+
+})
 
 routes.get('/adminCode', (req, res) => {
   auth.getCode((err, code) => {
-      if (err) {
-        console.error('Error getting admin code:', err)
-      } else {
-        console.log('Your admin code is:', code)
-      }
-    })
-  res.sendStatus(200)
+    if (err) {
+      console.error('Error getting admin code:', err)
+      res.status(500).json({err: err})
+    } else {
+      console.log('Your admin code is:', code)
+      res.sendStatus(200)
+    }
+  })
 })
 
-routes.use((req, res, next) => {
+const checkCookie = (req, res, next) => {
+  if(req.signedCookies.qqBlog) {
+    next()
+  } else {
+    res.status(401).json({err: 'Must be logged in'})
+  }
+}
+
+routes.post('/new', checkCookie, (req, res) => {
+    var newPost = {
+      _id: db.ObjectId(),
+      title: req.body.blogpost.title,
+      content: req.body.blogpost.content,
+      date: new Date()
+    }
+    db.collection('blog').insertOne(newPost, (err, data) => {
+      if (err) {
+        res.status(500).json({err: err})
+      } else {
+        res.json({"ID": newPost._id})
+      }
+    })
+})
+
+const checkCode = (req, res, next) => {
   if(otpRegEx.test(req.body.code)) {
     next()
   } else {
     res.status(401).json({err: 'Invalid code'})
   }
-})
+}
 
-routes.post('/new', (req, res) => {
-  auth.checkCode(req.body.code, (err, valid, verified) => {
-    if (err || valid != true || !verified) {
-      res.status(401).json({err: err, valid: valid, verified: verified}) 
-    } else {
-      var newPost = {
-        title: req.body.blogpost.title,
-        content: req.body.blogpost.content,
-        date: new Date()
-      }
-      db.collection('blog').insert(newPost)
-      res.json({posted: true})
-    }
-  })
-})
-
-routes.post('/qr', (req, res) => {
+routes.post('/qr', checkCode, (req, res) => {
     auth.checkCode(req.body.code, (err, valid, verified) => {
       if (err || valid != true || verified) {
         res.status(401).json({err: err, valid: valid, verified: verified}) 
@@ -90,7 +123,7 @@ routes.post('/qr', (req, res) => {
     })
 })
 
-routes.post('/verify', (req, res) => {
+routes.post('/verify', checkCode, (req, res) => {
   auth.checkCode(req.body.code, (err, valid) => {
     if (valid) {
       db.collection('admin').update({}, {$set: {verified: true}})

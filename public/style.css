@@ -3,19 +3,27 @@
 @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css);
 
 html {
-  box-sizing: border-box; }
+  box-sizing: border-box; 
+}
 
 *, *:before, *:after {
-  box-sizing: inherit; }
+  box-sizing: inherit; 
+}
 
 html, body, div, select {
   padding: 0;
-  margin: 0; }
+  margin: 0; 
+}
 
 body {
   background-color: #222426; 
   color: whitesmoke;
-  margin: 0 30px;}
+  max-width: 750px;
+  border-style: none solid;
+  border-width: 2px;
+  border-color: black;
+  margin: 0 auto;
+}
 
 body, input, code, textarea {
   -webkit-font-smoothing: antialiased;
@@ -28,15 +36,14 @@ pre {
   whitespace: pre;
   color: black;
   padding: 5px 10px;
-/*   border: 2px silver solid; */
-  background: #f6f8fa;
+  background: silver;
   overflow: auto;
 }
 
 code {
   font-size: 85%;
   display: inline;
-  background: #f6f8fa;
+  background: silver;
   color: black;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
@@ -46,19 +53,19 @@ code::before, code::after {
 }
 
 pre code::before, pre code::after {
-  content: "";
+  content: normal;
 }
 
-a, a:active, a:visited {
+a, a:active, a:visited, a:focus {
   color: hotpink;
   text-decoration: none;
 }
-
+/* 
 a:hover {
   color: springgreen;
-}
+} */
 
-h2 {
+h1, h2, h3, h4, h5 {
   margin: 5px 0 0 0;
 }
 
@@ -81,8 +88,7 @@ textarea:focus, input:focus {
 }
 
 .part {
- margin: 3px 3px 0 3px;
- padding: 5px 20px;
+  padding: 5px 20px;
 }
 
 #blog-frame {
@@ -92,26 +98,34 @@ textarea:focus, input:focus {
 }
 
 #blog-header {
- font-family: 'Quicksand', sans-serif;
- font-size: 36px;
- text-align: center;
- padding: 20px 10px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 36px;
+  text-align: center;
+  padding: 20px 40px;
+  background: rgba(0,0,0,0.4);
 }
 
 #blog-menu {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+  background: rgba(0,0,0,0.4);
+  padding: 10px;
+  margin-bottom: 30px;
 }
 
 .blog-menu-item {
-  width: 33%;
+  font-family: 'Quicksand', sans-serif;
   text-align: center;
+  font-weight: bold;
 }
 
+
+.blog-posts {
+  padding: 0 30px; 
+}
 .blog-post {
   text-align: justify;
-  margin-bottom: 5px;
 }
 
 .blog-post-date {
@@ -128,8 +142,8 @@ textarea:focus, input:focus {
 }
 
 .newpost-content {
- height: 30%;
- margin: 5px 0;
+  height: 30%;
+  margin: 5px 0;
 }
 
 SVG {

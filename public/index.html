@@ -1,8 +1,9 @@
-<html>
+<html data-ng-app="colonApp">
 <head>
   <!-- Browser set up -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, minimal-ui">
+  <meta name="theme-color" content="#000" />
   <link rel="icon" href="https://cdn.glitch.com/2ebbf8d6-8762-4ea2-ae2d-97679fa390c0%2Ffavicon.ico?1491384838208" type="image/icon">
   <title>colon dot underscore dot space</title>
 
@@ -20,15 +21,17 @@
   <script src="home.js"></script>
 </head>
 
-<body data-ng-app="colonApp">
+<body data-ng-controller="blog">
   <div id="blog-frame">
     <div id="blog-header">colon dot underscore dot space</div> 
-    <div id="blog-menu" class="part">
+    <div id="blog-menu">
       <a href="/#!/about" class="blog-menu-item">About</a>
       <a href="/#!/home" class="blog-menu-item">Home</a>
-      <a href="/#!/new" class="blog-menu-item">New</a>
+      <a href="/#!/new" class="blog-menu-item" ng-show="loggedin">New</a>
+      <a href="/#!/login" class="blog-menu-item" ng-show="!loggedin">Log in</a>
+      <a href="/#!/logout" class="blog-menu-item" ng-show="loggedin">Log out</a>
     </div>
-    <div ng-view></div>
+    <div class="blog-posts" ng-view></div>
   </div>
 </body>
 </html>

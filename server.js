@@ -13,7 +13,10 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     process.exit(1)
   } else {
     console.log('Connected to mongo')
-
+   
+    var cookieParser = require('cookie-parser')
+    app.use(cookieParser('mySecret'))
+    
     var bodyParser = require('body-parser')
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
