@@ -15,15 +15,15 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.3/showdown.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css" rel="stylesheet" type="text/css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/sunburst.min.css" rel="stylesheet" type="text/css">
   <script src="/node_modules/ng-showdown/dist/ng-showdown.min.js"></script>
 
   <script src="home.js"></script>
 </head>
 
 <body data-ng-controller="blog">
-  <div id="blog-frame">
-    <div id="blog-header">colon dot underscore dot space</div> 
+  <div id="blog-cont">
+    <div id="blog-head">colon dot underscore dot space</div> 
     <div id="blog-menu">
       <a href="/#!/about" class="blog-menu-item">About</a>
       <a href="/#!/home" class="blog-menu-item">Home</a>
@@ -31,7 +31,7 @@
       <a href="/#!/login" class="blog-menu-item" ng-show="!loggedin">Log in</a>
       <a href="/#!/logout" class="blog-menu-item" ng-show="loggedin">Log out</a>
     </div>
-    <div class="blog-posts" ng-view></div>
+    <div class="blog-body" ng-view></div>
   </div>
 </body>
 </html>

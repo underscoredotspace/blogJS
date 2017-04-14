@@ -1,11 +1,11 @@
-<div class="blog-post part" ng-hide="hideEditor"><form>
+<div class="blog-post" ng-hide="hideEditor"><form>
 	<input placeholder="Heading" ng-model="blogpost.title" class="newpost-title"><br>
 	<textarea placeholder="Post Text" ng-model="blogpost.content" class="newpost-content"></textarea><br>
 	<button type="submit" ng-click="submitPost()">Submit</button>
 </form></div>
 
-<div class="blog-post part">
-	<h2>{{blogpost.title}}</h2>
+<div class="blog-post">
+	<h1>{{blogpost.title}}</h1>
   <div markdown-to-html="blogpost.content"></div>
   <div class="blog-post-date"><a href="/#!/new">{{blogpost.date|niceDate}}</a></div>
 </div>
