@@ -25,7 +25,7 @@ body {
   margin: 0 auto;
 }
 
-body, input, code, textarea {
+body, input, code, textarea, button {
   -webkit-font-smoothing: antialiased;
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 16px;
@@ -33,18 +33,15 @@ body, input, code, textarea {
 
 pre {
   display: block;
-  whitespace: pre;
-  color: black;
   padding: 5px 10px;
-  background: silver;
+  background: black;
   overflow: auto;
 }
 
 code {
   font-size: 85%;
   display: inline;
-  background: silver;
-  color: black;
+  background: black;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
@@ -60,10 +57,6 @@ a, a:active, a:visited, a:focus {
   color: hotpink;
   text-decoration: none;
 }
-/* 
-a:hover {
-  color: springgreen;
-} */
 
 h1, h2, h3, h4, h5 {
   margin: 5px 0 0 0;
@@ -71,10 +64,6 @@ h1, h2, h3, h4, h5 {
 
 p {
   margin-top: 0;
-}
-
-button {
-  line-height: 1em;
 }
 
 textarea, input {
@@ -87,17 +76,13 @@ textarea:focus, input:focus {
   outline: solid 1px hotpink;
 }
 
-.part {
-  padding: 5px 20px;
-}
-
-#blog-frame {
+#blog-cont {
   display: flex; 
   flex-direction: column;
   flex-shrink: 0;
 }
 
-#blog-header {
+#blog-head {
   font-family: 'Quicksand', sans-serif;
   font-size: 36px;
   text-align: center;
@@ -111,7 +96,6 @@ textarea:focus, input:focus {
   justify-content: space-around;
   background: rgba(0,0,0,0.4);
   padding: 10px;
-  margin-bottom: 30px;
 }
 
 .blog-menu-item {
@@ -121,11 +105,17 @@ textarea:focus, input:focus {
 }
 
 
-.blog-posts {
-  padding: 0 30px; 
+.blog-body {
+  padding: 40px;
 }
+
 .blog-post {
   text-align: justify;
+  margin-bottom: 40px;
+}
+
+.blog-post:last-of-type {
+  margin: 0;
 }
 
 .blog-post-date {
