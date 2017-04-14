@@ -26,7 +26,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
 
   $routeProvider
   .when('/about', {
-    template: '<div class="part"><h1>TODO</h1></div>',
+    template: '<div class="blog-post"><h1>TODO</h1></div>',
     controller: 'about'
   })
   .when('/home', {
@@ -226,16 +226,5 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     var options = {year: 'numeric', month: 'long', day: 'numeric'}
     var today  = new Date(d)
     return today.toLocaleDateString("en-GB",options)
-  }
-})
-
-.directive('a', function() {
-  return {
-    restrict: 'E', 
-    link: (scope, element, attribs) => {
-      element.bind('mouseup', () => {
-        element.blur()
-      })
-    }
   }
 })
