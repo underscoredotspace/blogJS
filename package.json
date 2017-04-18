@@ -12,7 +12,6 @@
     "body-parser": "^1.17.1",
     "otp.js": "^1.1.0",
     "bcrypt": "^1.0.2",
-    "ng-showdown": "^1.1.0",
     "cookie-parser": "^1.4.3"
   },
   "repository": {
