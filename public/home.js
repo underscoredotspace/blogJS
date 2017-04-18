@@ -53,7 +53,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     templateUrl: 'part/auth.html',
     controller: 'colonAuth'
   })
-  .otherwise({redirectTo:'/about'})
+  .otherwise({redirectTo:'/home'})
 })
 
 .controller('about', function() {})
