@@ -26,7 +26,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
 
   $routeProvider
   .when('/about', {
-    template: '<div class="blog-post"><h1>TODO</h1></div>',
+    templateUrl: 'part/about.html',
     controller: 'about'
   })
   .when('/home', {
