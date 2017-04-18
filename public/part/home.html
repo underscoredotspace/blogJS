@@ -1,5 +1,5 @@
 <div class="blog-post part" data-ng-repeat="blogpost in blogposts | orderBy:'-_id'">
 	<h1>{{blogpost.title}}</h1>
-  <div markdown-to-html="blogpost.content"></div>
+  <div data-ng-bind-html="blogpost.contentHTML|trustHTML"></div>
   <div class="blog-post-date"><a href="#" ng-href="/#!/post/{{blogpost._id}}">{{blogpost.date|niceDate}}</a></div>
 </div>

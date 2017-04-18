@@ -84,7 +84,18 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   }
 })
 
-.controller('colonHome', function($scope, $http){
+.controller('colonHome', function($scope, $http, storage, $showdown, $sce) {
+  storage.get('blog', function(err, data) {
+    if (!err && data) {
+      $scope.blogposts = data
+    } else {
+      console.error(err)
+      getFromDB()
+    }
+  })
+  
+  function getFromDB() {
+    console.log('getting from database')
     $http.get('/api/latest/5')
     .then(function(res) {
         if (res.status==204) {
@@ -95,12 +106,24 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
             date: new Date()
           }]
         } else {
-            $scope.blogposts = res.data
+          convertToHtml(res.data, function(data) {
+            $scope.blogposts = data
+            storage.set('blog', data)
+          })
         }
     }, function(res) {
         console.error(res)
     })
+  }
+  
+  function convertToHtml(posts, cb) {
+    posts.forEach(function(post, ndx) {
+      post.contentHTML = $showdown.makeHtml(post.content)
+    })
+    cb(posts)
+  }
 })
+
 .controller('colonPost', function($scope, $routeParams, $http, $location){
   $http.get('/api/post/' + $routeParams.id)
   .then(function(res) {
@@ -226,5 +249,23 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     var options = {year: 'numeric', month: 'long', day: 'numeric'}
     var today  = new Date(d)
     return today.toLocaleDateString("en-GB",options)
+  }
+})
+
+.filter('trustHTML', ['$sce', function ($sce) { 
+  return function (text) {
+    return $sce.trustAsHtml(text);
+  };    
+}])
+
+.service('storage', function() {
+  return {
+    set: function(key, data) {
+      window.localStorage.setItem(key, JSON.stringify(data))
+    },
+    get: function(key, cb) {
+      const data = JSON.parse(window.localStorage.getItem(key))
+      cb(null, data)
+    }
   }
 })

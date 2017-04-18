@@ -25,10 +25,6 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     app.use('/node_modules', express.static('node_modules'));
     
     app.set('json spaces', 2)
-    app.use((req, res, next) => {
-      res.setHeader('expires', 0)
-      next()
-    })
     app.use('/api', require('./api'))
 
     app.use((req, res) => {
