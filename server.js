@@ -22,7 +22,6 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     app.use(bodyParser.json())
 
     app.use(express.static('public'))
-    app.use('/node_modules', express.static('node_modules'));
     
     app.set('json spaces', 2)
     app.use('/api', require('./api'))

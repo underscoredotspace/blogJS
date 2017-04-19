@@ -88,6 +88,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   storage.get('blog', function(err, data) {
     if (!err && data) {
       $scope.blogposts = data
+      getFromDB()
     } else {
       console.error(err)
       getFromDB()
