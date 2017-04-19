@@ -1,6 +1,10 @@
 window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
 
-.config(($showdownProvider, $routeProvider) => {
+.config(($showdownProvider, $routeProvider, $compileProvider) => {
+  $compileProvider.debugInfoEnabled(false)
+  $compileProvider.commentDirectivesEnabled(false)
+  $compileProvider.cssClassDirectivesEnabled(false)
+  
   window.showdown.extension('codehighlight', function() {
     const htmlunencode = (text) => text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     return [
@@ -103,7 +107,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
           console.warn('no posts yet!')
           $scope.blogposts = [{
             title: 'Welcome',
-            content: 'This is your blog. Make a [post](/#!/new). ',
+            content: 'This is your blog. Make a <a href="/#!/new">post</a>. ',
             date: new Date()
           }]
         } else {
