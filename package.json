@@ -8,12 +8,12 @@
   },
   "dependencies": {
     "express": "^4.15.2",
-    "mongodb": "^2.2.25",
+    "mongodb": "^2.2.26",
     "body-parser": "^1.17.1",
     "otp.js": "^1.1.0",
     "bcrypt": "^1.0.2",
-    "ng-showdown": "^1.1.0",
-    "cookie-parser": "^1.4.3"
+    "cookie-parser": "^1.4.3",
+    "on-headers": "^1.0.1"
   },
   "repository": {
     "url": "https://glitch.com/edit/#!/welcome-project"

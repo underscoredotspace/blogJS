@@ -1,6 +1,10 @@
 window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
 
-.config(($showdownProvider, $routeProvider) => {
+.config(($showdownProvider, $routeProvider, $compileProvider) => {
+  $compileProvider.debugInfoEnabled(false)
+  $compileProvider.commentDirectivesEnabled(false)
+  $compileProvider.cssClassDirectivesEnabled(false)
+  
   window.showdown.extension('codehighlight', function() {
     const htmlunencode = (text) => text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     return [
@@ -84,34 +88,42 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   }
 })
 
-.controller('colonHome', function($scope, $http){
-    $http.get('/api/latest/5')
-    .then(function(res) {
-        if (res.status==204) {
-          console.warn('no posts yet!')
-          $scope.blogposts = [{
-            title: 'Welcome',
-            content: 'This is your blog. Make a [post](/#!/new). ',
-            date: new Date()
-          }]
+.controller('colonHome', function($scope, $showdown, $sce, storage) {
+  storage.getFromLS('blog', function(err, data) {
+    if (!err && data) {
+      $scope.blogposts = data
+      storage.getFromDB(null, function(err, data) {
+        if (!err) {
+          $scope.blogposts = data
         } else {
-            $scope.blogposts = res.data
+          console.error(err)
         }
-    }, function(res) {
-        console.error(res)
-    })
+      })
+    } else {
+      console.error(err)
+      storage.getFromDB(null, function(err, data) {
+        if (!err) {
+          $scope.blogposts = data
+        } else {
+          console.error(err)
+        }
+      })
+    }
+  })
 })
-.controller('colonPost', function($scope, $routeParams, $http, $location){
-  $http.get('/api/post/' + $routeParams.id)
-  .then(function(res) {
-     if (res.status==204) {
+
+.controller('colonPost', function($scope, $routeParams, $location, storage) {
+  storage.getFromDB($routeParams.id, function(err, data) {
+    if (!err) {
+      if (data.status==204) {
         console.info('Post doesn\'t exist')
        $location.path('/home')
       } else {
-          $scope.blogposts = res.data
+          $scope.blogposts = data
       }
-  }, function(res) {
-      console.error(res)
+    } else {
+      console.error(err)
+    }
   })
 })
 
@@ -226,5 +238,71 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     var options = {year: 'numeric', month: 'long', day: 'numeric'}
     var today  = new Date(d)
     return today.toLocaleDateString("en-GB",options)
+  }
+})
+
+.filter('trustHTML', ['$sce', function ($sce) { 
+  return function (text) {
+    return $sce.trustAsHtml(text);
+  };    
+}])
+
+.service('storage', function($http, $showdown) {
+  return {
+    saveToLS: function(key, data, cb) {
+      if (!cb) cb = console.error
+      try {
+        window.localStorage.setItem(key, JSON.stringify(data))
+        cb()
+      } catch(err) {
+        cb(err)
+      }
+    },
+    getFromLS: function(key, cb) {
+      try {
+        const data = JSON.parse(window.localStorage.getItem(key))
+        cb(null, data)
+      } catch(err) {
+        cb(err, null)
+      }
+    },
+    getFromDB: function(postID, cb) {
+      const self = this
+      let post
+      console.log('getting from database')
+      if (!postID) {
+        post = 'latest/5'
+      } else {
+        post = 'post/' + postID
+      }
+      console.log(post)
+      $http.get('/api/' + post)
+      .then(function(res) {
+          if (res.status==204) {
+            console.warn('no posts yet!')
+            const blogposts = [{
+              title: 'Welcome',
+              content: 'This is your blog. Make a <a href="/#!/new">post</a>. ',
+              date: new Date()
+            }]
+            cb(null, blogposts)
+          } else {
+            self.convertMD(res.data, function(data) {
+              if (data.length>1) {
+                self.saveToLS('blog', data)
+              }
+              cb(null, data)
+            })
+          }
+      }).catch(function(err) {
+          cb(err)
+      })
+    },
+    convertMD: function(posts, cb) {
+      posts.forEach(function(post, ndx) {
+        post.contentHTML = $showdown.makeHtml(post.content)
+      })
+      cb(posts)
+    }
   }
 })

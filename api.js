@@ -3,6 +3,11 @@ var db = require('./mongo')
 var auth = require("./auth.js")
 const otpRegEx = /^[0-9]{6}$/
 
+// routes.use((req, res, next) => {
+//   res.setHeader('expires', 0)
+//   next()
+// })
+
 routes.get('/logout', (req, res) => {
   res.clearCookie('qqBlog')
   res.json({loggedin: false})

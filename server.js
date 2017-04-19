@@ -13,6 +13,15 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     process.exit(1)
   } else {
     console.log('Connected to mongo')
+    
+    const onHeaders = require('on-headers')
+
+    app.use((req, res, next) => {
+      onHeaders(res, function() {
+        this.removeHeader('Cache-Control')
+      })
+      next()
+    })
    
     var cookieParser = require('cookie-parser')
     app.use(cookieParser('mySecret'))
@@ -22,13 +31,8 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     app.use(bodyParser.json())
 
     app.use(express.static('public'))
-    app.use('/node_modules', express.static('node_modules'));
     
     app.set('json spaces', 2)
-    app.use((req, res, next) => {
-      res.setHeader('expires', 0)
-      next()
-    })
     app.use('/api', require('./api'))
 
     app.use((req, res) => {
