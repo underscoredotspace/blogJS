@@ -1,10 +1,17 @@
 {
-  "name": "quixotic-quill",
-  "version": "0.0.1",
-  "description": "A MongoDB test",
+  "name": "underscoredotspace-blog",
+  "version": "1.0.0",
+  "description": "Colin's Blog",
+  "readme": "README.md",
+  "homepage": "https://underscore.space",
+  "author": "Colin Tindle <ampersand@underscore.space> (https://underscore.space)",
+  "license": "CC-BY-NC-4.0",
+  "bugs": {
+    "url": "https://github.com/underscoredotspace/ng-cleantoast/issues"
+  },
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "dependencies": {
     "express": "^4.15.2",
@@ -15,13 +22,19 @@
     "cookie-parser": "^1.4.3",
     "on-headers": "^1.0.1"
   },
-  "repository": {
-    "url": "https://glitch.com/edit/#!/welcome-project"
+  "devDependencies": {
+    "dotenv": "^4.0.0",
+    "nodemon": "^1.11.0"
   },
-  "license": "CC-BY-NC-4.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/underscoredotspace/blogJS"
+  },
   "keywords": [
     "node",
-    "glitch",
-    "express"
+    "mongodb",
+    "express",
+    "OTP",
+    "blog"
   ]
 }

@@ -1,3 +1,4 @@
+'use strict'
 var OTP = require('otp.js')
 var GA = OTP.googleAuthenticator
 var db = require('./mongo')

@@ -1,12 +1,8 @@
+'use strict'
 var routes = require('express').Router()
 var db = require('./mongo')
 var auth = require("./auth.js")
 const otpRegEx = /^[0-9]{6}$/
-
-// routes.use((req, res, next) => {
-//   res.setHeader('expires', 0)
-//   next()
-// })
 
 routes.get('/logout', (req, res) => {
   res.clearCookie('qqBlog')
@@ -69,10 +65,13 @@ routes.post('/login', (req, res) => {
 })
 
 routes.get('/adminCode', (req, res) => {
-  auth.getCode((err, code) => {
+  auth.getCode((err, code, verified) => {
     if (err) {
       console.error('Error getting admin code:', err)
       res.status(500).json({err: err})
+    } else if (verified) {
+      console.error('Already verifed. Code no longer available.')
+      res.status(403).json({err: 'Already verifed. Code no longer available.'})
     } else {
       console.log('Your admin code is:', code)
       res.sendStatus(200)
