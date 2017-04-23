@@ -14,7 +14,7 @@ routes.get('/loggedin', (req, res) => {
 })
 
 routes.get('/latest/:count', (req, res) => {
-  var countRegEx = /^[0-9]{0,2}$/
+  var countRegEx = /^[0-9]{0,2}$/   // Number from 0-20
   if (!countRegEx.test(req.params.count) || Number(req.params.count)>20) {
     res.status(400).json({err: 'count must be 1-20'})
   } else {
@@ -88,6 +88,9 @@ const checkCookie = (req, res, next) => {
 }
 
 routes.post('/new', checkCookie, (req, res) => {
+  if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
+    res.status(400).json({err: 'Post or title not long enough'})
+  } else {
     var newPost = {
       _id: db.ObjectId(),
       title: req.body.blogpost.title,
@@ -101,6 +104,7 @@ routes.post('/new', checkCookie, (req, res) => {
         res.json({"ID": newPost._id})
       }
     })
+  }
 })
 
 const checkCode = (req, res, next) => {

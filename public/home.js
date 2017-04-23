@@ -268,12 +268,11 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     },
     getFromDB: function(postID, cb) {
       const self = this
-      let post
       console.log('getting from database')
       if (!postID) {
-        post = 'latest/5'
+        const post = 'latest/5'
       } else {
-        post = 'post/' + postID
+        const post = 'post/' + postID
       }
       console.log(post)
       $http.get('/api/' + post)
