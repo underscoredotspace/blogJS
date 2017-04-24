@@ -1,4 +1,4 @@
-window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
+window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
 .config(($showdownProvider, $routeProvider, $compileProvider) => {
   $compileProvider.debugInfoEnabled(false)
@@ -62,14 +62,12 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
 
 .controller('about', function() {})
 
-.controller('blog', function($scope, $http) {
-  $http.get('/api/loggedin')
-  .then(function(res) {
-    $scope.loggedin = res.data.loggedin
-  }, function(res) {
-    console.error(res)
+.controller('blog', function($scope, $cookies) {
+  if($cookies.get('qqBlog')) {
+    $scope.loggedin = true
+  } else {
     $scope.loggedin = false
-  })
+  }
 })
 
 .controller('logout', function($scope, $http, $location) {
@@ -88,7 +86,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   }
 })
 
-.controller('colonHome', function($scope, $showdown, $sce, storage) {
+.controller('colonHome', function($scope, storage) {
   storage.getFromLS('blog', function(err, data) {
     if (!err && data) {
       $scope.blogposts = data
@@ -127,7 +125,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   })
 })
 
-.controller('colonNewPost', function($scope, $http, $filter, $location) {
+.controller('colonNewPost', function($scope, $http, $location) {
   if (!$scope.$parent.loggedin) {
     $location.path('/login')
   } else {
@@ -180,7 +178,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
 
 .controller('colonAuth', function($scope, $http, $sce) {
   $http({
-    url: '/api/adminCode',
+    url: '/api/setup/adminCode',
     method: "GET"
   }).then(function(res) {
     $scope.message = 'Check the server console to get your setup code'
@@ -193,7 +191,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   
   $scope.getQR = function() {
     $http({
-      url: '/api/QR',
+      url: '/api/setup/QR',
       method: "POST",
       data: {code: $scope.setupCode},
       headers: {'Content-Type': 'application/json'}
@@ -217,7 +215,7 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
   
   $scope.verify = function() {
     $http({
-      url: '/api/verify',
+      url: '/api/setup/verify',
       method: "POST",
       data: {code: $scope.gaCode},
       headers: {'Content-Type': 'application/json'}
@@ -269,12 +267,13 @@ window.angular.module('colonApp', ['ngRoute', 'ng-showdown'])
     getFromDB: function(postID, cb) {
       const self = this
       console.log('getting from database')
+      let post
       if (!postID) {
-        const post = 'latest/5'
+        post = 'latest/5'
       } else {
-        const post = 'post/' + postID
+        post = 'post/' + postID
       }
-      console.log(post)
+      // console.log(post)
       $http.get('/api/' + post)
       .then(function(res) {
           if (res.status==204) {

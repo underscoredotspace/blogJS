@@ -15,6 +15,10 @@
 
 # Routes
 - Server (/api/)
+  - Login (login)
+  - Logout (logout)
+  - Login status (loggedin)
+
   - Posts (posts/)
     - GET
       - latest/{count}
@@ -25,6 +29,12 @@
       - delete/{id}
     - PATCH
       - update/{id} (JSON body)
+    
+  - Setup (setup/)
+    - Get admin code (adminCode)
+    - Get QR code (QR)
+    - Verify QR response (verify)
+
 - Client (/)
   - Latest (posts[/{count}][/{page}])
   - Post (post/{id}

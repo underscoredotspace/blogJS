@@ -5,6 +5,7 @@ var db = require('./mongo')
 var crypto = require('crypto')
 var bcrypt = require('bcrypt')
 var lastCode = null
+const otpRegEx = /^[0-9]{6}$/
 
 var newSecret = (cb) => {
   crypto.randomBytes(256, (err, buf) => {
@@ -53,6 +54,14 @@ var getCode = (cb) =>{
   })
 }
 
+var validateCode = (req, res, next) => {
+  if(otpRegEx.test(req.body.code)) {
+    next()
+  } else {
+    res.status(401).json({err: 'Invalid code'})
+  }
+}
+
 var checkCode = (code, cb) => {
   if (code==lastCode) {
     cb('Wait for next code')
@@ -84,4 +93,4 @@ var qrCode = (cb) => {
   })
 }
 
-module.exports = {checkCode, qrCode, getCode}
+module.exports = {checkCode, qrCode, getCode, validateCode}
