@@ -25,7 +25,7 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     })
    
     var cookieParser = require('cookie-parser')
-    app.use(cookieParser('mySecret'))
+    app.use(cookieParser('7hIseGuy.H3_f$&*5'))
     
     var bodyParser = require('body-parser')
     app.use(bodyParser.urlencoded({ extended: false }))

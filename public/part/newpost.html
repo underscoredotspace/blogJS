@@ -1,10 +1,13 @@
-<div class="blog-post"><form>
-	<input placeholder="Heading" data-ng-model="blogpost.title" class="newpost-title"><br>
-	<textarea placeholder="Post Text" data-ng-model="blogpost.content" class="newpost-content"></textarea><br>
-	<button type="submit" data-ng-click="submitPost()">Submit</button>
+<div class="blog-post"><form name="newPost">
+	<input placeholder="Heading" data-ng-model="blogpost.title" class="newpost-title" required data-ng-minlength="5"><br>
+	<textarea placeholder="Post Text" data-ng-model="blogpost.content" class="newpost-content" required data-ng-minlength="5"></textarea><br>
+	<button data-ng-click="submitPost()" data-ng-disabled="newPost.$invalid||newPost.$pristine">Submit</button>
+	<label class="form-error" data-ng-show="newPost.$invalid">
+		Moar content please
+	</label>
 </form></div>
 
-<div class="blog-post">
+<div class="blog-post" data-ng-hide="newPost.$invalid">
 	<h1>{{blogpost.title}}</h1>
   <div markdown-to-html="blogpost.content"></div>
   <div class="blog-post-date"><a href="/#!/new">{{blogpost.date|niceDate}}</a></div>

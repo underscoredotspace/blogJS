@@ -27,6 +27,12 @@ body, input, code, textarea, button {
   font-size: 16px;
 }
 
+button {
+  border: 1px solid black;
+  margin: 5px 0;
+  background: whitesmoke;
+}
+
 iframe {
   width: 100%;
 }
@@ -132,8 +138,14 @@ textarea:focus, input:focus {
 }
 
 .newpost-content {
-  height: 30%;
+  height: 30vh;
   margin: 5px 0;
+}
+
+.form-error {
+  margin-left: 10px;
+  color: hotpink;
+  font-weight: bold;
 }
 
 SVG {

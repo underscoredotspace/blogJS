@@ -26,16 +26,22 @@ routes.get('/latest', (req, res) => {
 })
 
 routes.get('/post/:id', (req, res) => {
-  db.collection('blog').find({'_id': db.ObjectId(req.params.id)}).toArray((err, data) => {
-    if (err) {
-      res.status(500).json(err)
-    }
-    if (data.length==0) {
-      res.status(204).json({err:'no matches'})
-    } else {
-      res.json(data)
-    }
-  })
+  const oIDRegEx = /[0-9a-f]{24}/i
+  if (!oIDRegEx.test(req.params.id)) {
+    res.status(400).json('Bad post ID')
+  } else {
+    db.collection('blog').find({'_id': db.ObjectId(req.params.id)}).toArray((err, data) => {
+      if (err) {
+        console.error(err)
+        res.status(500).json('Error getting post')
+      }
+      if (data.length==0) {
+        res.status(204).json({err:'no matches'})
+      } else {
+        res.json(data)
+      }
+    })
+  }
 })
 
 routes.post('/login', auth.validateCode, (req, res) => {
@@ -83,22 +89,32 @@ routes.post('/new', checkCookie, (req, res) => {
 })
 
 routes.delete('/post/:id', checkCookie, (req, res) => {
-  db.collection('blog').remove({'_id': db.ObjectId(req.params.id)}, (err, data) => {
-    res.json({'err': err, 'res': data})
-  })
+  const oIDRegEx = /[0-9a-f]{24}/i
+  if (!oIDRegEx.test(req.params.id)) {
+    res.status(400).json('Bad post ID')
+  } else {
+    db.collection('blog').remove({'_id': db.ObjectId(req.params.id)}, (err, data) => {
+      res.json({'err': err, 'res': data})
+    })
+  }
 })
 
 routes.patch('/post/:id', checkCookie, (req, res) => {
-  if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
-    res.status(400).json({err: 'Post or title not long enough'})
+  const oIDRegEx = /[0-9a-f]{24}/i
+  if (!oIDRegEx.test(req.params.id)) {
+    res.status(400).json('Bad post ID')
   } else {
-    var thePost = {
-      title: req.body.blogpost.title,
-      content: req.body.blogpost.content
+    if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
+      res.status(400).json({err: 'Post or title not long enough'})
+    } else {
+      var thePost = {
+        title: req.body.blogpost.title,
+        content: req.body.blogpost.content
+      }
+      db.collection('blog').updateOne({'_id': db.ObjectId(req.params.id)}, {$set:thePost}, (err, data) => {
+        res.json({'err': err, 'res': data})
+      })
     }
-    db.collection('blog').updateOne({'_id': db.ObjectId(req.params.id)}, {$set:thePost}, (err, data) => {
-      res.json({'err': err, 'res': data})
-    })
   }
 })
 

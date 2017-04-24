@@ -303,6 +303,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       data: {code: $scope.gaCode},
       headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
+      $scope.$parent.loggedin = true
       $scope.qr = null
       $scope.message = null
       $scope.gaCode = null

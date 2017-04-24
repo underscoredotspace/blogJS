@@ -46,6 +46,7 @@ routes.post('/verify', auth.validateCode, (req, res) => {
     if (err || !valid) {
       res.status(401)
     }
+    res.cookie('qqBlog', true, { maxAge: 1000 * 60 * 60, signed: true })
     res.json({err: err, valid: valid})
   })
 })
