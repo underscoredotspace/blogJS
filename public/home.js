@@ -33,20 +33,24 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
     controller: 'about'
   })
   .when('/home', {
-    templateUrl: 'part/home.html',
-    controller: 'colonHome'
+    templateUrl: 'part/posts.html',
+    controller: 'home'
+  })
+  .when('/home/:page', {
+    templateUrl: 'part/posts.html',
+    controller: 'home'
   })
   .when('/post/:id', {
-    templateUrl: 'part/home.html',
-    controller: 'colonPost'
+    templateUrl: 'part/posts.html',
+    controller: 'post'
   })
   .when('/new', {
     templateUrl: 'part/newpost.html',
-    controller: 'colonNewPost'
+    controller: 'new'
   })
   .when('/edit/:id', {
     templateUrl: 'part/newpost.html',
-    controller: 'colonEditPost'
+    controller: 'edit'
   })
   .when('/login', {
     templateUrl: 'part/login.html',
@@ -57,8 +61,8 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
     controller: 'logout'
   })
   .when('/setup/', {
-    templateUrl: 'part/auth.html',
-    controller: 'colonAuth'
+    templateUrl: 'part/setup.html',
+    controller: 'setup'
   })
   .otherwise({redirectTo:'/home'})
 })
@@ -119,7 +123,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 })
 
-.controller('colonHome', function($scope, storage) {
+.controller('home', function($scope, storage) {
   storage.getFromLS('blog', function(err, data) {
     if (!err && data) {
       $scope.blogposts = data
@@ -143,7 +147,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   })
 })
 
-.controller('colonPost', function($scope, $routeParams, $location, storage) {
+.controller('post', function($scope, $routeParams, $location, storage) {
   storage.getFromDB($routeParams.id, function(err, data) {
     if (!err) {
       if (data.status==204) {
@@ -158,7 +162,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   })
 })
 
-.controller('colonNewPost', function($scope, $http, $location) {
+.controller('new', function($scope, $http, $location) {
   if (!$scope.$parent.loggedin) {
     $location.path('/login')
   } else {
@@ -189,7 +193,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 })
 
-.controller('colonEditPost', function($scope, storage, $routeParams, $location, $http) {
+.controller('edit', function($scope, storage, $routeParams, $location, $http) {
   storage.getFromDB($routeParams.id, function(err, data) {
     if (!err) {
       if (data.status==204) {
@@ -241,7 +245,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 })
 
-.controller('colonAuth', function($scope, $http, $sce) {
+.controller('setup', function($scope, $http, $sce) {
   $http({
     url: '/api/setup/adminCode',
     method: "GET"

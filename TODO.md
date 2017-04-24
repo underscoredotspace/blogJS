@@ -1,10 +1,10 @@
 # New Posts/Admin
-- Autosave drafts, probably to DB
-- Editing existing posts
-- Delete post
-- ~~Portal for admin with cookie instead of OTP for every request~~
-- Emoji picker
-- Image/other assets storage/picker
+- [ ] Autosave drafts, probably to DB
+- [x] Editing existing posts
+- [x] Delete post
+- [x] Portal for admin with cookie instead of OTP for every request
+- [ ] Emoji picker
+- [ ] Image/other assets storage/picker
 
 # Oh shit!
 - tests (w/ framework (jasmine?))
@@ -20,14 +20,17 @@
 
   - Posts (posts/)
     - GET
-      - latest/{count}
-      - id/{id}[/{count}]
+      - latest/{count}/{page}
+        - latest > latest/5/0
+        - latest/5 > latest/5/0
+      - /{id}
+      - /since/{id}
     - POST
-      - new (JSON body)
+      - [x] new (JSON body)
     - DELETE
       - [x] delete/{id}
     - PATCH
-      - update/{id} (JSON body)
+      - [x] update/{id} (JSON body)
     
   - Setup (setup/)
     - [x] Get admin code (adminCode)
@@ -35,7 +38,7 @@
     - [x] Verify QR response (verify)
 
 - Client (/)
-  - Latest (posts[/{count}][/{page}])
-  - Post (post/{id}
-  - New (/new)
-  - Edit/Delete (/edit/{id})
+  - [ ] home/{page}
+  - [x] post/{id}
+  - [x] /new
+  - [x] /edit/{id}
