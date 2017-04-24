@@ -88,6 +88,20 @@ routes.delete('/post/:id', checkCookie, (req, res) => {
   })
 })
 
+routes.patch('/post/:id', checkCookie, (req, res) => {
+  if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
+    res.status(400).json({err: 'Post or title not long enough'})
+  } else {
+    var thePost = {
+      title: req.body.blogpost.title,
+      content: req.body.blogpost.content
+    }
+    db.collection('blog').updateOne({'_id': db.ObjectId(req.params.id)}, {$set:thePost}, (err, data) => {
+      res.json({'err': err, 'res': data})
+    })
+  }
+})
+
 routes.use('/setup', require('./setup'))
 
 routes.use((req, res) => {

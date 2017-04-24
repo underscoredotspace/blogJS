@@ -3,7 +3,6 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 .config(($showdownProvider, $routeProvider, $compileProvider) => {
   $compileProvider.debugInfoEnabled(false)
   $compileProvider.commentDirectivesEnabled(false)
-  $compileProvider.cssClassDirectivesEnabled(false)
   
   window.showdown.extension('codehighlight', function() {
     const htmlunencode = (text) => text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
@@ -45,6 +44,10 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
     templateUrl: 'part/newpost.html',
     controller: 'colonNewPost'
   })
+  .when('/edit/:id', {
+    templateUrl: 'part/newpost.html',
+    controller: 'colonEditPost'
+  })
   .when('/login', {
     templateUrl: 'part/login.html',
     controller: 'login'
@@ -73,7 +76,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 .directive('blogPost', function() {
   return {
     restrict: 'C',
-    controller: function($scope, $http, $filter, storage) {
+    controller: function($scope, $http, $filter, storage, $location) {
       $scope.postDelete = function(id) {
         $http({
           method: 'delete',
@@ -83,6 +86,9 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
           console.log('deleted', id)
           $scope.$parent.blogposts = $filter('filter')($scope.$parent.blogposts, {'_id': '!' + id});
           storage.saveToLS('blog', $scope.$parent.blogposts)
+          if($location.path() == '/post/' + id) {
+            $location.path('/')
+          }
         }).catch(function(err, res) {
           console.log(err)
           console.log(res)
@@ -91,6 +97,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
       $scope.postEdit = function(id) {
         console.log('edit', id)
+        $location.path('/edit/' + id)
       }
     }
   }
@@ -179,6 +186,38 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
           console.error(err.data)
       })
     }
+  }
+})
+
+.controller('colonEditPost', function($scope, storage, $routeParams, $location, $http) {
+  storage.getFromDB($routeParams.id, function(err, data) {
+    if (!err) {
+      if (data.status==204) {
+        console.info('Post doesn\'t exist')
+        $location.path('/home')
+      } else {
+        $scope.blogpost = data[0]
+      }
+    } else {
+      console.error(err)
+    }
+  })
+
+  $scope.submitPost = function() {
+      var blogpost = {
+        title: $scope.blogpost.title,
+        content: $scope.blogpost.content
+      }
+      $http({
+          url: '/api/post/'+$routeParams.id,
+          method: "PATCH",
+          data: {blogpost: blogpost},
+          headers: {'Content-Type': 'application/json'}
+      }).then(function(res) {
+        $location.path('/post/'+ $routeParams.id)
+      }, function(err) {
+        console.error(err.data)
+      })
   }
 })
 
@@ -299,7 +338,6 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       } else {
         post = 'post/' + postID
       }
-      // console.log(post)
       $http.get('/api/' + post)
       .then(function(res) {
           if (res.status==204) {
