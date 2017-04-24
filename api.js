@@ -82,6 +82,12 @@ routes.post('/new', checkCookie, (req, res) => {
   }
 })
 
+routes.delete('/post/:id', checkCookie, (req, res) => {
+  db.collection('blog').remove({'_id': db.ObjectId(req.params.id)}, (err, data) => {
+    res.json({'err': err, 'res': data})
+  })
+})
+
 routes.use('/setup', require('./setup'))
 
 routes.use((req, res) => {

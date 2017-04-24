@@ -62,11 +62,37 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
 .controller('about', function() {})
 
-.controller('blog', function($scope, $cookies) {
+.controller('blog', function($scope, $cookies, $http, $filter) {
   if($cookies.get('qqBlog')) {
     $scope.loggedin = true
   } else {
     $scope.loggedin = false
+  }
+})
+
+.directive('blogPost', function() {
+  return {
+    restrict: 'C',
+    controller: function($scope, $http, $filter, storage) {
+      $scope.postDelete = function(id) {
+        $http({
+          method: 'delete',
+          url: '/api/post/' + id,
+          headers: {'Content-Type': 'application/json'}
+        }).then(function(res) {
+          console.log('deleted', id)
+          $scope.$parent.blogposts = $filter('filter')($scope.$parent.blogposts, {'_id': '!' + id});
+          storage.saveToLS('blog', $scope.$parent.blogposts)
+        }).catch(function(err, res) {
+          console.log(err)
+          console.log(res)
+        })
+      }
+
+      $scope.postEdit = function(id) {
+        console.log('edit', id)
+      }
+    }
   }
 })
 
