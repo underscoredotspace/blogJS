@@ -35,6 +35,7 @@
       <a href="/#!/login" class="blog-menu-item" data-ng-show="!loggedin">Log in</a>
       <a href="/#!/logout" class="blog-menu-item" data-ng-show="loggedin">Log out</a>
     </div>
+    <div class="blog-error" data-ng-show="error" data-ng-bind="error"></div>
     <div class="blog-body" data-ng-view></div>
   </div>
 </body>

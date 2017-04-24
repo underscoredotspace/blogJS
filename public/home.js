@@ -147,19 +147,33 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   })
 })
 
-.controller('post', function($scope, $routeParams, $location, storage) {
-  storage.getFromDB($routeParams.id, function(err, data) {
-    if (!err) {
-      if (data.status==204) {
-        console.info('Post doesn\'t exist')
-       $location.path('/home')
-      } else {
-          $scope.blogposts = data
-      }
-    } else {
-      console.error(err)
+.controller('post', function($scope, $routeParams, $location, $timeout, storage) {
+  function postError(err, gohome) {
+    $scope.$parent.error = err
+    if (gohome) {
+      $timeout(function() {
+        $scope.$parent.error = null
+        $location.path('/home')
+      }, 3000)
     }
-  })
+  }
+
+  const oIDRegEx = /[0-9a-fA-F]{24}/i
+  if (!oIDRegEx.test($routeParams.id)) {
+    postError("Invalid post. Going home...", true)
+  } else {
+    storage.getFromDB($routeParams.id, function(err, data) {
+      if (!err) {
+        if (data.status==204) {
+          postError("Invalid post. Going home...", true)
+        } else {
+          $scope.blogposts = data
+        }
+      } else {
+        postError("Error getting post")
+      }
+    })
+  }
 })
 
 .controller('new', function($scope, $http, $location) {

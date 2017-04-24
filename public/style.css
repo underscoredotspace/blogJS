@@ -105,7 +105,7 @@ textarea:focus, input:focus {
   font-weight: bold;
 }
 
-.blog-body {
+.blog-body, .blog-error {
   padding: 40px;
 }
 
