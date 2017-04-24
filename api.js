@@ -3,15 +3,6 @@ var routes = require('express').Router()
 var db = require('./mongo')
 var auth = require("./auth.js")
 
-routes.get('/logout', (req, res) => {
-  res.clearCookie('qqBlog')
-  res.json({loggedin: false})
-})
-
-routes.get('/loggedin', (req, res) => {
-  res.json({loggedin: !(!req.signedCookies.qqBlog)})
-})
-
 routes.get('/latest/:count', (req, res) => {
   var countRegEx = /^[0-9]{0,2}$/   // Number from 0-20
   if (!countRegEx.test(req.params.count) || Number(req.params.count)>20) {
@@ -56,6 +47,11 @@ routes.post('/login', auth.validateCode, (req, res) => {
       res.json({loggedin: true})
     }
   })
+})
+
+routes.get('/logout', (req, res) => {
+  res.clearCookie('qqBlog')
+  res.json({loggedin: false})
 })
 
 const checkCookie = (req, res, next) => {

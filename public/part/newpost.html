@@ -1,7 +1,7 @@
-<div class="blog-post" ng-hide="hideEditor"><form>
-	<input placeholder="Heading" ng-model="blogpost.title" class="newpost-title"><br>
-	<textarea placeholder="Post Text" ng-model="blogpost.content" class="newpost-content"></textarea><br>
-	<button type="submit" ng-click="submitPost()">Submit</button>
+<div class="blog-post"><form>
+	<input placeholder="Heading" data-ng-model="blogpost.title" class="newpost-title"><br>
+	<textarea placeholder="Post Text" data-ng-model="blogpost.content" class="newpost-content"></textarea><br>
+	<button type="submit" data-ng-click="submitPost()">Submit</button>
 </form></div>
 
 <div class="blog-post">
