@@ -1,11 +1,13 @@
 window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
-.config(($showdownProvider, $routeProvider, $compileProvider) => {
+.config(function ($showdownProvider, $routeProvider, $compileProvider) {
   $compileProvider.debugInfoEnabled(false)
   $compileProvider.commentDirectivesEnabled(false)
   
   window.showdown.extension('codehighlight', function() {
-    const htmlunencode = (text) => text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    const htmlunencode = function(text) {
+      return text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    }
     return [
       {
         type: 'output',
@@ -243,7 +245,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   if ($scope.$parent.loggedin) {
     $location.path('/home')
   } else {
-    $scope.login = () => {
+    $scope.login = function() {
       $http({
           url: '/api/login',
           method: "POST",
