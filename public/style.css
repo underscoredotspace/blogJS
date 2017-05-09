@@ -19,6 +19,7 @@ body {
   border-width: 2px;
   border-color: black;
   margin: 0 auto;
+  min-height: 100vh;
 }
 
 body, input, code, textarea, button {
@@ -31,10 +32,6 @@ button {
   border: 1px solid black;
   margin: 5px 0;
   background: whitesmoke;
-}
-
-iframe {
-  width: 100%;
 }
 
 pre {
