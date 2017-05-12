@@ -1,6 +1,6 @@
 window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
-.config(function ($showdownProvider, $routeProvider, $compileProvider) {
+.config(['$showdownProvider', '$routeProvider', '$compileProvider', function ($showdownProvider, $routeProvider, $compileProvider) {
   $compileProvider.debugInfoEnabled(false)
   $compileProvider.commentDirectivesEnabled(false)
   
@@ -67,22 +67,22 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
     controller: 'setup'
   })
   .otherwise({redirectTo:'/home'})
-})
+}])
 
 .controller('about', function() {})
 
-.controller('blog', function($scope, $cookies, $http, $filter) {
+.controller('blog', ['$scope', '$cookies', '$http', '$filter', function($scope, $cookies, $http, $filter) {
   if($cookies.get('qqBlog')) {
     $scope.loggedin = true
   } else {
     $scope.loggedin = false
   }
-})
+}])
 
 .directive('blogPost', function() {
   return {
     restrict: 'C',
-    controller: function($scope, $http, $filter, storage, $location) {
+    controller: ['$scope', '$http', '$filter', 'storage', '$location', function($scope, $http, $filter, storage, $location) {
       $scope.postDelete = function(id) {
         $http({
           method: 'delete',
@@ -105,11 +105,11 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
         console.log('edit', id)
         $location.path('/edit/' + id)
       }
-    }
+    }]
   }
 })
 
-.controller('logout', function($scope, $http, $location) {
+.controller('logout', ['$scope', '$http', '$location', function($scope, $http, $location) {
   if (!$scope.$parent.loggedin) {
     $location.path('/home')
   } else {
@@ -123,9 +123,9 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       $location.path('/home')
     })
   }
-})
+}])
 
-.controller('home', function($scope, storage) {
+.controller('home', ['$scope', 'storage', function($scope, storage) {
   storage.getFromLS('blog', function(err, data) {
     if (!err && data) {
       $scope.blogposts = data
@@ -147,9 +147,9 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       })
     }
   })
-})
+}])
 
-.controller('post', function($scope, $routeParams, $location, $timeout, storage) {
+.controller('post', ['$scope', '$routeParams', '$location', '$timeout', 'storage', function($scope, $routeParams, $location, $timeout, storage) {
   function postError(err, gohome) {
     $scope.$parent.error = err
     if (gohome) {
@@ -176,9 +176,9 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       }
     })
   }
-})
+}])
 
-.controller('new', function($scope, $http, $location) {
+.controller('new', ['$scope', '$http', '$location', function($scope, $http, $location) {
   if (!$scope.$parent.loggedin) {
     $location.path('/login')
   } else {
@@ -207,9 +207,9 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       })
     }
   }
-})
+}])
 
-.controller('edit', function($scope, storage, $routeParams, $location, $http) {
+.controller('edit', ['$scope', 'storage', '$routeParams', '$location', '$http', function($scope, storage, $routeParams, $location, $http) {
   storage.getFromDB($routeParams.id, function(err, data) {
     if (!err) {
       if (data.status==204) {
@@ -239,9 +239,9 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
         console.error(err.data)
       })
   }
-})
+}])
 
-.controller('login', function($scope, $http, $location) {
+.controller('login', ['$scope', '$http', '$location', function($scope, $http, $location) {
   if ($scope.$parent.loggedin) {
     $location.path('/home')
   } else {
@@ -259,9 +259,9 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       })
     }
   }
-})
+}])
 
-.controller('setup', function($scope, $http, $sce) {
+.controller('setup', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
   $http({
     url: '/api/setup/adminCode',
     method: "GET"
@@ -315,7 +315,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       console.error(err.data)
     })
   }
-})
+}])
   
 .filter('niceDate', function() {
   return function(d) {
@@ -331,7 +331,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   };    
 }])
 
-.service('storage', function($http, $showdown) {
+.service('storage', ['$http', '$showdown', function($http, $showdown) {
   return {
     saveToLS: function(key, data, cb) {
       if (!cb) cb = console.error
@@ -353,7 +353,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
     getFromDB: function(postID, cb) {
       const self = this
       console.log('getting from database')
-      let post
+      var post
       if (!postID) {
         post = 'latest/5'
       } else {
@@ -388,4 +388,4 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       cb(posts)
     }
   }
-})
+}])

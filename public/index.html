@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ng-app="colonApp">
+<html lang="en" data-ng-app="colonApp" ng-strict-di>
 <head>
   <!-- Browser set up -->
   <meta charset="utf-8">
@@ -21,22 +21,22 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.4/showdown.min.js" integrity="sha256-zA+ZIy6Tri6PReZFQ8DksaeqShqWgMi4EU4ZH0hDfys=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js" integrity="sha256-3SFEu3qBPVRitcXI7ITnBKtwkYmoqF7ap4xI5dEexaY=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ng-showdown/1.1.0/ng-showdown.min.js" integrity="sha256-9bwOmdcDBxHlhIMpldChdtUiq93qFKpWlr2TGdL/daw=" crossorigin="anonymous"></script>
-
-  <script src="home.js"></script>
 </head>
 
 <body data-ng-controller="blog">
   <div id="blog-cont">
     <div id="blog-head">underscore . space</div> 
     <div id="blog-menu">
-      <a href="/#!/about" class="blog-menu-item">About</a>
-      <a href="/#!/home" class="blog-menu-item">Home</a>
-      <a href="/#!/new" class="blog-menu-item" data-ng-show="loggedin">New</a>
-      <a href="/#!/login" class="blog-menu-item" data-ng-show="!loggedin">Log in</a>
-      <a href="/#!/logout" class="blog-menu-item" data-ng-show="loggedin">Log out</a>
+      <a href="#!/about" class="blog-menu-item">About</a>
+      <a href="#!/home" class="blog-menu-item">Home</a>
+      <a href="#!/new" class="blog-menu-item" data-ng-show="loggedin">New</a>
+      <a href="#!/login" class="blog-menu-item" data-ng-show="!loggedin">Log in</a>
+      <a href="#!/logout" class="blog-menu-item" data-ng-show="loggedin">Log out</a>
     </div>
     <div class="blog-error" data-ng-show="error" data-ng-bind="error"></div>
     <div class="blog-body" data-ng-view></div>
   </div>
+  
+  <script src="home.min.js"></script>
 </body>
 </html>

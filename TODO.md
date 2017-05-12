@@ -1,17 +1,23 @@
+# Main
+- [ ] Have individual posts saved to LocalStorage instead of one big (bad) blob
+- [ ] Only update LocalStorage if there's been a change
+- [ ] Only reload blogs to scope if there's a difference from LocalStorage
+
+
 # New Posts/Admin
 - [ ] Autosave drafts, probably to DB
 - [x] Editing existing posts
 - [x] Delete post
-- [x] Portal for admin with cookie instead of OTP for every request
+- [x] ~~Portal for~~ admin with cookie instead of OTP for every request
 - [ ] Emoji picker
 - [ ] Image/other assets storage/picker
 
 # Oh shit!
-- tests (w/ framework (jasmine?))
-- Travis?
-- Grunt tasks
-  - Minification
-  - Run tests
+- [ ] tests (w/ framework (jasmine?))
+- [ ] Travis?
+- [ ] Grunt tasks
+  - [ ] Minification
+  - [ ] Run tests
 
 # Routes
 - Server (/api/)
