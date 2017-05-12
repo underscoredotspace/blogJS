@@ -11,7 +11,7 @@
   },
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon server",
     "test": "grunt test",
     "cover": "istanbul cover ./tests/*.spec.js && istanbul-coveralls"
   },

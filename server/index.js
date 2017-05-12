@@ -31,7 +31,7 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
 
-    app.use(express.static('public'))
+    app.use(express.static('client'))
     
     app.set('json spaces', 2)
     app.use('/api', require('./api'))

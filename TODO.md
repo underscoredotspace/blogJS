@@ -14,10 +14,11 @@
 
 # Oh shit!
 - [ ] tests (w/ framework (jasmine?))
-- [ ] Travis?
-- [ ] Grunt tasks
-  - [ ] Minification
-  - [ ] Run tests
+- [ ] TravisCI
+
+# Grunt tasks
+  - [x] Minification
+  - [x] Run tests
 
 # Routes
 - Server (/api/)
