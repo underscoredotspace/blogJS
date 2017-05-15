@@ -4,3 +4,4 @@ node_modules/
 .grunt/
 .glitch-assets
 _SpecRunner.html
+coverage/

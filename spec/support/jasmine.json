@@ -1,0 +1,12 @@
+{
+  "spec_dir": "spec",
+  "spec_files": [
+    "**/*.[sS]pec.js"
+  ],
+  "helpers": [
+    "https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular.min.js",
+    "https://code.angularjs.org/1.6.4/angular-mocks.js"
+  ],
+  "stopSpecOnExpectationFailure": false,
+  "random": false
+}
