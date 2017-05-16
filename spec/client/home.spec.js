@@ -1,6 +1,4 @@
-// Currently there are no tests
-
-describe('dummy test', function(){
+describe('There are no tests', function(){
   it('should fail', function() {
     expect(1).toBeLessThan(1)
   })
