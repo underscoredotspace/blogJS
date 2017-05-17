@@ -16,8 +16,15 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular.min.js',
+      'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-cookies.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-route.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-sanitize.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.4/showdown.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/ng-showdown/1.1.0/ng-showdown.min.js',
+      'https://code.angularjs.org/1.6.4/angular-mocks.js',
       'client/home.js',
-      'spec/*.spec.js'
+      'spec/**/*.spec.js'
     ],
 
 
@@ -26,8 +33,18 @@ module.exports = function(config) {
       '*.min.js'
     ],
 
-    reporters: ['progress'],
+    // coverage reporter generates the coverage
+    reporters: ['progress', 'coverage', 'coveralls'],
+
     preprocessors: {
+      // source files, that you wanna generate coverage for
+      // do not include tests or libraries
+      // (these files will be instrumented by Istanbul)
+      'client/*.js': ['coverage']
+    },
+    coverageReporter: {
+      type : 'lcov',
+      dir : 'coverage/'
     },
 
     // web server port
@@ -44,7 +61,7 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
+    autoWatch: true,
 
 
     // start these browsers
@@ -54,7 +71,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true,
+    singleRun: false,
 
     // Concurrency level
     // how many browser should be started simultaneous

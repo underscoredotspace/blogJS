@@ -27,9 +27,9 @@
 
   - Posts (posts/)
     - GET
-      - latest/{count}/{page}
-        - latest > latest/5/0
-        - latest/5 > latest/5/0
+      - /{count}/{page}
+        - / > /5/0
+        - /5 > /5/0
       - /{id}
       - /since/{id}
     - POST

@@ -1,4 +1,4 @@
-window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
+angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
 .config(['$showdownProvider', '$routeProvider', '$compileProvider', function ($showdownProvider, $routeProvider, $compileProvider) {
   $compileProvider.debugInfoEnabled(false)
@@ -32,7 +32,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   $routeProvider
   .when('/about', {
     templateUrl: 'part/about.html',
-    controller: 'about'
+    controller: function() {}
   })
   .when('/home', {
     templateUrl: 'part/posts.html',
@@ -69,8 +69,6 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   .otherwise({redirectTo:'/home'})
 }])
 
-.controller('about', function() {})
-
 .controller('blog', ['$scope', '$cookies', '$http', '$filter', function($scope, $cookies, $http, $filter) {
   if($cookies.get('qqBlog')) {
     $scope.loggedin = true
@@ -82,7 +80,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 .directive('blogPost', function() {
   return {
     restrict: 'C',
-    controller: ['$scope', '$http', '$filter', 'storage', '$location', function($scope, $http, $filter, storage, $location) {
+    controller: ['$scope', '$http', '$filter', '$location', function($scope, $http, $filter, $location) {
       $scope.postDelete = function(id) {
         $http({
           method: 'delete',
@@ -91,7 +89,6 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
         }).then(function(res) {
           console.log('deleted', id)
           $scope.$parent.blogposts = $filter('filter')($scope.$parent.blogposts, {'_id': '!' + id});
-          storage.saveToLS('blog', $scope.$parent.blogposts)
           if($location.path() == '/post/' + id) {
             $location.path('/')
           }
@@ -125,31 +122,17 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 }])
 
-.controller('home', ['$scope', 'storage', function($scope, storage) {
-  storage.getFromLS('blog', function(err, data) {
-    if (!err && data) {
+.controller('home', ['$scope', 'blogService', function($scope, blog) {
+  blog.get(null, function(err, data) {
+    if (!err) {
       $scope.blogposts = data
-      storage.getFromDB(null, function(err, data) {
-        if (!err) {
-          $scope.blogposts = data
-        } else {
-          console.error(err)
-        }
-      })
     } else {
       console.error(err)
-      storage.getFromDB(null, function(err, data) {
-        if (!err) {
-          $scope.blogposts = data
-        } else {
-          console.error(err)
-        }
-      })
     }
   })
 }])
 
-.controller('post', ['$scope', '$routeParams', '$location', '$timeout', 'storage', function($scope, $routeParams, $location, $timeout, storage) {
+.controller('post', ['$scope', '$routeParams', '$location', '$timeout', 'blogService', function($scope, $routeParams, $location, $timeout, blog) {
   function postError(err, gohome) {
     $scope.$parent.error = err
     if (gohome) {
@@ -164,7 +147,7 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   if (!oIDRegEx.test($routeParams.id)) {
     postError("Invalid post. Going home...", true)
   } else {
-    storage.getFromDB($routeParams.id, function(err, data) {
+    blog.get($routeParams.id, function(err, data) {
       if (!err) {
         if (data.status==204) {
           postError("Invalid post. Going home...", true)
@@ -209,8 +192,8 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 }])
 
-.controller('edit', ['$scope', 'storage', '$routeParams', '$location', '$http', function($scope, storage, $routeParams, $location, $http) {
-  storage.getFromDB($routeParams.id, function(err, data) {
+.controller('edit', ['$scope', 'blogService', '$routeParams', '$location', '$http', function($scope, blog, $routeParams, $location, $http) {
+  blog.get($routeParams.id, function(err, data) {
     if (!err) {
       if (data.status==204) {
         console.info('Post doesn\'t exist')
@@ -331,28 +314,10 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   };    
 }])
 
-.service('storage', ['$http', '$showdown', function($http, $showdown) {
+.service('blogService', ['$http', '$showdown', function($http, $showdown) {
   return {
-    saveToLS: function(key, data, cb) {
-      if (!cb) cb = console.error
-      try {
-        window.localStorage.setItem(key, JSON.stringify(data))
-        cb()
-      } catch(err) {
-        cb(err)
-      }
-    },
-    getFromLS: function(key, cb) {
-      try {
-        const data = JSON.parse(window.localStorage.getItem(key))
-        cb(null, data)
-      } catch(err) {
-        cb(err, null)
-      }
-    },
-    getFromDB: function(postID, cb) {
+    get: function(postID, cb) {
       const self = this
-      console.log('getting from database')
       var post
       if (!postID) {
         post = 'latest/5'
@@ -371,9 +336,6 @@ window.angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
             cb(null, blogposts)
           } else {
             self.convertMD(res.data, function(data) {
-              if (data.length>1) {
-                self.saveToLS('blog', data)
-              }
               cb(null, data)
             })
           }

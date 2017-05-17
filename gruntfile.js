@@ -7,8 +7,8 @@ module.exports = function(grunt) {
         }
       },
       build: {
-        src: 'public/home.js',
-        dest: 'public/home.min.js'
+        src: 'client/home.js',
+        dest: 'client/home.min.js'
       }
     }
   });
