@@ -13,6 +13,7 @@
   "scripts": {
     "start": "nodemon server",
     "test": "karma start",
+    "test-local": "karma start --auto-watch",
     "cover": "karma start --reporters coverage,coveralls"
   },
   "dependencies": {
