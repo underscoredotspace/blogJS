@@ -5,7 +5,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   $compileProvider.commentDirectivesEnabled(false)
   
   window.showdown.extension('codehighlight', function() {
-    const htmlunencode = function(text) {
+    function htmlunencode(text) {
       return text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     }
     return [
@@ -89,7 +89,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
         }).then(function(res) {
           console.log('deleted', id)
           $scope.$parent.blogposts = $filter('filter')($scope.$parent.blogposts, {'_id': '!' + id});
-          if($location.path() == '/post/' + id) {
+          if($location.path() === '/post/' + id) {
             $location.path('/')
           }
         }).catch(function(err, res) {
@@ -145,17 +145,17 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
   const oIDRegEx = /[0-9a-fA-F]{24}/i
   if (!oIDRegEx.test($routeParams.id)) {
-    postError("Invalid post. Going home...", true)
+    postError('Invalid post. Going home...', true)
   } else {
     blog.get($routeParams.id, function(err, data) {
       if (!err) {
-        if (data.status==204) {
-          postError("Invalid post. Going home...", true)
+        if (data.status===204) {
+          postError('Invalid post. Going home...', true)
         } else {
           $scope.blogposts = data
         }
       } else {
-        postError("Error getting post")
+        postError('Error getting post')
       }
     })
   }
@@ -166,8 +166,8 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
     $location.path('/login')
   } else {
     $scope.blogpost = {
-      title:  "",
-      content:    "",
+      title: '',
+      content: '',
       date: new Date()
     }
 
@@ -178,7 +178,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       }
       $http({
           url: '/api/new',
-          method: "POST",
+          method: 'POST',
           data: {blogpost: blogpost},
           headers: {'Content-Type': 'application/json'}
       }).then(function(res) {
@@ -195,7 +195,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 .controller('edit', ['$scope', 'blogService', '$routeParams', '$location', '$http', function($scope, blog, $routeParams, $location, $http) {
   blog.get($routeParams.id, function(err, data) {
     if (!err) {
-      if (data.status==204) {
+      if (data.status===204) {
         console.info('Post doesn\'t exist')
         $location.path('/home')
       } else {
@@ -213,7 +213,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       }
       $http({
           url: '/api/post/'+$routeParams.id,
-          method: "PATCH",
+          method: 'PATCH',
           data: {blogpost: blogpost},
           headers: {'Content-Type': 'application/json'}
       }).then(function(res) {
@@ -231,7 +231,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
     $scope.login = function() {
       $http({
           url: '/api/login',
-          method: "POST",
+          method: 'POST',
           data: {code: $scope.gaCode},
           headers: {'Content-Type': 'application/json'}
       }).then(function(res) {
@@ -247,7 +247,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 .controller('setup', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
   $http({
     url: '/api/setup/adminCode',
-    method: "GET"
+    method: 'GET'
   }).then(function(res) {
     $scope.message = 'Check the server console to get your setup code'
   }, function(err) {
@@ -260,7 +260,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   $scope.getQR = function() {
     $http({
       url: '/api/setup/QR',
-      method: "POST",
+      method: 'POST',
       data: {code: $scope.setupCode},
       headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
@@ -284,7 +284,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   $scope.verify = function() {
     $http({
       url: '/api/setup/verify',
-      method: "POST",
+      method: 'POST',
       data: {code: $scope.gaCode},
       headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
@@ -304,7 +304,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   return function(d) {
     var options = {year: 'numeric', month: 'long', day: 'numeric'}
     var today  = new Date(d)
-    return today.toLocaleDateString("en-GB",options)
+    return today.toLocaleDateString('en-GB',options)
   }
 })
 
@@ -326,7 +326,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       }
       $http.get('/api/' + post)
       .then(function(res) {
-          if (res.status==204) {
+          if (res.status===204) {
             console.warn('no posts yet!')
             const blogposts = [{
               title: 'Welcome',

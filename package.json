@@ -12,8 +12,8 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server",
-    "test": "karma start",
-    "test-local": "karma start --auto-watch",
+    "test": "karma start --no-auto-watch",
+    "test-local": "karma start",
     "cover": "karma start --reporters coverage,coveralls"
   },
   "dependencies": {
