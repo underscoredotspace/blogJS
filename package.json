@@ -9,35 +9,37 @@
   "bugs": {
     "url": "https://github.com/underscoredotspace/ng-cleantoast/issues"
   },
-  "main": "server.js",
+  "main": "app/server/index.js",
   "scripts": {
-    "start": "nodemon server",
-    "test": "karma start --no-auto-watch",
-    "test-local": "karma start",
-    "cover": "karma start --reporters coverage,coveralls"
+    "start": "node app/server",
+    "dev": "nodemon app/server",
+    "test": "karma start",
+    "travis": "karma start karma-travis.conf.js && npm run min-test",
+    "browser-test": "karma start --browsers Chrome,Safari,Firefox",
+    "min-test": "grunt min && karma start karma-ugly.conf.js"
   },
   "dependencies": {
-    "express": "^4.15.2",
-    "mongodb": "^2.2.26",
-    "body-parser": "^1.17.1",
-    "otp.js": "^1.1.0",
     "bcrypt": "^1.0.2",
+    "body-parser": "^1.17.2",
     "cookie-parser": "^1.4.3",
-    "on-headers": "^1.0.1"
+    "express": "^4.15.3",
+    "mongodb": "^2.2.27",
+    "on-headers": "^1.0.1",
+    "otp.js": "^1.1.0"
   },
   "devDependencies": {
     "dotenv": "^4.0.0",
     "grunt": "^1.0.1",
-    "grunt-contrib-uglify": "^2.2.0",
-    "jasmine": "^2.6.0",
-    "jasmine-core": "^2.6.1",
+    "grunt-contrib-uglify": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
+    "jasmine-core": "^2.6.2",
     "karma": "^1.7.0",
-    "karma-jasmine": "^1.1.0",
-    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-chrome-launcher": "^2.1.1",
     "karma-coverage": "^1.1.1",
     "karma-coveralls": "^1.1.2",
-    "nodemon": "^1.11.0",
-    "phantomjs-prebuilt": "^2.1.14"
+    "karma-firefox-launcher": "^1.0.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-safari-launcher": "^1.0.0",
+    "nodemon": "^1.11.0"
   },
   "repository": {
     "type": "git",

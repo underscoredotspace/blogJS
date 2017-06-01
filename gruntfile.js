@@ -1,14 +1,9 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     uglify: {
-      options: {
-        mangle: {
-          except: []
-        }
-      },
       build: {
-        src: 'client/home.js',
-        dest: 'client/home.min.js'
+        src: 'app/client/home.js',
+        dest: 'app/client/home.min.js'
       }
     }
   });

@@ -4,16 +4,14 @@ var express = require('express')
 var app = express()
 
 if (!process.env.MONGO_ADDR) {
-  console.error('Environment variable \'MONGO_ADDR\' must point to your mongodb')
-  process.exit(1)
+  throw(new Error('Environment variable "MONGO_ADDR" must point to your mongodb'))
 }
 
 require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
   if (err) {
-    console.error(err)
-    process.exit(1)
+    throw(err)
   } else {
-    console.log('Connected to mongo')
+    console.info('Connected to mongo')
     
     const onHeaders = require('on-headers')
 
@@ -31,7 +29,7 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
 
-    app.use(express.static('client'))
+    app.use(express.static('app/client'))
     
     app.set('json spaces', 2)
     app.use('/api', require('./api'))
@@ -42,7 +40,9 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
   
     // listen for requests :)
     var listener = app.listen(process.env.PORT, function () {
-      console.log('Your app is listening on http://localhost:' + listener.address().port)
-    });
+      console.info(`Your app is listening on http://localhost:${listener.address().port}`)
+    }).on('error', (err) => {
+      throw(err)
+    })
   }
 })

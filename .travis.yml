@@ -1,18 +1,25 @@
+dist: trusty
 language: node_js
 node_js:
-- "7"
-- "6"
-- "5"
-- "4"
+  - "node"
 
 env:
   - CXX=g++-4.8
+
 addons:
   apt:
     sources:
+      - google-chrome
       - ubuntu-toolchain-r-test
     packages:
+      - google-chrome-beta # use this until stable is v59+
       - g++-4.8
 
-after_success:
-- npm run cover
+before_script:
+  - export CHROME_BIN="google-chrome-beta"
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - bower install
+
+script: 
+  - npm run travis
