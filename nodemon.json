@@ -1,4 +1,4 @@
 {
   "verbose": false,
-  "ignore": ["client/**/*", "*.md", "*.json", "spec/client/**/*"]
+  "ignore": ["app/client/**/*", "*.md", "*.json", "app/test/client/**/*"]
 }

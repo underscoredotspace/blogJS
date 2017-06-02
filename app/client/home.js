@@ -1,6 +1,6 @@
 angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
-.config(['$showdownProvider', '$routeProvider', '$compileProvider', function ($showdownProvider, $routeProvider, $compileProvider) {
+angular.module('colonApp').config(['$showdownProvider', '$routeProvider', '$compileProvider', function ($showdownProvider, $routeProvider, $compileProvider) {
   $compileProvider.debugInfoEnabled(false)
   $compileProvider.commentDirectivesEnabled(false)
   
@@ -31,8 +31,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 
   $routeProvider
   .when('/about', {
-    templateUrl: 'part/about.html',
-    controller: function() {}
+    templateUrl: 'part/about.html'
   })
   .when('/home', {
     templateUrl: 'part/posts.html',
@@ -69,15 +68,17 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   .otherwise({redirectTo:'/home'})
 }])
 
-.controller('blog', ['$scope', '$cookies', '$http', '$filter', function($scope, $cookies, $http, $filter) {
-  if($cookies.get('qqBlog')) {
-    $scope.loggedin = true
-  } else {
-    $scope.loggedin = false
-  }
-}])
+angular.module('colonApp').controller('blogController', blogController)
+blogController.$inject = ['$cookies']
 
-.directive('blogPost', function() {
+function blogController($cookies) {
+  this.loggedin = false
+  if($cookies.get('qqBlog')) {
+    this.loggedin = true
+  }
+}
+
+angular.module('colonApp').directive('blogPost', function() {
   return {
     restrict: 'C',
     controller: ['$scope', '$http', '$filter', '$location', function($scope, $http, $filter, $location) {
@@ -106,23 +107,23 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 })
 
-.controller('logout', ['$scope', '$http', '$location', function($scope, $http, $location) {
-  if (!$scope.$parent.loggedin) {
+angular.module('colonApp').controller('logout', ['$scope', '$http', '$location', function($scope, $http, $location) {
+  if (!$scope.$parent.blog.loggedin) {
     $location.path('/home')
   } else {
     $http.get('/api/logout')
     .then(function(res) {
-      $scope.$parent.loggedin = false
+      $scope.$parent.blog.loggedin = false
       $location.path('/home')
     }, function(res) {
       console.error(res)
-      $scope.$parent.loggedin = false
+      $scope.$parent.blog.loggedin = false
       $location.path('/home')
     })
   }
 }])
 
-.controller('home', ['$scope', 'blogService', function($scope, blog) {
+angular.module('colonApp').controller('home', ['$scope', 'blogService', function($scope, blog) {
   blog.get(null, function(err, data) {
     if (!err) {
       $scope.blogposts = data
@@ -132,7 +133,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   })
 }])
 
-.controller('post', ['$scope', '$routeParams', '$location', '$timeout', 'blogService', function($scope, $routeParams, $location, $timeout, blog) {
+angular.module('colonApp').controller('post', ['$scope', '$routeParams', '$location', '$timeout', 'blogService', function($scope, $routeParams, $location, $timeout, blog) {
   function postError(err, gohome) {
     $scope.$parent.error = err
     if (gohome) {
@@ -161,8 +162,8 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 }])
 
-.controller('new', ['$scope', '$http', '$location', function($scope, $http, $location) {
-  if (!$scope.$parent.loggedin) {
+angular.module('colonApp').controller('new', ['$scope', '$http', '$location', function($scope, $http, $location) {
+  if (!$scope.$parent.blog.loggedin) {
     $location.path('/login')
   } else {
     $scope.blogpost = {
@@ -192,7 +193,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 }])
 
-.controller('edit', ['$scope', 'blogService', '$routeParams', '$location', '$http', function($scope, blog, $routeParams, $location, $http) {
+angular.module('colonApp').controller('edit', ['$scope', 'blogService', '$routeParams', '$location', '$http', function($scope, blog, $routeParams, $location, $http) {
   blog.get($routeParams.id, function(err, data) {
     if (!err) {
       if (data.status===204) {
@@ -224,8 +225,8 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 }])
 
-.controller('login', ['$scope', '$http', '$location', function($scope, $http, $location) {
-  if ($scope.$parent.loggedin) {
+angular.module('colonApp').controller('login', ['$scope', '$http', '$location', function($scope, $http, $location) {
+  if ($scope.$parent.blog.loggedin) {
     $location.path('/home')
   } else {
     $scope.login = function() {
@@ -235,7 +236,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
           data: {code: $scope.gaCode},
           headers: {'Content-Type': 'application/json'}
       }).then(function(res) {
-          $scope.$parent.loggedin = true
+          $scope.$parent.blog.loggedin = true
           $location.path('/home')
       }, function(err) {
           console.error(err.data)
@@ -244,7 +245,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 }])
 
-.controller('setup', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
+angular.module('colonApp').controller('setup', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
   $http({
     url: '/api/setup/adminCode',
     method: 'GET'
@@ -288,7 +289,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
       data: {code: $scope.gaCode},
       headers: {'Content-Type': 'application/json'}
     }).then(function(res) {
-      $scope.$parent.loggedin = true
+      $scope.$parent.blog.loggedin = true
       $scope.qr = null
       $scope.message = null
       $scope.gaCode = null
@@ -300,7 +301,7 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 }])
   
-.filter('niceDate', function() {
+angular.module('colonApp').filter('niceDate', function() {
   return function(d) {
     var options = {year: 'numeric', month: 'long', day: 'numeric'}
     var today  = new Date(d)
@@ -308,13 +309,13 @@ angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
   }
 })
 
-.filter('trustHTML', ['$sce', function ($sce) { 
+angular.module('colonApp').filter('trustHTML', ['$sce', function ($sce) { 
   return function (text) {
     return $sce.trustAsHtml(text);
   };    
 }])
 
-.service('blogService', ['$http', '$showdown', function($http, $showdown) {
+angular.module('colonApp').service('blogService', ['$http', '$showdown', function($http, $showdown) {
   return {
     get: function(postID, cb) {
       const self = this

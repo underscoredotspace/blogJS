@@ -23,20 +23,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ng-showdown/1.1.0/ng-showdown.min.js" integrity="sha256-9bwOmdcDBxHlhIMpldChdtUiq93qFKpWlr2TGdL/daw=" crossorigin="anonymous"></script>
 </head>
 
-<body data-ng-controller="blog">
+<body data-ng-controller="blogController as blog">
   <div id="blog-cont">
     <div id="blog-head">underscore . space</div> 
     <div id="blog-menu">
       <a href="#!/about" class="blog-menu-item">About</a>
       <a href="#!/home" class="blog-menu-item">Home</a>
-      <a href="#!/new" class="blog-menu-item" data-ng-show="loggedin">New</a>
-      <a href="#!/login" class="blog-menu-item" data-ng-show="!loggedin">Log in</a>
-      <a href="#!/logout" class="blog-menu-item" data-ng-show="loggedin">Log out</a>
+      <a href="#!/new" class="blog-menu-item" data-ng-show="blog.loggedin">New</a>
+      <a href="#!/login" class="blog-menu-item" data-ng-show="!blog.loggedin">Log in</a>
+      <a href="#!/logout" class="blog-menu-item" data-ng-show="blog.loggedin">Log out</a>
     </div>
     <div class="blog-error" data-ng-show="error" data-ng-bind="error"></div>
     <div class="blog-body" data-ng-view></div>
   </div>
   
-  <script src="home.min.js"></script>
+  <script src="home.js"></script>
 </body>
 </html>
