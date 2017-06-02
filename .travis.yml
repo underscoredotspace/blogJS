@@ -23,3 +23,6 @@ before_script:
 
 script: 
   - npm run travis
+
+notifications:
+  - slack: $slack
