@@ -22,20 +22,21 @@ module.exports = function(config) {
       'bower_components/showdown/dist/showdown.min.js',
       'bower_components/ng-showdown/dist/ng-showdown.min.js',
       'bower_components/angular-mocks/angular-mocks.js',
-      'app/client/home.js',
+      'app/client/*.js',
       'app/test/client/*.spec.js'
     ],
 
 
     // list of files to exclude
     exclude: [
+      'app/client/*.min.js',
     ],
 
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'app/src/**/*.js': ['coverage']
+      'app/client/home.js': ['coverage']
     },
 
 

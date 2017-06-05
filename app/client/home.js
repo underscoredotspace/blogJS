@@ -1,111 +1,144 @@
-angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
+(function() {
+  angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
+})();
 
-angular.module('colonApp').config(['$showdownProvider', '$routeProvider', '$compileProvider', function ($showdownProvider, $routeProvider, $compileProvider) {
-  $compileProvider.debugInfoEnabled(false)
-  $compileProvider.commentDirectivesEnabled(false)
-  
-  window.showdown.extension('codehighlight', function() {
-    function htmlunencode(text) {
-      return text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+(function(){
+    angular
+        .module('colonApp')
+        .config(configConfig)
+
+    configConfig.$inject = ['$routeProvider', '$showdownProvider']
+
+    function configConfig($routeProvider, $showdownProvider) {
+      routerConfig($routeProvider)
+      showdownConfig($showdownProvider)
     }
-    return [
-      {
-        type: 'output',
-        filter: function (text, converter, options) {
+
+    function routerConfig($routeProvider) {
+      $routeProvider
+      .when('/about', {
+        templateUrl: 'part/about.html'
+      })
+      .when('/home', {
+        templateUrl: 'part/posts.html',
+        controller: 'home'
+      })
+      .when('/home/:page', {
+        templateUrl: 'part/posts.html',
+        controller: 'home'
+      })
+      .when('/post/:id', {
+        templateUrl: 'part/posts.html',
+        controller: 'post'
+      })
+      .when('/new', {
+        templateUrl: 'part/newpost.html',
+        controller: 'new'
+      })
+      .when('/edit/:id', {
+        templateUrl: 'part/newpost.html',
+        controller: 'edit'
+      })
+      .when('/login', {
+        templateUrl: 'part/login.html',
+        controller: 'login'
+      })
+      .when('/logout', {
+        template: '<div class="part">Logging out...</div>',
+        controller: 'logout'
+      })
+      .when('/setup/', {
+        templateUrl: 'part/setup.html',
+        controller: 'setup'
+      })
+      .otherwise({redirectTo:'/home'})
+    }
+
+    function showdownConfig($showdownProvider) {
+      window.showdown.extension('codehighlight', codeHighlight)
+      $showdownProvider.loadExtension('codehighlight')
+
+      function codeHighlight() {
+        const htmlunencode = (text) => text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+        
+        function filterFunction(text, converter, options) {
           // use new showdown's regexp engine to conditionally parse codeblocks
           var left  = '<code\\b[^>]*>',
               right = '</code>',
               flags = 'g',
-              replacement = function (wholeMatch, match, left, right) {
+              replacement = (wholeMatch, match, left, right) => {
                 // unescape match to prevent double escaping
                 match = htmlunencode(match)
                 return left + window.hljs.highlightAuto(match).value + right
               }
           return window.showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags)
         }
+        
+        return [
+          {
+            type: 'output',
+            filter: filterFunction
+          }
+        ]
       }
-    ]
-  })
-  
-  $showdownProvider.loadExtension('codehighlight')
+    }
 
-  $routeProvider
-  .when('/about', {
-    templateUrl: 'part/about.html'
-  })
-  .when('/home', {
-    templateUrl: 'part/posts.html',
-    controller: 'home'
-  })
-  .when('/home/:page', {
-    templateUrl: 'part/posts.html',
-    controller: 'home'
-  })
-  .when('/post/:id', {
-    templateUrl: 'part/posts.html',
-    controller: 'post'
-  })
-  .when('/new', {
-    templateUrl: 'part/newpost.html',
-    controller: 'new'
-  })
-  .when('/edit/:id', {
-    templateUrl: 'part/newpost.html',
-    controller: 'edit'
-  })
-  .when('/login', {
-    templateUrl: 'part/login.html',
-    controller: 'login'
-  })
-  .when('/logout', {
-    template: '<div class="part">Logging out...</div>',
-    controller: 'logout'
-  })
-  .when('/setup/', {
-    templateUrl: 'part/setup.html',
-    controller: 'setup'
-  })
-  .otherwise({redirectTo:'/home'})
+}());
+
+angular.module('colonApp').config(['$compileProvider', function ($compileProvider) {
+  $compileProvider.debugInfoEnabled(false)
+  $compileProvider.commentDirectivesEnabled(false)
 }])
 
 angular.module('colonApp').controller('blogController', blogController)
 blogController.$inject = ['$cookies']
 
 function blogController($cookies) {
-  this.loggedin = false
+  const vm = this
+  vm.loggedin = false
   if($cookies.get('qqBlog')) {
-    this.loggedin = true
+    vm.loggedin = true
   }
 }
 
-angular.module('colonApp').directive('blogPost', function() {
-  return {
-    restrict: 'C',
-    controller: ['$scope', '$http', '$filter', '$location', function($scope, $http, $filter, $location) {
-      $scope.postDelete = function(id) {
-        $http({
-          method: 'delete',
-          url: '/api/post/' + id,
-          headers: {'Content-Type': 'application/json'}
-        }).then(function(res) {
-          console.log('deleted', id)
-          $scope.$parent.blogposts = $filter('filter')($scope.$parent.blogposts, {'_id': '!' + id});
-          if($location.path() === '/post/' + id) {
-            $location.path('/')
-          }
-        }).catch(function(err, res) {
-          console.log(err)
-          console.log(res)
-        })
-      }
+angular.module('colonApp').directive('blogPost', blogPost)
 
-      $scope.postEdit = function(id) {
-        console.log('edit', id)
-        $location.path('/edit/' + id)
-      }
-    }]
+function blogPost() {
+  const directive = {
+    restrict: 'C',
+    controller: blogPostController,
+    controllerAs: 'vm'
   }
-})
+
+  blogPostController.$inject = ['$http', '$filter', '$location']
+
+  function blogPostController($http, $filter, $location) {
+    const vm = this
+    vm.postDelete = function(id) {
+      $http({
+        method: 'delete',
+        url: '/api/post/' + id,
+        headers: {'Content-Type': 'application/json'}
+      }).then(function(res) {
+        console.log('deleted', id)
+        vm.$parent.blogposts = $filter('filter')(vm.$parent.blogposts, {'_id': '!' + id});
+        if($location.path() === '/post/' + id) {
+          $location.path('/')
+        }
+      }).catch(function(err, res) {
+        console.log(err)
+        console.log(res)
+      })
+    }
+
+    vm.postEdit = function(id) {
+      console.log('edit', id)
+      $location.path('/edit/' + id)
+    }
+  }
+
+  return directive
+}
 
 angular.module('colonApp').controller('logout', ['$scope', '$http', '$location', function($scope, $http, $location) {
   if (!$scope.$parent.blog.loggedin) {

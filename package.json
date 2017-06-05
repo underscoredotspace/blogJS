@@ -12,7 +12,7 @@
   "main": "app/server/index.js",
   "scripts": {
     "start": "node app/server",
-    "dev": "nodemon app/server",
+    "dev": "nodemon app/server & grunt",
     "test": "karma start",
     "travis": "karma start karma-travis.conf.js && npm run min-test",
     "browser-test": "karma start --browsers Chrome,Safari,Firefox",
@@ -28,9 +28,11 @@
     "otp.js": "^1.1.0"
   },
   "devDependencies": {
+    "bower": "^1.8.0",
     "dotenv": "^4.0.0",
     "grunt": "^1.0.1",
     "grunt-contrib-uglify": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
+    "grunt-contrib-watch": "^1.0.0",
     "jasmine-core": "^2.6.2",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.1.1",
@@ -39,8 +41,7 @@
     "karma-firefox-launcher": "^1.0.1",
     "karma-jasmine": "^1.1.0",
     "karma-safari-launcher": "^1.0.0",
-    "nodemon": "^1.11.0",
-    "bower": "^1.8.0"
+    "nodemon": "^1.11.0"
   },
   "repository": {
     "type": "git",

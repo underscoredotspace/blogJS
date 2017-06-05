@@ -22,13 +22,14 @@ module.exports = function(config) {
       'bower_components/showdown/dist/showdown.min.js',
       'bower_components/ng-showdown/dist/ng-showdown.min.js',
       'bower_components/angular-mocks/angular-mocks.js',
-      'app/client/*.min.js',
+      'app/client/*.js',
       'app/test/client/*.spec.js'
     ],
 
 
     // list of files to exclude
     exclude: [
+      '*.min.js'
     ],
 
 
