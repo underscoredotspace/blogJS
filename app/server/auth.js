@@ -24,7 +24,7 @@ var getSecret = (cb) => {
     if (data.length > 1) {
       cb('too many records in admin collection')
     } else {
-      if (data.length==0) {
+      if (data.length === 0) {
         newSecret((err, secret) => {
           if (err) {
             cb(err)
@@ -39,7 +39,7 @@ var getSecret = (cb) => {
         } else {
           cb('problem with admin record', null)
         }
-      };
+      }
     }
   })
 }
@@ -63,7 +63,7 @@ var validateCode = (req, res, next) => {
 }
 
 var checkCode = (code, cb) => {
-  if (code==lastCode) {
+  if (code === lastCode) {
     cb('Wait for next code')
   } else {
     getSecret((err, secret, verified) => {

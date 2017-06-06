@@ -1,7 +1,7 @@
 'use strict'
 var routes = require('express').Router()
 var db = require('./mongo')
-var auth = require("./auth.js")
+var auth = require('./auth.js')
 
 routes.get('/latest/:count', (req, res) => {
   var countRegEx = /^[0-9]{0,2}$/   // Number from 0-20
@@ -12,7 +12,7 @@ routes.get('/latest/:count', (req, res) => {
       if (err) {
         res.status(500).json(err)
       }
-      if (data.length==0) {
+      if (data.length === 0) {
         res.status(204).json({err:'no matches'})
       } else {
         res.json(data)
@@ -35,7 +35,7 @@ routes.get('/post/:id', (req, res) => {
         console.error(err)
         res.status(500).json('Error getting post')
       }
-      if (data.length==0) {
+      if (data.length === 0) {
         res.status(204).json({err:'no matches'})
       } else {
         res.json(data)
@@ -46,7 +46,7 @@ routes.get('/post/:id', (req, res) => {
 
 routes.post('/login', auth.validateCode, (req, res) => {
   auth.checkCode(req.body.code, (err, valid, verified) => {
-    if (err || valid != true || !verified) {
+    if (err || valid !== true || !verified) {
       res.status(401).json({err: err, valid: valid, verified: verified}) 
     } else {
       res.cookie('qqBlog', true, { maxAge: 1000 * 60 * 60, signed: true })
@@ -82,7 +82,7 @@ routes.post('/new', checkCookie, (req, res) => {
       if (err) {
         res.status(500).json({err: err})
       } else {
-        res.json({"ID": newPost._id})
+        res.json({'ID': newPost._id})
       }
     })
   }

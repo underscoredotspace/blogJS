@@ -6,17 +6,21 @@ var state = {
   db: null,
 }
 
-exports.connect = function(url, done) {
-  if (state.db) return done()
+const connect = (url, done) => {
+  if (state.db) {
+    return done()
+  }
 
-  MongoClient.connect(url, function(err, db) {
-    if (err) return done(err)
+  MongoClient.connect(url, (err, db) => {
+    if (err) {
+      return done(err)
+    }
     state.db = db
     done()
   })
 }
 
-exports.collection = function(collectionName) {
+const collection = (collectionName) => {
   if (!collectionName) {
     return null
   } else {
@@ -24,4 +28,4 @@ exports.collection = function(collectionName) {
   }
 }
 
-exports.ObjectId = mongodb.ObjectId
+module.exports = {connect, collection, ObjectId: mongodb.ObjectId}

@@ -2,7 +2,7 @@
 
 var routes = require('express').Router()
 var db = require('./mongo')
-var auth = require("./auth.js")
+var auth = require('./auth.js')
 
 // If blog setup not yet complete, prints admin code to server console
 routes.get('/adminCode', (req, res) => {
@@ -23,7 +23,7 @@ routes.get('/adminCode', (req, res) => {
 // Generates and sends QR code
 routes.post('/qr', auth.validateCode, (req, res) => {
     auth.checkCode(req.body.code, (err, valid, verified) => {
-      if (err || valid != true || verified) {
+      if (err || valid !== true || verified) {
         res.status(401).json({err: err, valid: valid, verified: verified}) 
       } else {
         auth.qrCode((err, qr) => {
