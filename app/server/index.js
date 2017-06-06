@@ -1,10 +1,12 @@
 'use strict'
-require('dotenv').config()
 var express = require('express')
 var app = express()
 
 if (!process.env.MONGO_ADDR) {
-  throw(new Error('Environment variable "MONGO_ADDR" must point to your mongodb'))
+  require('dotenv').config()
+  if (!process.env.MONGO_ADDR) {
+    throw(new Error('Environment variable "MONGO_ADDR" must point to your mongodb'))
+  }
 }
 
 require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
