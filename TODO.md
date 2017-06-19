@@ -64,5 +64,4 @@
 # Pie in the Sky
 - Templating so others can use this as a framework
 - Docker deployment upon successful tests
-- http2/pwa
 - Proper caching
