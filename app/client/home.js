@@ -400,42 +400,79 @@
 
 (function() {
   angular.module('colonApp').service('blogService', blogService)
-  blogService.$inject = ['$http', '$showdown']
-  function blogService($http, $showdown) {
+  blogService.$inject = ['$http', '$q', '$showdown']
+
+  function blogService($http, $q, $showdown) {
+
     return {
-      get: function(postID, cb) {
-        const self = this
-        var post
-        if (!postID) {
-          post = 'latest/5'
-        } else {
-          post = 'post/' + postID
-        }
-        $http.get('/api/' + post)
-        .then(function(res) {
-            if (res.status===204) {
-              console.warn('no posts yet!')
-              const blogposts = [{
-                title: 'Welcome',
-                content: 'This is your blog. Make a <a href="/#!/new">post</a>. ',
-                date: new Date()
-              }]
-              cb(null, blogposts)
-            } else {
-              self.convertMD(res.data, function(data) {
-                cb(null, data)
-              })
-            }
-        }).catch(function(err) {
-            cb(err)
-        })
-      },
-      convertMD: function(posts, cb) {
-        posts.forEach(function(post, ndx) {
-          post.contentHTML = $showdown.makeHtml(post.content)
-        })
-        cb(posts)
+      get: getPost,
+      delete: deletePost,
+      edit: editPost,
+      new: newPost
+    }
+
+    function getPost(postID, cb) {
+      const self = this
+
+      let post
+      if (!postID) {
+        post = 'latest/5'
+      } else {
+        post = 'post/' + postID
       }
+
+      $http.get('/api/' + post)
+      .then(function(res) {
+          if (res.status===204) {
+            console.warn('no posts yet!')
+            const blogposts = [{
+              title: 'Welcome',
+              content: 'This is your blog. Make a <a href="/#!/new">post</a>. ',
+              date: new Date()
+            }]
+            cb(null, blogposts)
+          } else {
+            convertMD(res.data, function(data) {
+              cb(null, data)
+            })
+          }
+      }).catch(function(err) {
+          cb(err)
+      })
+    }
+
+    function deletePost(id) {
+      const options = {
+        method: 'delete',
+        url: '/api/post/' + id,
+        headers: {'Content-Type': 'application/json'}
+      }
+
+      return $http(options)
+    }
+
+    function editPost(id, post) {
+      if (!angular.isDefined(post)) {
+        return $q.reject('Edited post required')
+      }
+      const options = {
+        method: 'PATCH',
+        url: '/api/post/' + id,
+        data: {blogpost: post},
+        headers: {'Content-Type': 'application/json'}
+      }
+
+      return $http(options)
+    }
+
+    function newPost() {
+    }
+
+    function convertMD(posts, cb) {
+      posts.forEach(function(post, ndx) {
+        post.contentHTML = $showdown.makeHtml(post.content)
+      })
+      cb(posts)
     }
   }
 })();

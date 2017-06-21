@@ -3,6 +3,11 @@ language: node_js
 node_js:
   - "node"
 
+cache:
+  yarn: true
+  directories:
+    - "node_modules"
+
 env:
   - CXX=g++-4.8
 
@@ -12,17 +17,11 @@ addons:
       - google-chrome
       - ubuntu-toolchain-r-test
     packages:
-      - google-chrome-beta # use this until stable is v59+
+      - google-chrome-stable
       - g++-4.8
 
-before_script:
-  - export CHROME_BIN="google-chrome-beta"
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - bower install
-
 script: 
-  - npm run travis
+  - yarn travis
 
 notifications:
   slack: tealhawk:$SLACK_KEY

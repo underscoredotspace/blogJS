@@ -14,9 +14,6 @@
 # New Posts/Admin
 - [ ] Autosave drafts to local storage
 - [ ] Manual save of drafts to DB
-- [x] Editing existing posts
-- [x] Delete post
-- [x] ~~Portal for~~ admin with cookie instead of OTP for every request
 - [ ] Emoji picker
 - [ ] Image/other assets storage/picker
 
@@ -24,12 +21,6 @@
 - Moar tests
   - [ ] Client
   - [ ] Server
-- [x] TravisCI
-
-# Grunt tasks
-- [x] Minification
-  - [x] With watch
-- [x] ~~Run tests~~ 100% npm
 
 # Routes
 - Server (/api/)
@@ -58,10 +49,10 @@
 - Client (/)
   - [ ] home/{page}
   - [x] post/{id}
-  - [x] /new
-  - [x] /edit/{id}
+  - [x] new
+  - [x] edit/{id}
 
 # Pie in the Sky
 - Templating so others can use this as a framework
-- Docker deployment upon successful tests
-- Proper caching
+- Deployment upon successful tests
+- Caching
