@@ -169,7 +169,7 @@
 
 (function() {
   angular.module('colonApp').controller('home', homeController)
-  homeController.$inject = ['$scope', 'blog']
+  homeController.$inject = ['$scope', 'blogService']
 
   function homeController($scope, blog) {
     blog.get(null, function(err, data) {
@@ -343,10 +343,14 @@
         }
       }, function(err) {
         if (err.data.verified) {
-          $scope.message='You\'re already verified. If you lost the code in Google Authenticator, delete the admin collection in the database to start again'
+          $scope.message=`You're already verified. 
+                          If you lost the code in Google Authenticator, 
+                          delete the admin collection in the database to start again`
           $scope.step = 0
         } else {
-          $scope.message = 'Error getting QR code. Restart blog on the server and come back to this page to generate a new setup code' 
+          $scope.message = `Error getting QR code. 
+                            Restart blog on the server and 
+                            come back to this page to generate a new setup code`
         }
         console.error(err.data)
       })
@@ -365,7 +369,9 @@
         $scope.gaCode = null
         $scope.step = 3
       }, function(err) {
-        $scope.message = 'Error verifying code. Try again with the next one. If this still doesn\'t work, delete the admin collection in the database and start again'
+        $scope.message = `Error verifying code. 
+                          Try again with the next one. 
+                          If this still doesn't work, delete the admin collection in the database and start again`
         console.error(err.data)
       })
     }

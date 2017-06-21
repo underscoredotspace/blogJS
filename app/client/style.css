@@ -20,12 +20,12 @@ body {
   border-color: black;
   margin: 0 auto;
   min-height: 100vh;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
-body, input, code, textarea, button {
+body, input, textarea, button {
   -webkit-font-smoothing: antialiased;
-  font-family: 'Source Sans Pro', sans-serif;
-  font-size: 16px;
+  font-size: 20px;
 }
 
 button {
@@ -46,7 +46,7 @@ code {
   font-size: 85%;
   display: inline;
   background: black;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-family: 'Source Code Pro', monospace;
 }
 
 code::before, code::after {
