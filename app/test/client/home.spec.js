@@ -21,14 +21,16 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   it('should get latest 5 posts', () => {
     const getLatest5 = $httpBackend.expectGET('/api/latest/5').respond([])
-    blogService.get(null, (err, res) => {})
-    $httpBackend.flush()
+    blogService.get()
+    .then($httpBackend.flush())
+    .catch(err => expect(err).toBeUndefined())
   })
 
   it('should get single post', () => {
     const getSinglePost = $httpBackend.expectGET('/api/post/592c78780e0322032c845436').respond([])
-    blogService.get('592c78780e0322032c845436', (err, res) => {})
-    $httpBackend.flush()
+    blogService.get('592c78780e0322032c845436')
+    .then($httpBackend.flush())
+    .catch(err => expect(err).toBeUndefined())
   })
 
   it('should delete single post', () => {
@@ -54,5 +56,11 @@ describe('blogService: Completes API calls for blog posts', () => {
     blogService.edit('592c78780e0322032c845436')
     .then(res => expect(res).toBeUndefined())
     .catch(err => expect(err).toBe('Edited post required'))
+  })
+
+  it('should fail to edit a post because post id is missing', () => {
+    blogService.edit()
+    .then(res => expect(res).toBeUndefined())
+    .catch(err => expect(err).toBe('Post ID required'))
   })
 })

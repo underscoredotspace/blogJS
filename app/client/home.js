@@ -172,13 +172,9 @@
   homeController.$inject = ['$scope', 'blogService']
 
   function homeController($scope, blog) {
-    blog.get(null, function(err, data) {
-      if (!err) {
-        $scope.blogposts = data
-      } else {
-        console.error(err)
-      }
-    })
+    blog.get()
+    .then(posts => $scope.blogposts = posts.data)
+    .catch(err => console.error)
   }
 })();
 
@@ -201,17 +197,9 @@
     if (!oIDRegEx.test($routeParams.id)) {
       postError('Invalid post. Going home...', true)
     } else {
-      blog.get($routeParams.id, function(err, data) {
-        if (!err) {
-          if (data.status===204) {
-            postError('Invalid post. Going home...', true)
-          } else {
-            $scope.blogposts = data
-          }
-        } else {
-          postError('Error getting post')
-        }
-      })
+      blog.get($routeParams.id)
+      .then(posts => $scope.blogposts = posts.data)
+      .catch(err => console.error)
     }
   }
 })();
@@ -390,17 +378,8 @@
 })();
 
 (function() {
-  angular.module('colonApp').filter('trustHTML', trustHtmlFilter)
-  trustHtmlFilter.$inject = ['$sce']
-
-  function trustHtmlFilter($sce) { 
-    return (text) => $sce.trustAsHtml(text)
-  }
-})();
-
-(function() {
   angular.module('colonApp').service('blogService', blogService)
-  blogService.$inject = ['$http', '$q', '$showdown']
+  blogService.$inject = ['$http', '$q']
 
   function blogService($http, $q, $showdown) {
 
@@ -411,37 +390,28 @@
       new: newPost
     }
 
-    function getPost(postID, cb) {
-      const self = this
-
+    function getPost(id) {
       let post
-      if (!postID) {
+      if (!id) {
         post = 'latest/5'
       } else {
-        post = 'post/' + postID
+        post = 'post/' + id
       }
 
-      $http.get('/api/' + post)
-      .then(function(res) {
-          if (res.status===204) {
-            console.warn('no posts yet!')
-            const blogposts = [{
-              title: 'Welcome',
-              content: 'This is your blog. Make a <a href="/#!/new">post</a>. ',
-              date: new Date()
-            }]
-            cb(null, blogposts)
-          } else {
-            convertMD(res.data, function(data) {
-              cb(null, data)
-            })
-          }
-      }).catch(function(err) {
-          cb(err)
-      })
+      const options = {
+        method: 'get',
+        url: '/api/' + post,
+        headers: {'Content-Type': 'application/json'}
+      }
+
+      return $http(options)
     }
 
     function deletePost(id) {
+      if (!angular.isDefined(id)) {
+        return $q.reject('Post ID required')
+      }
+
       const options = {
         method: 'delete',
         url: '/api/post/' + id,
@@ -452,9 +422,12 @@
     }
 
     function editPost(id, post) {
-      if (!angular.isDefined(post)) {
+      if (!angular.isDefined(id)) {
+        return $q.reject('Post ID required')
+      } else if (!angular.isDefined(post)) {
         return $q.reject('Edited post required')
       }
+      
       const options = {
         method: 'PATCH',
         url: '/api/post/' + id,
@@ -466,13 +439,6 @@
     }
 
     function newPost() {
-    }
-
-    function convertMD(posts, cb) {
-      posts.forEach(function(post, ndx) {
-        post.contentHTML = $showdown.makeHtml(post.content)
-      })
-      cb(posts)
     }
   }
 })();

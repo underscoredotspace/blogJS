@@ -25,7 +25,7 @@ body {
 
 body, input, textarea, button {
   -webkit-font-smoothing: antialiased;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 button {
