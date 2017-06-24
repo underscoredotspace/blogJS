@@ -31,7 +31,9 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
 
-    app.use(express.static('app/client'))
+    app.use(express.static('app/client/dist'))
+    app.use(express.static('app/client/view'))
+    
     app.use(express.static('node_modules/angular'))
     app.use(express.static('node_modules/angular-cookies'))
     app.use(express.static('node_modules/angular-route'))

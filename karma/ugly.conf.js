@@ -11,7 +11,7 @@ module.exports = function(config) {
       'node_modules/showdown/dist/showdown.min.js',
       'node_modules/ng-showdown/dist/ng-showdown.min.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      'app/client/home.min.js',
+      'app/client/dist/app.min.js',
       'app/test/client/*.spec.js'
     ],
     reporters: ['progress'],

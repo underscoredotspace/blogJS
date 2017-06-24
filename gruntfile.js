@@ -1,14 +1,18 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     uglify: {
-      build: {
-        src: 'app/client/home.js',
-        dest: 'app/client/home.min.js'
+      options: {
+        sourceMap: true
+      },
+      blog: {
+        files: {
+          'app/client/dist/app.min.js': ['app/client/src/*.js']
+        }
       }
     },
     watch: {
       minify: {
-        files: ['app/client/**/*.js', '!app/client/**/*.min.js'],
+        files: ['app/client/src/*.js'],
         tasks: ['min']
       }
     }
