@@ -6,7 +6,6 @@ describe('blogService: Completes API calls for blog posts', () => {
     inject(function($injector) {
       blogService = $injector.get('blogService')
       $httpBackend = $injector.get('$httpBackend')
-      $rootScope = $injector.get('$rootScope')
     })
   })
 
