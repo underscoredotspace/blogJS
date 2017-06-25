@@ -94,13 +94,24 @@
 
 (function(){
   angular.module('colonApp').controller('blogController', blogController)
-  blogController.$inject = ['$cookies']
+  blogController.$inject = ['$rootScope', 'authService', 'blogService', '$location']
 
-  function blogController($cookies) {
+  function blogController($rootScope, authService, blogService, $location) {
     const vm = this
-    vm.loggedin = false
-    if($cookies.get('qqBlog')) {
-      vm.loggedin = true
+    vm.loggedin = authService.isLoggedIn()
+
+    $rootScope.$on('auth-status', () => {
+      vm.loggedin = authService.isLoggedIn()
+    })
+
+    vm.postDelete = id => {
+      blogService.delete(id)
+      .then(() => {$location.path('/home')})
+      .catch(err => console.error)
+    }
+
+    vm.postEdit = id => {
+      console.log(id)
     }
   }
 })();
@@ -148,22 +159,16 @@
 
 (function() {
   angular.module('colonApp').controller('logout', logoutController)
-  logoutController.$inject = ['$scope', '$http', '$location']
+  logoutController.$inject = ['$scope', '$location', 'authService']
 
-  function logoutController($scope, $http, $location) {
-    if (!$scope.$parent.blog.loggedin) {
+  function logoutController($scope, $location, authService) {
+    if (!authService.isLoggedIn()) {
       $location.path('/home')
-    } else {
-      $http.get('/api/logout')
-      .then(function(res) {
-        $scope.$parent.blog.loggedin = false
-        $location.path('/home')
-      }, function(res) {
-        console.error(res)
-        $scope.$parent.blog.loggedin = false
-        $location.path('/home')
-      })
     }
+
+    authService.logout()
+    .then(() => {$location.path('/home')})
+    .catch(console.error)      
   }
 })();
 
@@ -180,28 +185,20 @@
 
 (function() {
   angular.module('colonApp').controller('post', postController)
-  postController.$inject = ['$scope', '$routeParams', '$location', '$timeout', 'blogService']
+  postController.$inject = ['$scope', '$routeParams', '$location', 'blogService']
 
-  function postController($scope, $routeParams, $location, $timeout, blog) {
-    function postError(err, gohome) {
-      $scope.$parent.error = err
-      if (gohome) {
-        $timeout(function() {
-          $scope.$parent.error = null
-          $location.path('/home')
-        }, 3000)
-      }
-    }
-
+  function postController($scope, $routeParams, $location, blogService) {
+    const vm = this
     const oIDRegEx = /[0-9a-fA-F]{24}/i
     if (!oIDRegEx.test($routeParams.id)) {
-      postError('Invalid post. Going home...', true)
+      $location.path('/home')
     } else {
-      blog.get($routeParams.id)
-      .then(posts => $scope.blogposts = posts.data)
+      blogService.get($routeParams.id)
+      .then(posts => {$scope.blogposts = posts.data})
       .catch(err => console.error)
     }
   }
+
 })();
 
 (function() {
@@ -277,25 +274,17 @@
 
 (function() {
   angular.module('colonApp').controller('login', loginController)
-  loginController.$inject = ['$scope', '$http', '$location']
+  loginController.$inject = ['$scope', '$location', 'authService']
 
-  function loginController($scope, $http, $location) {
-    if ($scope.$parent.blog.loggedin) {
+  function loginController($scope, $location, authService) {
+    if (authService.isLoggedIn()) {
       $location.path('/home')
-    } else {
-      $scope.login = function() {
-        $http({
-            url: '/api/login',
-            method: 'POST',
-            data: {code: $scope.gaCode},
-            headers: {'Content-Type': 'application/json'}
-        }).then(function(res) {
-            $scope.$parent.blog.loggedin = true
-            $location.path('/home')
-        }, function(err) {
-            console.error(err.data)
-        })
-      }
+    }
+
+    $scope.login = function(code) {
+      authService.login(code)
+      .then(() => {$location.path('/home')})
+      .catch(console.error)      
     }
   }
 })();

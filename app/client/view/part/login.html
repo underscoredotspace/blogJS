@@ -3,5 +3,6 @@
     Probably not for you
   </h1>
   &nbsp;<br>
-    <input type="text" data-ng-model="gaCode" data-ng-pattern="/[0-9]{6}/" required placeholder="Enter Code">&nbsp;<button data-ng-click="login()" data-ng-disabled="frmLogin.$invalid">Submit</button>
+  <input type="text" data-ng-model="gaCode" data-ng-pattern="/[0-9]{6}/" required placeholder="Enter Code">
+  &nbsp;<button data-ng-click="login(gaCode)" data-ng-disabled="frmLogin.$invalid">Submit</button>
 </form></div>
