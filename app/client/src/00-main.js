@@ -33,11 +33,13 @@
       })
       .when('/new', {
         templateUrl: 'part/newpost.html',
-        controller: 'new'
+        controller: 'new',
+        controllerAs: 'new',
       })
       .when('/edit/:id', {
         templateUrl: 'part/newpost.html',
-        controller: 'edit'
+        controller: 'edit',
+        controllerAs: 'new'
       })
       .when('/login', {
         templateUrl: 'part/login.html',
@@ -160,77 +162,67 @@
       $location.path('/edit/' + id)
     }
   }
-
 })();
 
 (function() {
   angular.module('colonApp').controller('new', newController)
-  newController.$inject = ['$scope', '$http', '$location']
-  function newController($scope, $http, $location) {
-    if (!$scope.$parent.blog.loggedin) {
-      $location.path('/login')
-    } else {
-      $scope.blogpost = {
-        title: '',
-        content: '',
-        date: new Date()
-      }
+  newController.$inject = ['$http', '$location', 'authService', 'blogService']
 
-      $scope.submitPost = function() {
-        var blogpost = {
-          title: $scope.blogpost.title,
-          content: $scope.blogpost.content
-        }
-        $http({
-            url: '/api/new',
-            method: 'POST',
-            data: {blogpost: blogpost},
-            headers: {'Content-Type': 'application/json'}
-        }).then(function(res) {
-          if(res.data.hasOwnProperty('ID')) {
-            $location.path('/post/'+ res.data.ID)
-          }
-        }, function(err) {
-            console.error(err.data)
+  function newController($http, $location, authService, blogService) {
+    const vm = this
+
+    if (!authService.isLoggedIn()) {
+      $location.path('/login')
+    }
+    vm.blogpost = {
+      date: new Date()
+    }
+
+    vm.submitPost = blogpost => {
+      blogService.new(blogpost)
+        .then(id => {
+          $location.path('/post/'+ id)
         })
-      }
+        .catch(err => console.error)
     }
   }
 })();
 
 (function() {
-  // **FIX** //
   angular.module('colonApp').controller('edit', editController)
-  editController.$inject = ['$scope', 'blogService', '$routeParams', '$location', '$http']
-  function editController($scope, blog, $routeParams, $location, $http) {
-    blog.get($routeParams.id, function(err, data) {
-      if (!err) {
-        if (data.status===204) {
-          console.info('Post doesn\'t exist')
-          $location.path('/home')
-        } else {
-          $scope.blogpost = data[0]
-        }
-      } else {
-        console.error(err)
-      }
-    })
+  editController.$inject = ['blogService', 'authService', '$routeParams', '$location']
 
-    $scope.submitPost = function() {
-        var blogpost = {
-          title: $scope.blogpost.title,
-          content: $scope.blogpost.content
-        }
-        $http({
-            url: '/api/post/'+$routeParams.id,
-            method: 'PATCH',
-            data: {blogpost: blogpost},
-            headers: {'Content-Type': 'application/json'}
-        }).then(function(res) {
-          $location.path('/post/'+ $routeParams.id)
-        }, function(err) {
-          console.error(err.data)
+  function editController(blogService, authService, $routeParams, $location) {
+    const vm = this
+
+    if (!authService.isLoggedIn()) {
+      $location.path('/login')
+    }
+
+    let id
+
+    if (angular.isDefined($routeParams.id)) {
+      const oIDRegEx = /[0-9a-fA-F]{24}/i
+      if (!oIDRegEx.test($routeParams.id)) {
+        $location.path('/home')
+      } else {
+        id = $routeParams.id
+      }
+    }
+
+    blogService.get(id)
+      .then(posts => {
+        vm.blogpost = posts.data[0]
+      })
+      .catch(err => console.error)
+
+
+    vm.submitPost = blogpost => {
+      blogService.edit(id, blogpost)
+        .then(id => {
+          $location.path('/post/'+ id)
         })
+        .catch(err => console.error)
     }
   }
 })();

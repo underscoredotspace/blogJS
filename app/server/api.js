@@ -68,7 +68,7 @@ const checkCookie = (req, res, next) => {
   }
 }
 
-routes.post('/new', checkCookie, (req, res) => {
+routes.post('/post', checkCookie, (req, res) => {
   if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
     res.status(400).json({err: 'Post or title not long enough'})
   } else {
@@ -82,7 +82,7 @@ routes.post('/new', checkCookie, (req, res) => {
       if (err) {
         res.status(500).json({err: err})
       } else {
-        res.json({'ID': newPost._id})
+        res.json({'id': newPost._id})
       }
     })
   }
@@ -112,7 +112,11 @@ routes.patch('/post/:id', checkCookie, (req, res) => {
         content: req.body.blogpost.content
       }
       db.collection('blog').updateOne({'_id': db.ObjectId(req.params.id)}, {$set:thePost}, (err, data) => {
-        res.json({'err': err, 'res': data})
+        if (err) {
+          res.status(500).json({err: err})
+        } else {
+          res.json({'id': req.params.id})
+        }
       })
     }
   }

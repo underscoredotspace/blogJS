@@ -50,6 +50,19 @@ describe('blogService: Completes API calls for blog posts', () => {
     .catch(err => expect(err).toBeUndefined())
   })
 
+  it('should make a new post', () => {
+    const newPost = $httpBackend.expect('POST', '/api/post').respond({id:'592c78780e0322032c845430'})
+    const blogpost = {
+      title: 'A title that is long enought to post',
+      content: 'Content. You know, the nonsense you expect people to read. '
+    }
+    blogService.new(blogpost)
+      .then(id => expect(id).toBe('592c78780e0322032c845430'))
+      .catch(err => expect(err).toBeUndefined())
+
+      $httpBackend.flush()
+  })
+
   // Failing conditions
   it('should fail to delete single post due to missing id', () => {
     blogService.delete()
@@ -80,12 +93,38 @@ describe('blogService: Completes API calls for blog posts', () => {
   })
 
   it('should fail to edit a post because content is too short', () => {
-    const post = {
+    const blogpost = {
       title: 'A title that is long enought to post',
       content: 'Hi'
     }
-    blogService.edit('592c78780e0322032c845430', post)
+    blogService.edit('592c78780e0322032c845430', blogpost)
     .then(res => expect(res).toBeUndefined())
+    .catch(err => expect(err).toBe('Title or content too short'))
+  })
+
+  it('should fail to make a new post because blogpost param is missing', () => {
+    blogService.new()
+      .then(id => expect(id).toBeUndefined())
+      .catch(err => expect(err).toBe('New post required'))
+  })
+
+  it('should fail to make new post because title is too short', () => {
+    const blogpost = {
+      title: 'Hi',
+      content: 'Content. You know, the nonsense you expect people to read. '
+    }
+    blogService.new(blogpost)
+    .then(id => expect(id).toBeUndefined())
+    .catch(err => expect(err).toBe('Title or content too short'))
+  })
+
+  it('should fail to make new post because content is too short', () => {
+    const blogpost = {
+      title: 'A title that is long enought to post',
+      content: 'Hi'
+    }
+    blogService.new(blogpost)
+    .then(id => expect(id).toBeUndefined())
     .catch(err => expect(err).toBe('Title or content too short'))
   })
 })
