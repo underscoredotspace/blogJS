@@ -1,9 +1,9 @@
-<div class="blog-post part" data-ng-repeat="blogpost in blogposts | orderBy:'-_id'">
+<div class="blog-post part" data-ng-repeat="blogpost in posts.blogposts | orderBy:'-_id'">
 	<h1>{{blogpost.title}}</h1>
   <div data-markdown-to-html="blogpost.content"></div>
   <div class="blog-post-date"><a href="#" data-ng-href="/#!/post/{{blogpost._id}}">{{blogpost.date|niceDate}}</a></div>
   <div data-ng-hide="!blog.loggedin">
-    <button type="submit" data-ng-click="blog.postEdit(blogpost._id)">Edit</button>
-    <button type="submit" data-ng-click="blog.postDelete(blogpost._id)">Delete</button>
+    <button type="submit" data-ng-click="posts.postEdit(blogpost._id)">Edit</button>
+    <button type="submit" data-ng-click="posts.postDelete(blogpost._id)">Delete</button>
   </div>
 </div>

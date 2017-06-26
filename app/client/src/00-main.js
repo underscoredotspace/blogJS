@@ -18,15 +18,18 @@
       })
       .when('/home', {
         templateUrl: 'part/posts.html',
-        controller: 'home'
+        controller: 'post',
+        controllerAs: 'posts',
       })
       .when('/home/:page', {
         templateUrl: 'part/posts.html',
-        controller: 'home'
+        controller: 'post',
+        controllerAs: 'posts',
       })
       .when('/post/:id', {
         templateUrl: 'part/posts.html',
-        controller: 'post'
+        controller: 'post',
+        controllerAs: 'posts',
       })
       .when('/new', {
         templateUrl: 'part/newpost.html',
@@ -94,108 +97,67 @@
 
 (function(){
   angular.module('colonApp').controller('blogController', blogController)
-  blogController.$inject = ['$rootScope', 'authService', 'blogService', '$location']
+  blogController.$inject = ['$rootScope', 'authService']
 
-  function blogController($rootScope, authService, blogService, $location) {
+  function blogController($rootScope, authService) {
     const vm = this
     vm.loggedin = authService.isLoggedIn()
 
     $rootScope.$on('auth-status', () => {
       vm.loggedin = authService.isLoggedIn()
     })
-
-    vm.postDelete = id => {
-      blogService.delete(id)
-      .then(() => {$location.path('/home')})
-      .catch(err => console.error)
-    }
-
-    vm.postEdit = id => {
-      console.log(id)
-    }
-  }
-})();
-
-(function() {
-  angular.module('colonApp').directive('blogPost', blogPost)
-
-  function blogPost() {
-    const directive = {
-      restrict: 'C',
-      controller: blogPostController,
-      controllerAs: 'vm'
-    }
-
-    blogPostController.$inject = ['$http', '$filter', '$location']
-
-    function blogPostController($http, $filter, $location) {
-      const vm = this
-      vm.postDelete = function(id) {
-        $http({
-          method: 'delete',
-          url: '/api/post/' + id,
-          headers: {'Content-Type': 'application/json'}
-        }).then(function(res) {
-          console.log('deleted', id)
-          vm.$parent.blogposts = $filter('filter')(vm.$parent.blogposts, {'_id': '!' + id});
-          if($location.path() === '/post/' + id) {
-            $location.path('/')
-          }
-        }).catch(function(err, res) {
-          console.log(err)
-          console.log(res)
-        })
-      }
-
-      vm.postEdit = function(id) {
-        console.log('edit', id)
-        $location.path('/edit/' + id)
-      }
-    }
-
-    return directive
   }
 })();
 
 (function() {
   angular.module('colonApp').controller('logout', logoutController)
-  logoutController.$inject = ['$scope', '$location', 'authService']
+  logoutController.$inject = ['$location', 'authService']
 
-  function logoutController($scope, $location, authService) {
+  function logoutController($location, authService) {
     if (!authService.isLoggedIn()) {
       $location.path('/home')
     }
 
     authService.logout()
-    .then(() => {$location.path('/home')})
-    .catch(console.error)      
-  }
-})();
-
-(function() {
-  angular.module('colonApp').controller('home', homeController)
-  homeController.$inject = ['$scope', 'blogService']
-
-  function homeController($scope, blog) {
-    blog.get()
-    .then(posts => $scope.blogposts = posts.data)
-    .catch(err => console.error)
+      .then(() => {$location.path('/home')})
+      .catch(console.error)      
   }
 })();
 
 (function() {
   angular.module('colonApp').controller('post', postController)
-  postController.$inject = ['$scope', '$routeParams', '$location', 'blogService']
+  postController.$inject = ['$routeParams', '$location', '$filter', 'blogService']
 
-  function postController($scope, $routeParams, $location, blogService) {
+  function postController($routeParams, $location, $filter, blogService) {
     const vm = this
-    const oIDRegEx = /[0-9a-fA-F]{24}/i
-    if (!oIDRegEx.test($routeParams.id)) {
-      $location.path('/home')
-    } else {
-      blogService.get($routeParams.id)
-      .then(posts => {$scope.blogposts = posts.data})
+    let id
+
+    if (angular.isDefined($routeParams.id)) {
+      const oIDRegEx = /[0-9a-fA-F]{24}/i
+      if (!oIDRegEx.test($routeParams.id)) {
+        $location.path('/home')
+      } else {
+        id = $routeParams.id
+      }
+    }
+    blogService.get(id)
+      .then(posts => {vm.blogposts = posts.data})
       .catch(err => console.error)
+
+    vm.postDelete = id => {
+      blogService.delete(id)
+        .then(() => {
+          if ($location.path() !== '/home') {
+            $location.path('/home')
+          } else {
+            vm.blogposts = $filter('filter')(vm.blogposts, {'_id': '!' + id})
+          }
+        })
+        .catch(err => console.error)
+    }
+
+    vm.postEdit = id => {
+      $location.path('/edit/' + id)
     }
   }
 
@@ -237,6 +199,7 @@
 })();
 
 (function() {
+  // **FIX** //
   angular.module('colonApp').controller('edit', editController)
   editController.$inject = ['$scope', 'blogService', '$routeParams', '$location', '$http']
   function editController($scope, blog, $routeParams, $location, $http) {
@@ -283,8 +246,8 @@
 
     $scope.login = function(code) {
       authService.login(code)
-      .then(() => {$location.path('/home')})
-      .catch(console.error)      
+        .then(() => {$location.path('/home')})
+        .catch(console.error)      
     }
   }
 })();
