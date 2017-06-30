@@ -2,13 +2,19 @@
   angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
 })();
 
-(function(){
-    angular.module('colonApp').config(configConfig)
-    configConfig.$inject = ['$routeProvider', '$showdownProvider']
+(function() {
+  angular.module('colonApp')
+    .constant('showdown', window.showdown)
+    .constant('hljs', window.hljs)
+})();
 
-    function configConfig($routeProvider, $showdownProvider) {
+(function(){
+    angular.module('colonApp').config(config)
+    config.$inject = ['$routeProvider', '$showdownProvider', 'showdown', 'hljs']
+
+    function config($routeProvider, $showdownProvider, showdown, hljs) {
       routerConfig($routeProvider)
-      showdownConfig($showdownProvider)
+      showdownConfig($showdownProvider, showdown, hljs)
     }
 
     function routerConfig($routeProvider) {
@@ -19,34 +25,34 @@
       .when('/home', {
         templateUrl: 'part/posts.html',
         controller: 'post',
-        controllerAs: 'posts',
+        controllerAs: 'vm',
       })
       .when('/home/:page', {
         templateUrl: 'part/posts.html',
         controller: 'post',
-        controllerAs: 'posts',
+        controllerAs: 'vm',
       })
       .when('/post/:id', {
         templateUrl: 'part/posts.html',
         controller: 'post',
-        controllerAs: 'posts',
+        controllerAs: 'vm',
       })
       .when('/new', {
         templateUrl: 'part/newpost.html',
         controller: 'new',
-        controllerAs: 'new',
+        controllerAs: 'vm',
       })
       .when('/edit/:id', {
         templateUrl: 'part/newpost.html',
         controller: 'edit',
-        controllerAs: 'new'
+        controllerAs: 'vm'
       })
       .when('/login', {
         templateUrl: 'part/login.html',
         controller: 'login'
       })
       .when('/logout', {
-        template: '<div class="part">Logging out...</div>',
+        template: '',
         controller: 'logout'
       })
       .when('/setup/', {
@@ -56,42 +62,37 @@
       .otherwise({redirectTo:'/home'})
     }
 
-    function showdownConfig($showdownProvider) {
-      window.showdown.extension('codehighlight', codeHighlight)
+    function showdownConfig($showdownProvider, showdown, hljs) {
+      showdown.extension('codehighlight', codeHighlight)
       $showdownProvider.loadExtension('codehighlight')
 
       function codeHighlight() {
-        const htmlunencode = (text) => text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-        
-        function filterFunction(text, converter, options) {
-          // use new showdown's regexp engine to conditionally parse codeblocks
-          var left  = '<code\\b[^>]*>',
-              right = '</code>',
-              flags = 'g',
-              replacement = (wholeMatch, match, left, right) => {
-                // unescape match to prevent double escaping
-                match = htmlunencode(match)
-                return left + window.hljs.highlightAuto(match).value + right
-              }
-          return window.showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags)
+        function htmlunencode (text) {
+          return text.replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
         }
         
-        return [
-          {
-            type: 'output',
-            filter: filterFunction
+        function filterFunc (text, converter, options) {
+          const [left, right] = ['<code\\b[^>]*>', '</code>']
+
+          function replacement(wholeMatch, match, left, right) {
+            match = htmlunencode(match)
+            return `${left}${hljs.highlightAuto(match).value}${right}`
           }
-        ]
+          return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, 'g')
+        }
+
+        return [{type: 'output', filter: filterFunc}]
       }
     }
-
 })();
 
 (function(){
-  angular.module('colonApp').config(noDebug)
-  noDebug.$inject = ['$compileProvider']
+  angular.module('colonApp').config(production)
+  production.$inject = ['$compileProvider']
 
-  function noDebug($compileProvider) {
+  function production($compileProvider) {
     $compileProvider.debugInfoEnabled(false)
     $compileProvider.commentDirectivesEnabled(false)
   }
@@ -142,23 +143,30 @@
         id = $routeParams.id
       }
     }
+
     blogService.get(id)
-      .then(posts => {vm.blogposts = posts.data})
+      .then(posts => {
+        vm.blogposts = []
+        posts.data.forEach((post, ndx) => {
+          vm.blogposts.push(post)
+        });
+      })
       .catch(err => console.error)
 
-    vm.postDelete = id => {
+    vm.postDelete = postDelete
+
+    function postDelete(id) {
       blogService.delete(id)
         .then(() => {
-          if ($location.path() !== '/home') {
-            $location.path('/home')
-          } else {
-            vm.blogposts = $filter('filter')(vm.blogposts, {'_id': '!' + id})
-          }
+          vm.blogposts = $filter('filter')(vm.blogposts, {'_id': '!' + id})
+          $location.path('/home')
         })
         .catch(err => console.error)
     }
 
-    vm.postEdit = id => {
+    vm.postEdit = postEdit
+
+    function postEdit(id) {
       $location.path('/edit/' + id)
     }
   }

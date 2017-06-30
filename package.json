@@ -10,12 +10,13 @@
     "url": "https://github.com/underscoredotspace/blogJS/issues"
   },
   "scripts": {
+    "build": "grunt min",
     "start": "node app/server",
-    "dev": "nodemon app/server & grunt",
+    "dev": "nodemon app/server & grunt & yarn test",
     "test": "karma start karma/local.conf.js",
     "travis": "karma start karma/travis.conf.js && yarn min-test",
     "browser-test": "karma start karma/local.conf.js --browsers Chrome,Safari,Firefox",
-    "min-test": "grunt min && karma start karma/ugly.conf.js"
+    "min-test": "yarn build && karma start karma/ugly.conf.js"
   },
   "dependencies": {
     "angular": "^1.6.4",

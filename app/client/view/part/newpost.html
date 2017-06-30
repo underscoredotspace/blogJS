@@ -1,14 +1,14 @@
 <div class="blog-post"><form name="newPost">
-	<input placeholder="Heading" data-ng-model="new.blogpost.title" class="newpost-title" required data-ng-minlength="5"><br>
-	<textarea placeholder="Post Text" data-ng-model="new.blogpost.content" class="newpost-content" required data-ng-minlength="5"></textarea><br>
-	<button data-ng-click="new.submitPost(new.blogpost)" data-ng-disabled="newPost.$invalid||newPost.$pristine">Submit</button>
+	<input placeholder="Heading" data-ng-model="vm.blogpost.title" class="newpost-title" required data-ng-minlength="5"><br>
+	<textarea placeholder="Post Text" data-ng-model="vm.blogpost.content" class="newpost-content" required data-ng-minlength="5"></textarea><br>
+	<button data-ng-click="vm.submitPost(vm.blogpost)" data-ng-disabled="newPost.$invalid||newPost.$pristine">Submit</button>
 	<label class="form-error" data-ng-show="newPost.$invalid">
 		Moar content please
 	</label>
 </form></div>
 
 <div class="blog-post" data-ng-hide="newPost.$invalid">
-	<h1>{{new.blogpost.title}}</h1>
-  <div markdown-to-html="new.blogpost.content"></div>
-  <div class="blog-post-date"><a href="/#!/new">{{new.blogpost.date|niceDate}}</a></div>
+	<h1>{{vm.blogpost.title}}</h1>
+  <div markdown-to-html="vm.blogpost.content"></div>
+  <div class="blog-post-date"><a href="/#!/new">{{vm.blogpost.date|niceDate}}</a></div>
 </div>

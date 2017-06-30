@@ -31,16 +31,18 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
 
-    app.use(express.static('app/client/dist'))
-    app.use(express.static('app/client/view'))
-    
-    app.use(express.static('node_modules/angular'))
-    app.use(express.static('node_modules/angular-cookies'))
-    app.use(express.static('node_modules/angular-route'))
-    app.use(express.static('node_modules/angular-sanitize'))
-    app.use(express.static('node_modules/showdown/dist'))
-    app.use(express.static('node_modules/ng-showdown/dist'))
-    app.use(express.static('node_modules/highlightjs'))
+    app.use(
+      express.static('app/client/build'),
+      express.static('app/client/view'),
+      
+      express.static('node_modules/angular'),
+      express.static('node_modules/angular-cookies'),
+      express.static('node_modules/angular-route'),
+      express.static('node_modules/angular-sanitize'),
+      express.static('node_modules/showdown/dist'),
+      express.static('node_modules/ng-showdown/dist'),
+      express.static('node_modules/highlightjs')
+    )
     
     app.set('json spaces', 2)
     app.use('/api', require('./api'))

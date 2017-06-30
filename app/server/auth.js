@@ -7,7 +7,9 @@ var bcrypt = require('bcrypt')
 var lastCode = null
 const otpRegEx = /^[0-9]{6}$/
 
-var newSecret = (cb) => {
+module.exports = {checkCode, qrCode, getCode, validateCode}
+
+function newSecret (cb) {
   crypto.randomBytes(256, (err, buf) => {
     if (err) {
       cb(err)
@@ -19,7 +21,7 @@ var newSecret = (cb) => {
   })
 }
 
-var getSecret = (cb) => {
+function getSecret (cb) {
   db.collection('admin').find().toArray((err, data) => {
     if (data.length > 1) {
       cb('too many records in admin collection')
@@ -44,7 +46,7 @@ var getSecret = (cb) => {
   })
 }
 
-var getCode = (cb) =>{
+function getCode (cb) {
   getSecret((err, secret, verified) => {
     if (err) {
       cb(err)
@@ -54,7 +56,7 @@ var getCode = (cb) =>{
   })
 }
 
-var validateCode = (req, res, next) => {
+function validateCode (req, res, next) {
   if(otpRegEx.test(req.body.code)) {
     next()
   } else {
@@ -62,7 +64,7 @@ var validateCode = (req, res, next) => {
   }
 }
 
-var checkCode = (code, cb) => {
+function checkCode (code, cb) {
   if (code === lastCode) {
     cb('Wait for next code')
   } else {
@@ -82,7 +84,7 @@ var checkCode = (code, cb) => {
   }
 }
 
-var qrCode = (cb) => {
+function qrCode (cb) {
   var user = 'user', org = 'blog'
   getSecret((err, secret) => {
     if (err) {
@@ -92,5 +94,3 @@ var qrCode = (cb) => {
     }
   })
 }
-
-module.exports = {checkCode, qrCode, getCode, validateCode}
