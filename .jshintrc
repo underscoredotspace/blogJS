@@ -1,6 +1,6 @@
 {
 	"jasmine": true,
-	"predef": ["inject"], // Jasmine func not included?
+	"predef": ["inject", "jest"],
 	"asi": true,
 
 	// Per John Papa's style guide apart from above

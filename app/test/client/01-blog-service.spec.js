@@ -1,7 +1,18 @@
+require('angular')
+require('angular-cookies')
+require('angular-route')
+require('angular-sanitize')
+window.showdown = require('showdown')
+require('ng-showdown')
+require('highlightjs')
+require('angular-mocks')
+require('../../client/src/00-main.js')
+require('../../client/src/01-blog-service.js')
+
 describe('blogService: Completes API calls for blog posts', () => {
   let blogService, $httpBackend, $rootScope
   beforeEach(() => {
-    module('colonApp')
+    angular.mock.module('colonApp')
 
     inject(function($injector) {
       blogService = $injector.get('blogService')

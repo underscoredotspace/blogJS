@@ -9,7 +9,7 @@
 - [ ] Split functionality up a bit
 - [ ] Global blog service so that controllers can be much cleaner
 - [ ] Get route set up with related controler rather than in config
-- [ ] Break down codeHighlight() for Showdown. Separate completely? 
+- [X] Break down codeHighlight() for Showdown. Separate completely? 
 
 # New Posts/Admin
 - [ ] Autosave drafts to local storage
@@ -20,7 +20,10 @@
 # Oh shit!
 - Moar tests
   - [ ] Client
+    - blogService
+    - authService
   - [ ] Server
+    - auth
 
 # Routes
 - Server (/api/)

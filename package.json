@@ -13,10 +13,8 @@
     "build": "grunt min",
     "start": "node app/server",
     "dev": "nodemon app/server & grunt & yarn test",
-    "test": "karma start karma/local.conf.js",
-    "travis": "karma start karma/travis.conf.js && yarn min-test",
-    "browser-test": "karma start karma/local.conf.js --browsers Chrome,Safari,Firefox",
-    "min-test": "yarn build && karma start karma/ugly.conf.js"
+    "test": "jest --watch --coverage",
+    "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "angular": "^1.6.4",
@@ -36,17 +34,11 @@
   },
   "devDependencies": {
     "angular-mocks": "^1.6.4",
+    "coveralls": "^2.13.1",
     "grunt": "^1.0.1",
     "grunt-contrib-uglify": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
     "grunt-contrib-watch": "^1.0.0",
-    "jasmine-core": "^2.6.2",
-    "karma": "^1.7.0",
-    "karma-chrome-launcher": "^2.1.1",
-    "karma-coverage": "^1.1.1",
-    "karma-coveralls": "^1.1.2",
-    "karma-firefox-launcher": "^1.0.1",
-    "karma-jasmine": "^1.1.0",
-    "karma-safari-launcher": "^1.0.0",
+    "jest": "^20.0.4",
     "nodemon": "^1.11.0"
   },
   "repository": {

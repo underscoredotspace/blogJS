@@ -14,14 +14,12 @@ env:
 addons:
   apt:
     sources:
-      - google-chrome
       - ubuntu-toolchain-r-test
     packages:
-      - google-chrome-stable
       - g++-4.8
 
 script: 
-  - yarn travis
+  - yarn test:ci
 
 notifications:
   slack: tealhawk:$SLACK_KEY
