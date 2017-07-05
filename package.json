@@ -13,8 +13,15 @@
     "build": "grunt min",
     "start": "node app/server",
     "dev": "nodemon app/server & grunt & yarn test",
-    "test": "jest --watch --coverage",
+    "test": "jest",
+    "test:dev": "jest --watch --notify",
     "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "app/{client/src,server}/*.js"
+    ]
   },
   "dependencies": {
     "angular": "^1.6.4",

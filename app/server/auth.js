@@ -7,7 +7,13 @@ var bcrypt = require('bcrypt')
 var lastCode = null
 const otpRegEx = /^[0-9]{6}$/
 
-module.exports = {checkCode, qrCode, getCode, validateCode}
+module.exports = {
+  checkCode, 
+  qrCode, 
+  getCode, 
+  validateCode, 
+  _newSecret: newSecret, 
+  _getSecret: getSecret}
 
 function newSecret (cb) {
   crypto.randomBytes(256, (err, buf) => {
@@ -23,23 +29,27 @@ function newSecret (cb) {
 
 function getSecret (cb) {
   db.collection('admin').find().toArray((err, data) => {
-    if (data.length > 1) {
-      cb('too many records in admin collection')
+    if (err) {
+      cb(err)
     } else {
-      if (data.length === 0) {
-        newSecret((err, secret) => {
-          if (err) {
-            cb(err)
-          } else {
-            db.collection('admin').insert({secret: secret, verified: false}) 
-            cb(null, secret, false)
-          }
-        })
+      if (data.length > 1) {
+        cb('too many records in admin collection')
       } else {
-        if (data[0].hasOwnProperty('secret') && data[0].hasOwnProperty('verified') && data[0].secret) {
-          cb(null, data[0].secret, data[0].verified)  
+        if (data.length === 0) {
+          newSecret((err, secret) => {
+            if (err) {
+              cb(err)
+            } else {
+              db.collection('admin').insert({secret: secret, verified: false}) 
+              cb(null, secret, false)
+            }
+          })
         } else {
-          cb('problem with admin record', null)
+          if (data[0].hasOwnProperty('secret') && data[0].hasOwnProperty('verified') && data[0].secret) {
+            cb(null, data[0].secret, data[0].verified)  
+          } else {
+            cb('problem with admin record')
+          }
         }
       }
     }
