@@ -1,8 +1,8 @@
 'use strict'
 
-var routes = require('express').Router()
-var db = require('./mongo')
-var auth = require('./auth.js')
+const routes = require('express').Router()
+const db = require('./mongo')
+const auth = require('./auth.js')
 
 // If blog setup not yet complete, prints admin code to server console
 routes.get('/adminCode', (req, res) => {

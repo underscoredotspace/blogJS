@@ -1,10 +1,10 @@
 'use strict'
-var routes = require('express').Router()
-var db = require('./mongo')
-var auth = require('./auth.js')
+const routes = require('express').Router()
+const db = require('./mongo')
+const auth = require('./auth.js')
 
 routes.get('/latest/:count', (req, res) => {
-  var countRegEx = /^[0-9]{0,2}$/   // Number from 0-20
+  const countRegEx = /^[0-9]{0,2}$/   // Number from 0-20
   if (!countRegEx.test(req.params.count) || Number(req.params.count)>20) {
     res.status(400).json({err: 'count must be 1-20'})
   } else {
@@ -72,7 +72,7 @@ routes.post('/post', checkCookie, (req, res) => {
   if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
     res.status(400).json({err: 'Post or title not long enough'})
   } else {
-    var newPost = {
+    const newPost = {
       _id: db.ObjectId(),
       title: req.body.blogpost.title,
       content: req.body.blogpost.content,
@@ -107,7 +107,7 @@ routes.patch('/post/:id', checkCookie, (req, res) => {
     if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
       res.status(400).json({err: 'Post or title not long enough'})
     } else {
-      var thePost = {
+      const thePost = {
         title: req.body.blogpost.title,
         content: req.body.blogpost.content
       }

@@ -1,6 +1,6 @@
 'use strict'
-var express = require('express')
-var app = express()
+const express = require('express')
+const app = express()
 
 if (!process.env.MONGO_ADDR) {
   require('dotenv').config()
@@ -24,10 +24,10 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
       next()
     })
    
-    var cookieParser = require('cookie-parser')
+    const cookieParser = require('cookie-parser')
     app.use(cookieParser('7hIseGuy.H3_f$&*5'))
     
-    var bodyParser = require('body-parser')
+    const bodyParser = require('body-parser')
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
 
@@ -52,7 +52,7 @@ require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
     })
   
     // listen for requests :)
-    var listener = app.listen(process.env.PORT, function () {
+    const listener = app.listen(process.env.PORT, function () {
       console.info(`Your app is listening on http://localhost:${listener.address().port}`)
     }).on('error', (err) => {
       throw(err)

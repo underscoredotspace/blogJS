@@ -2,7 +2,7 @@
 const mongodb = require('mongodb')
 const MongoClient = mongodb.MongoClient
 
-var state = {
+const state = {
   db: null,
 }
 

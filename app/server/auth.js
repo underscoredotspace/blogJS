@@ -1,10 +1,10 @@
 'use strict'
-var OTP = require('otp.js')
-var GA = OTP.googleAuthenticator
-var db = require('./mongo')
-var crypto = require('crypto')
-var bcrypt = require('bcrypt')
-var lastCode = null
+const OTP = require('otp.js')
+const GA = OTP.googleAuthenticator
+const db = require('./mongo')
+const crypto = require('crypto')
+const bcrypt = require('bcrypt')
+let lastCode = null
 const otpRegEx = /^[0-9]{6}$/
 
 module.exports = {
@@ -82,7 +82,7 @@ function checkCode (code, cb) {
       if (err) {
         cb(err)
       } else {
-        var delta = GA.verify(code, secret)
+        const delta = GA.verify(code, secret)
         if (delta && Math.abs(delta.delta) <= 1) {
           lastCode = code
           cb(null, true, verified)
@@ -95,7 +95,7 @@ function checkCode (code, cb) {
 }
 
 function qrCode (cb) {
-  var user = 'user', org = 'blog'
+  const user = 'user', org = 'blog'
   getSecret((err, secret) => {
     if (err) {
       cb(err)

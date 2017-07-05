@@ -1,14 +1,15 @@
-const okSecret = 'EQZGCJBQGUSGEZRWGNGUE2BWPJKGMSSSORSHQWJZJ4XU25LRJNHFIULZNREUO5LSLFCEEZ2HGFZEM3LGNVKFKY2XGZYVC2KX'
 
 describe('OTP Auth Service', () => {
-    let mockDb
+  const okSecret = 'EQZGCJBQGUSGEZRWGNGUE2BWPJKGMSSSORSHQWJZJ4XU25LRJNHFIULZNREUO5LSLFCEEZ2HGFZEM3LGNVKFKY2XGZYVC2KX'
+  let mockDb, mockGa
 
   mockDb = {
     data: null,
     collection: jest.fn().mockImplementation(() => mockDb),
     find: jest.fn().mockImplementation(() => mockDb),
     insert: jest.fn(),
-    toArray: jest.fn().mockImplementation(cb => cb(null, mockDb.data))}
+    toArray: jest.fn().mockImplementation(cb => cb(null, mockDb.data))
+  }
 
   jest.mock('../../server/mongo', () => mockDb)
 
@@ -144,6 +145,68 @@ describe('OTP Auth Service', () => {
       expect(next).not.toHaveBeenCalled()
       expect(res.status).toHaveBeenCalledWith(401)
       expect(res.json).toHaveBeenCalledWith({err: 'Invalid code'})
+    })
+  })
+
+  describe('Check code', () => {
+    mockDb.data = [{secret: okSecret, verified: false}]
+
+    it('should return true when provided valid code', (done) => {
+      let myCode
+
+      auth.getCode((err, code, verified) => {
+        myCode = code
+      })
+
+      auth.checkCode(myCode, (err, pass) => {
+        expect(pass).toBe(true)
+        done()
+      })
+    })
+
+    it('should return false when provided invalid code', (done) => {
+      let myCode
+
+      auth.getCode((err, code, verified) => {
+        myCode = (Number(code) + 1).toString()
+        if (myCode.length < 6) {
+          const diff = 6 - myCode.length
+          for(let i=0; i<diff; i++) {
+            myCode = '0' + myCode
+          }
+        }
+      })
+
+      auth.checkCode(myCode, (err, pass) => {
+        expect(pass).toBe(false)
+        done()
+      })
+    })
+
+    it('should return error when provided valid code for the second time', (done) => {
+      let myCode
+
+      auth.getCode((err, code, verified) => {
+        myCode = code
+      })
+
+      auth.checkCode(myCode, () => {})
+      auth.checkCode(myCode, (err, pass) => {
+        expect(err).toBe('Wait for next code')
+        expect(pass).toBeUndefined()
+        done()
+      })
+
+    })
+
+  })
+
+  describe('Get QR', () => {
+    it('should give a QR SVG', () => {
+      auth.qrCode((err, QR) => {
+        const qrRegEx = /<svg.+\/><\/svg>/
+        expect(qrRegEx.test(QR)).toBe(true)
+      })
     })
   })
 

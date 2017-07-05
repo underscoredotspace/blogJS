@@ -322,8 +322,8 @@
   angular.module('colonApp').filter('niceDate', niceDataFilter)
   function niceDataFilter() {
     return function(d) {
-      var options = {year: 'numeric', month: 'long', day: 'numeric'}
-      var today  = new Date(d)
+      const options = {year: 'numeric', month: 'long', day: 'numeric'}
+      const today  = new Date(d)
       return today.toLocaleDateString('en-GB',options)
     }
   }
