@@ -26,17 +26,18 @@ routes.get('/latest', (req, res) => {
 })
 
 routes.get('/post/:id', (req, res) => {
-  const oIDRegEx = /[0-9a-f]{24}/i
+  const oIDRegEx = /^[0-9a-f]{24}$/i
+
   if (!oIDRegEx.test(req.params.id)) {
-    res.status(400).json('Bad post ID')
+    res.status(400).json({err:'Bad post ID'})
   } else {
     db.collection('blog').find({'_id': db.ObjectId(req.params.id)}).toArray((err, data) => {
       if (err) {
         console.error(err)
-        res.status(500).json('Error getting post')
+        res.status(500).json({err:'Error getting post'})
       }
       if (data.length === 0) {
-        res.status(204).json({err:'no matches'})
+        res.sendStatus(204)
       } else {
         res.json(data)
       }

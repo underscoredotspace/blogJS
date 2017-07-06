@@ -1,7 +1,7 @@
 
 describe('OTP Auth Service', () => {
   const okSecret = 'EQZGCJBQGUSGEZRWGNGUE2BWPJKGMSSSORSHQWJZJ4XU25LRJNHFIULZNREUO5LSLFCEEZ2HGFZEM3LGNVKFKY2XGZYVC2KX'
-  let mockDb, mockGa
+  let mockDb
 
   mockDb = {
     data: null,
