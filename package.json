@@ -12,7 +12,7 @@
   "scripts": {
     "build": "grunt min",
     "start": "node app/server",
-    "dev": "nodemon app/server & grunt & yarn test",
+    "dev": "nodemon app/server & grunt",
     "test": "jest",
     "test:dev": "jest --watch --notify",
     "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls"

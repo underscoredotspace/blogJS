@@ -8,6 +8,7 @@ let lastCode = null
 const otpRegEx = /^[0-9]{6}$/
 
 module.exports = {
+  checkCookie,
   checkCode, 
   qrCode, 
   getCode, 
@@ -91,6 +92,14 @@ function checkCode (code, cb) {
         }
       }
     })
+  }
+}
+
+function checkCookie (req, res, next) {
+  if(req.signedCookies['qqBlog']==='true') {
+    next()
+  } else {
+    res.status(401).json({err: 'Must be logged in'})
   }
 }
 

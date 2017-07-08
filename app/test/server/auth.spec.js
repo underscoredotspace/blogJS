@@ -201,6 +201,36 @@ describe('OTP Auth Service', () => {
 
   })
 
+  describe('Check cookie', () => {
+    let req = {body:{}, signedCookies: {}}
+    
+    const res = {
+      status: jest.fn().mockImplementation(() => res),
+      json: jest.fn().mockImplementation(() => res)
+    }, next = jest.fn()
+
+    beforeEach(() => {
+      req = req = {body:{}, signedCookies: {}}
+      jest.clearAllMocks()
+    })
+
+    it('should call next() cos we set cookie', () => {
+      req.signedCookies = {'qqBlog':'true'}
+      auth.checkCookie(req, res, next)
+      expect(next).toHaveBeenCalled()
+      expect(res.status).not.toHaveBeenCalled()
+      expect(res.json).not.toHaveBeenCalled()
+    })
+
+    it('should return error cos we didn\'t set cookie', () => {
+      req.signedCookies = {}
+      auth.checkCookie(req, res, next)
+      expect(res.status).toHaveBeenCalledWith(401)
+      expect(res.json).toHaveBeenCalledWith({err: 'Must be logged in'})
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
+
   describe('Get QR', () => {
     it('should give a QR SVG', () => {
       auth.qrCode((err, QR) => {

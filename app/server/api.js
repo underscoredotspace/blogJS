@@ -2,6 +2,7 @@
 const routes = require('express').Router()
 const db = require('./mongo')
 const auth = require('./auth.js')
+const oIDRegEx = /^[a-f\d]{24}$/i
 
 routes.get('/latest/:count', (req, res) => {
   const countRegEx = /^[0-9]{0,2}$/   // Number from 0-20
@@ -13,7 +14,7 @@ routes.get('/latest/:count', (req, res) => {
         res.status(500).json(err)
       }
       if (data.length === 0) {
-        res.status(204).json({err:'no matches'})
+        res.sendStatus(204)
       } else {
         res.json(data)
       }
@@ -26,15 +27,12 @@ routes.get('/latest', (req, res) => {
 })
 
 routes.get('/post/:id', (req, res) => {
-  const oIDRegEx = /^[0-9a-f]{24}$/i
-
   if (!oIDRegEx.test(req.params.id)) {
     res.status(400).json({err:'Bad post ID'})
   } else {
     db.collection('blog').find({'_id': db.ObjectId(req.params.id)}).toArray((err, data) => {
       if (err) {
-        console.error(err)
-        res.status(500).json({err:'Error getting post'})
+        res.status(500).json({err:err})
       }
       if (data.length === 0) {
         res.sendStatus(204)
@@ -61,15 +59,7 @@ routes.get('/logout', (req, res) => {
   res.json({loggedin: false})
 })
 
-const checkCookie = (req, res, next) => {
-  if(req.signedCookies.qqBlog) {
-    next()
-  } else {
-    res.status(401).json({err: 'Must be logged in'})
-  }
-}
-
-routes.post('/post', checkCookie, (req, res) => {
+routes.post('/post', auth.checkCookie, (req, res) => {
   if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
     res.status(400).json({err: 'Post or title not long enough'})
   } else {
@@ -89,8 +79,7 @@ routes.post('/post', checkCookie, (req, res) => {
   }
 })
 
-routes.delete('/post/:id', checkCookie, (req, res) => {
-  const oIDRegEx = /[0-9a-f]{24}/i
+routes.delete('/post/:id', auth.checkCookie, (req, res) => {
   if (!oIDRegEx.test(req.params.id)) {
     res.status(400).json('Bad post ID')
   } else {
@@ -100,8 +89,7 @@ routes.delete('/post/:id', checkCookie, (req, res) => {
   }
 })
 
-routes.patch('/post/:id', checkCookie, (req, res) => {
-  const oIDRegEx = /[0-9a-f]{24}/i
+routes.patch('/post/:id', auth.checkCookie, (req, res) => {
   if (!oIDRegEx.test(req.params.id)) {
     res.status(400).json('Bad post ID')
   } else {
