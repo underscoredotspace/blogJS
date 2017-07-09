@@ -114,6 +114,7 @@ routes.patch('/post/:id', auth.checkCookie, (req, res) => {
 routes.use('/setup', require('./setup'))
 
 routes.use((req, res) => {
+  console.error(`${req.method} request for ${req.baseUrl}${req.url} - 404`)
   res.sendStatus(404)
 })
 
