@@ -2,13 +2,14 @@ describe('Blog API', () => {
   const mockDb = {
     data: null,
     oid: '595f70031e019e7f2a7aa121',
+    err: null,
     collection: jest.fn().mockImplementation(() => mockDb),
     find: jest.fn().mockImplementation(() => mockDb),
     insert: jest.fn(),
-    insertOne: jest.fn().mockImplementation((newPost, cb) => cb(null, [])),
-    updateOne: jest.fn().mockImplementation((id, newPost, cb) => cb(null, [])),
-    remove: jest.fn().mockImplementation((id, cb) => cb(null, [])),
-    toArray: jest.fn().mockImplementation(cb => cb(null, mockDb.data)),
+    insertOne: jest.fn().mockImplementation((newPost, cb) => cb(mockDb.err, [])),
+    updateOne: jest.fn().mockImplementation((id, newPost, cb) => cb(mockDb.err, [])),
+    remove: jest.fn().mockImplementation((id, cb) => cb(mockDb.err, [])),
+    toArray: jest.fn().mockImplementation(cb => cb(mockDb.err, mockDb.data)),
     sort: jest.fn().mockImplementation(cb => mockDb),
     limit: jest.fn().mockImplementation(cb => mockDb),
     ObjectId: jest.fn().mockImplementation(() => mockDb.oid)
@@ -50,6 +51,7 @@ describe('Blog API', () => {
     mockDb.insertOne.mockClear()
     mockDb.updateOne.mockClear()
     mockDb.remove.mockClear()
+    mockDb.err = null
 
     mockAuth.checkCode.mockClear()
     mockAuth.validateCode.mockClear()
@@ -80,6 +82,19 @@ describe('Blog API', () => {
       
       return request(app).get('/api/latest/3').then(res => {
         expect(res.status).toBe(204)
+        expect(mockDb.collection).toHaveBeenCalledWith('blog')
+        expect(mockDb.limit).toHaveBeenCalledWith(3)
+        expect(mockDb.sort).toHaveBeenCalledWith({'_id': -1})
+        expect(mockDb.toArray).toHaveBeenCalled()
+      })
+    })
+
+    it('should get 3 latest posts', () => {
+      mockDb.err = 'some error'
+      
+      return request(app).get('/api/latest/3').then(res => {
+        expect(res.status).toBe(500)
+        expect(res.text).toBe('{\"err\":\"some error\"}')
         expect(mockDb.collection).toHaveBeenCalledWith('blog')
         expect(mockDb.limit).toHaveBeenCalledWith(3)
         expect(mockDb.sort).toHaveBeenCalledWith({'_id': -1})
@@ -136,7 +151,20 @@ describe('Blog API', () => {
         expect(mockDb.limit).not.toHaveBeenCalled()
         expect(mockDb.sort).not.toHaveBeenCalled()
         expect(mockDb.toArray).toHaveBeenCalled()
-      }).catch(err => expect(err).toBeUndefined())
+      })
+    })
+
+    it('should return mongo error', () => {
+      mockDb.err = 'some error'
+
+      return request(app).get('/api/post/592c78780e0322032c845436').then(res => {
+        expect(res.status).toBe(500)
+        expect(res.text).toBe('{\"err\":\"some error\"}')
+        expect(mockDb.collection).toHaveBeenCalledWith('blog')
+        expect(mockDb.limit).not.toHaveBeenCalled()
+        expect(mockDb.sort).not.toHaveBeenCalled()
+        expect(mockDb.toArray).toHaveBeenCalled()
+      })
     })
   })
 
@@ -173,6 +201,20 @@ describe('Blog API', () => {
         expect(mockDb.insertOne).not.toHaveBeenCalled()
         expect(res.status).toBe(400)
         expect(res.text).toBe('{\"err\":\"Post or title not long enough\"}')
+      })
+    })
+
+    it('should fail to make a new post because of database error', () => {
+      const newPost = {blogpost: {
+        title: 'post title',
+        content: 'post content',
+      }}
+      mockDb.err = 'some error'
+
+      return request(app).post('/api/post').send(newPost).then(res => {
+        expect(mockDb.insertOne).toHaveBeenCalled()
+        expect(res.status).toBe(500)
+        expect(res.text).toBe('{\"err\":\"some error\"}')
       })
     })
   })
@@ -235,6 +277,19 @@ describe('Blog API', () => {
       return request(app).patch('/api/post/' + mockDb.oid).send(newPost).then(res => {
         expect(mockDb.updateOne).not.toHaveBeenCalled()
         expect(res.status).toBe(400)
+      })
+    })
+
+    it('Should fail to update because of database error', () => {
+      const newPost = {blogpost: {
+        title: 'post title',
+        content: 'post content',
+      }}
+      mockDb.err = 'some error'
+      
+      return request(app).patch('/api/post/' + mockDb.oid).send(newPost).then(res => {
+        expect(mockDb.updateOne).toHaveBeenCalled()
+        expect(res.text).toBe('{\"err\":\"some error\"}')
       })
     })
   })

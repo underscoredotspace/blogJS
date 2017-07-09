@@ -11,7 +11,7 @@ routes.get('/latest/:count', (req, res) => {
   } else {
     db.collection('blog').find({}).sort({'_id':-1}).limit(Number(req.params.count)).toArray((err, data) => {
       if (err) {
-        res.status(500).json(err)
+        res.status(500).json({err})
       }
       if (data.length === 0) {
         res.sendStatus(204)
@@ -32,7 +32,7 @@ routes.get('/post/:id', (req, res) => {
   } else {
     db.collection('blog').find({'_id': db.ObjectId(req.params.id)}).toArray((err, data) => {
       if (err) {
-        res.status(500).json({err:err})
+        res.status(500).json({err})
       }
       if (data.length === 0) {
         res.sendStatus(204)
@@ -46,7 +46,7 @@ routes.get('/post/:id', (req, res) => {
 routes.post('/login', auth.validateCode, (req, res) => {
   auth.checkCode(req.body.code, (err, valid, verified) => {
     if (err || valid !== true || !verified) {
-      res.status(401).json({err: err, valid: valid, verified: verified}) 
+      res.status(401).json({err, valid, verified}) 
     } else {
       res.cookie('qqBlog', true, { maxAge: 1000 * 60 * 60, signed: true })
       res.json({loggedin: true})
@@ -71,7 +71,7 @@ routes.post('/post', auth.checkCookie, (req, res) => {
     }
     db.collection('blog').insertOne(newPost, (err, data) => {
       if (err) {
-        res.status(500).json({err: err})
+        res.status(500).json({err})
       } else {
         res.json({'id': newPost._id})
       }
@@ -102,7 +102,7 @@ routes.patch('/post/:id', auth.checkCookie, (req, res) => {
       }
       db.collection('blog').updateOne({'_id': db.ObjectId(req.params.id)}, {$set:thePost}, (err, data) => {
         if (err) {
-          res.status(500).json({err: err})
+          res.status(500).json({err})
         } else {
           res.json({'id': req.params.id})
         }

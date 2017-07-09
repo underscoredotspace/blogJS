@@ -2,25 +2,28 @@
 const mongodb = require('mongodb')
 const MongoClient = mongodb.MongoClient
 
-const state = {
-  db: null,
+const state = {db: null}
+
+function disconnect() {
+  state.db = null
 }
 
-const connect = (url, done) => {
+function connect (url, done) {
   if (state.db) {
-    return done()
-  }
-
-  MongoClient.connect(url, (err, db) => {
-    if (err) {
-      return done(err)
-    }
-    state.db = db
     done()
-  })
+  } else {
+    MongoClient.connect(url, (err, db) => {
+      if (err) {
+        done(err)
+      } else {
+        state.db = db
+        done()
+      }
+    })
+  }
 }
 
-const collection = (collectionName) => {
+function collection(collectionName) {
   if (!collectionName) {
     return null
   } else {
@@ -28,4 +31,4 @@ const collection = (collectionName) => {
   }
 }
 
-module.exports = {connect, collection, ObjectId: mongodb.ObjectId}
+module.exports = {connect, _disconnect:disconnect, collection, ObjectId: mongodb.ObjectId}
