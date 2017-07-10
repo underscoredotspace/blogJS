@@ -1,4 +1,3 @@
-
 describe('OTP Auth Service', () => {
   const okSecret = 'EQZGCJBQGUSGEZRWGNGUE2BWPJKGMSSSORSHQWJZJ4XU25LRJNHFIULZNREUO5LSLFCEEZ2HGFZEM3LGNVKFKY2XGZYVC2KX'
   let mockDb
@@ -16,10 +15,8 @@ describe('OTP Auth Service', () => {
   const auth = require('../../server/auth')
 
   beforeEach(() => {
-    mockDb.insert.mockClear()
-    mockDb.toArray.mockClear()
-    mockDb.find.mockClear()
-    mockDb.collection.mockClear()
+    mockDb.data = []
+    jest.clearAllMocks()
   })
 
   describe('Get secret', () => {
@@ -149,9 +146,8 @@ describe('OTP Auth Service', () => {
   })
 
   describe('Check code', () => {
-    mockDb.data = [{secret: okSecret, verified: false}]
-
     it('should return true when provided valid code', (done) => {
+      mockDb.data = [{secret: okSecret, verified: false}]
       let myCode
 
       auth.getCode((err, code, verified) => {
@@ -165,6 +161,7 @@ describe('OTP Auth Service', () => {
     })
 
     it('should return false when provided invalid code', (done) => {
+      mockDb.data = [{secret: okSecret, verified: false}]
       let myCode
 
       auth.getCode((err, code, verified) => {
@@ -184,6 +181,7 @@ describe('OTP Auth Service', () => {
     })
 
     it('should return error when provided valid code for the second time', (done) => {
+      mockDb.data = [{secret: okSecret, verified: false}]
       let myCode
 
       auth.getCode((err, code, verified) => {

@@ -51,30 +51,12 @@ describe('API Setup Routes', () => {
   app.use('/api/setup', setup)
 
   beforeEach(() => {
-    mockDb.insert.mockClear()
-    mockDb.toArray.mockClear()
-    mockDb.find.mockClear()
-    mockDb.collection.mockClear()
-    mockDb.sort.mockClear()
-    mockDb.limit.mockClear()
-    mockDb.insertOne.mockClear()
-    mockDb.updateOne.mockClear()
-    mockDb.remove.mockClear()
-
-    mockAuth.checkCode.mockClear()
-    mockAuth.validateCode.mockClear()
-    mockAuth.checkCookie.mockClear()
-    mockAuth.getCode.mockClear()
-    mockAuth.qrCode.mockClear()
-
+    jest.clearAllMocks()
     mockAuth.pass = null
     mockAuth.verified = null
     mockAuth.err = null
     mockAuth.code = null
     mockAuth.qrErr = null
-
-    console.log.mockClear()
-    console.error.mockClear()
   })
 
   describe('Get Admin Code', () => {

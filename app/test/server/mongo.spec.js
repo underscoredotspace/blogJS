@@ -21,9 +21,7 @@ describe('Mongo handler module', () => {
   beforeEach(() => {
     mongo._disconnect()
     mockMongo.err = null
-    mockMongo.MongoClient.connect.mockClear()
-    mockMongo.MongoClient.collection.mockClear()
-    mockMongo.db.collection.mockClear()
+    jest.clearAllMocks()
   })
 
   describe('Connecting', () => {

@@ -42,20 +42,8 @@ describe('Blog API', () => {
   app.use('/api', api)
 
   beforeEach(() => {
-    mockDb.insert.mockClear()
-    mockDb.toArray.mockClear()
-    mockDb.find.mockClear()
-    mockDb.collection.mockClear()
-    mockDb.sort.mockClear()
-    mockDb.limit.mockClear()
-    mockDb.insertOne.mockClear()
-    mockDb.updateOne.mockClear()
-    mockDb.remove.mockClear()
     mockDb.err = null
-
-    mockAuth.checkCode.mockClear()
-    mockAuth.validateCode.mockClear()
-    mockAuth.checkCookie.mockClear()
+    jest.clearAllMocks()
   })
 
   it('Should 404 cos bad API path', () => {

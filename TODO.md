@@ -7,7 +7,7 @@
 
 ## Client
 - [ ] Split functionality up a bit
-- [ ] Global blog service so that controllers can be much cleaner
+- [X] Global blog service so that controllers can be much cleaner
 - [ ] Get route set up with related controler rather than in config
 - [X] Break down codeHighlight() for Showdown. Separate completely? 
 
@@ -20,10 +20,15 @@
 # Oh shit!
 - Moar tests
   - [ ] Client
-    - blogService
-    - authService
+    - [X] blogService
+    - [X] authService
+    - [ ] main
   - [ ] Server
-    - auth
+    - [X] auth
+    - [X] api
+    - [X] setup
+    - [X] mongo
+    - [ ] index
 
 # Routes
 - Server (/api/)
