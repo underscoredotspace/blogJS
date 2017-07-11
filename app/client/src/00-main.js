@@ -49,7 +49,8 @@
       })
       .when('/login', {
         templateUrl: 'part/login.html',
-        controller: 'login'
+        controller: 'login',
+        controllerAs: 'vm'
       })
       .when('/logout', {
         template: '',
@@ -117,13 +118,10 @@
   logoutController.$inject = ['$location', 'authService']
 
   function logoutController($location, authService) {
-    if (!authService.isLoggedIn()) {
-      $location.path('/home')
+    if (authService.isLoggedIn()) {
+      authService.logout().catch(console.error)      
     }
-
-    authService.logout()
-      .then(() => {$location.path('/home')})
-      .catch(console.error)      
+    $location.path('/home')
   }
 })();
 
@@ -237,17 +235,18 @@
 
 (function() {
   angular.module('colonApp').controller('login', loginController)
-  loginController.$inject = ['$scope', '$location', 'authService']
+  loginController.$inject = ['$location', 'authService']
 
-  function loginController($scope, $location, authService) {
+  function loginController($location, authService) {
+    const vm = this
     if (authService.isLoggedIn()) {
       $location.path('/home')
-    }
-
-    $scope.login = function(code) {
-      authService.login(code)
-        .then(() => {$location.path('/home')})
-        .catch(console.error)      
+    } else {
+      vm.login = function(code) {
+        authService.login(code)
+          .then(() => {$location.path('/home')})
+          .catch(console.error)      
+      }
     }
   }
 })();

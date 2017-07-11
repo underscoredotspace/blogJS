@@ -26,13 +26,13 @@ describe('authService: Controls authentication', () => {
   })
 
   it('should contain a functions login, logout and isLoggedIn', () => {
-    expect(authService.login).toEqual(jasmine.any(Function))
-    expect(authService.logout).toEqual(jasmine.any(Function))
-    expect(authService.isLoggedIn).toEqual(jasmine.any(Function))
+    expect(authService.login).toBeInstanceOf(Function)
+    expect(authService.logout).toBeInstanceOf(Function)
+    expect(authService.isLoggedIn).toBeInstanceOf(Function)
   })
 
   it('should return logged in status as false', () => {
-    expect(authService.isLoggedIn()).toEqual(false)
+    expect(authService.isLoggedIn()).toBeFalsy()
   })
 
   it('should log user in', () => {
