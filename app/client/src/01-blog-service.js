@@ -16,7 +16,7 @@
     function getPost(id) {
       let post
       if (!id) {
-        post = 'latest/5'
+        post = 'latest/2'
       } else {
         post = 'post/' + id
       }

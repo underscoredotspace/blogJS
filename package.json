@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "grunt min",
+    "build:watch": "grunt",
     "start": "node app/server",
     "dev": "nodemon app/server & grunt",
     "test": "jest",
@@ -24,9 +25,9 @@
     ]
   },
   "dependencies": {
-    "angular": "^1.6.4",
-    "angular-cookies": "^1.6.4",
-    "angular-route": "^1.6.4",
+    "angular": "^1.6.5",
+    "angular-cookies": "^1.6.5",
+    "angular-route": "^1.6.5",
     "bcrypt": "^1.0.2",
     "body-parser": "^1.17.2",
     "cookie-parser": "^1.4.3",
@@ -40,7 +41,7 @@
     "showdown": "^1.7.1"
   },
   "devDependencies": {
-    "angular-mocks": "^1.6.4",
+    "angular-mocks": "^1.6.5",
     "coveralls": "^2.13.1",
     "grunt": "^1.0.1",
     "grunt-contrib-uglify": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",

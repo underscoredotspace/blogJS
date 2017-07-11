@@ -10,5 +10,5 @@
 <div class="blog-post" data-ng-hide="newPost.$invalid">
 	<h1>{{vm.blogpost.title}}</h1>
   <div markdown-to-html="vm.blogpost.content"></div>
-  <div class="blog-post-date"><a href="/#!/new">{{vm.blogpost.date|niceDate}}</a></div>
+  <div class="blog-post-date"><a href="/#!/new">{{vm.blogpost.date|date:'d MMMM y'}}</a></div>
 </div>

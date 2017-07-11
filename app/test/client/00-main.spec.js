@@ -94,16 +94,4 @@ describe('Client main', () => {
       expect($location.path()).toBe('/home')
     })
   })
-
-  describe('niceDate Filter', () => {
-    it('gives a nice date', () => {
-      const niceDate = $filter('niceDate')
-      expect(niceDate(new Date('2083-02-28T11:11:11.909Z'))).toBe('February 28, 2083')
-    })
-
-    it(`returns 'Invalid Date'`, () => {
-      const niceDate = $filter('niceDate')
-      expect(niceDate('blah')).toBe('Invalid Date')
-    })
-  })
 })

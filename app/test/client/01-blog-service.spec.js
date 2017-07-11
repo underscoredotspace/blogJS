@@ -29,8 +29,8 @@ describe('blogService: Completes API calls for blog posts', () => {
     expect(blogService.get).toEqual(jasmine.any(Function))
   })
 
-  it('should get latest 5 posts', () => {
-    const getLatest5 = $httpBackend.expectGET('/api/latest/5').respond([])
+  it('should get latest 2 posts', () => {
+    const getLatest5 = $httpBackend.expectGET('/api/latest/2').respond([])
     blogService.get()
     .then($httpBackend.flush())
     .catch(err => expect(err).toBeUndefined())
