@@ -46,7 +46,7 @@ code {
   font-size: 85%;
   display: inline;
   background: black;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Fira Code','Source Code Pro', monospace;
 }
 
 code::before, code::after {

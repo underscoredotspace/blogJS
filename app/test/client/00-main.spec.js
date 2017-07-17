@@ -10,27 +10,38 @@ describe('Client main', () => {
 
   require('../../client/src/00-main.js')
 
-  let $rootScope, $controller, $location, $filter
-
+  let promiseOk, promiseResolve, $rootScope, $controller, $location, $filter, $q
+  
   const authService = {
     loggedin: false,
     isLoggedIn: jest.fn().mockImplementation(() => authService.loggedin),
     logout: jest.fn().mockImplementation(fakePromise),
     login: jest.fn().mockImplementation(fakePromise)
   }
+  
+  const okOID = '592c78780e0322032c845430'
 
-  let promiseOk = true
+  const blogService = {
+    get: jest.fn().mockImplementation(fakePromise),
+    delete: jest.fn().mockImplementation(fakePromise),
+    edit: jest.fn().mockImplementation(fakePromise),
+    new: jest.fn().mockImplementation(fakePromise)
+  }
+
+
   function fakePromise() {
     if (promiseOk) {
-      return new Promise((resolve, reject) => resolve('ok'))
+      return $q.resolve(promiseResolve)
     } else {
-      return new Promise((resolve, reject) => reject('error'))
+      return $q.reject('error')
     }
   }
 
   beforeEach(() => {
     authService.loggedin = false
-    authService.ok = false
+
+    promiseOk = true
+    promiseResolve = 'ok'
     jest.clearAllMocks()
 
     angular.mock.module('colonApp')
@@ -40,13 +51,14 @@ describe('Client main', () => {
       $controller = $injector.get('$controller')
       $location = $injector.get('$location')
       $filter = $injector.get('$filter')
+      $q = $injector.get('$q')
     })
   })
 
   describe('blogController', () => {
     it('Reflects us being logged in', () => {
       authService.loggedin = true
-      var controller = $controller('blogController', {authService:authService})
+      const controller = $controller('blogController', {authService:authService})
       $rootScope.$broadcast('auth-status')
       expect(authService.isLoggedIn).toHaveBeenCalled()
       expect(controller.loggedin).toEqual(true);
@@ -61,17 +73,124 @@ describe('Client main', () => {
     })
   })
 
+  describe('postController', () => {
+    it('should load latest posts', () => {
+      promiseResolve = {data:['test', 'test2']}
+      const controller = $controller('post', {blogService})
+      $rootScope.$digest()
+      expect(controller.postEdit).toBeInstanceOf(Function)
+      expect(controller.postDelete).toBeInstanceOf(Function)
+      expect(blogService.get).toHaveBeenCalledWith(undefined)
+      expect(controller.blogposts[1]).toBe('test2')
+      expect(controller.blogposts.length).toBe(2)
+    })
+
+    it('should load specific post', () => {
+      promiseResolve = {data:['test']}
+      const routeParams = {id: okOID}
+      const controller = $controller('post', {blogService, $routeParams:routeParams})
+      $rootScope.$digest()
+      expect(controller.postEdit).toBeInstanceOf(Function)
+      expect(controller.postDelete).toBeInstanceOf(Function)
+      expect(blogService.get).toHaveBeenCalledWith(routeParams.id)
+      expect(controller.blogposts[0]).toBe('test')
+    })
+
+    it('should not load specific post cos id is bad', () => {
+      const routeParams = {id:'zzz'}
+      const controller = $controller('post', {blogService, $routeParams:routeParams})
+      $rootScope.$digest()
+      expect($location.path()).toBe('/home')
+    })
+
+    it('test edit', () => {
+      const controller = $controller('post', {blogService})
+      controller.postEdit('595f70031e019e7f2a7aa121')
+      $rootScope.$digest()
+      expect($location.path()).toBe('/edit/595f70031e019e7f2a7aa121')
+    })
+
+    it('test delete while at post/:id', () => {
+      promiseResolve = {data:['test']}
+      const routeParams = {id:'595f70031e019e7f2a7aa121'}
+      const controller = $controller('post', {blogService, $routeParams:routeParams})
+      controller.postDelete('595f70031e019e7f2a7aa121')
+      $rootScope.$digest()
+      expect($location.path()).toBe('/home')
+    })
+
+    it('delete while at home', () => {
+      promiseResolve = {data:[
+        {_id: '595f70031e019e7f2a7aa121'},
+        {_id: '595f70031e019e7f2a7aa128'}
+      ]}
+      const controller = $controller('post', {blogService})
+      controller.postDelete('595f70031e019e7f2a7aa121')
+      $rootScope.$digest()
+      expect(controller.blogposts.length).toBe(1)
+    })
+  })
+
+  describe('newController', () => {
+    it('Redirect to /login when not logged in', () => {
+      const controller = $controller('new', {authService, blogService})
+      $rootScope.$digest()
+      expect($location.path()).toBe('/login')
+    })
+
+    it('Load new post page when logged in', () => {
+      authService.loggedin = true
+      const controller = $controller('new', {authService, blogService})
+      $rootScope.$digest()
+      expect(controller.submitPost).toBeInstanceOf(Function)
+      expect(controller.blogpost).toBeInstanceOf(Object)
+      expect(controller.blogpost.hasOwnProperty('date')).toBeTruthy()
+    })
+
+    it('Should submit post to API and redirect to new post', () => {
+      authService.loggedin = true
+      const blogpost = {title: 'title', content: 'content'}
+      const controller = $controller('new', {authService, blogService})
+      $rootScope.$digest()
+      controller.submitPost(blogpost)
+      $rootScope.$digest()
+      expect(blogService.new).toHaveBeenCalledWith({content: 'content', title: 'title'})
+      expect($location.path()).toBe('/post/ok')
+    })
+  })
+
+  describe('editController', () => {
+
+    it('Redirect to /login when not logged in', () => {
+      const controller = $controller('edit', {authService, blogService})
+      $rootScope.$digest()
+      expect($location.path()).toBe('/login')
+    })
+
+    it('Load edit post page when logged in', () => {
+      authService.loggedin = true
+      const $routeParams = {id:okOID}
+      promiseResolve = {data: [{title: 'title', content: 'content'}]}
+      const controller = $controller('edit', {authService, blogService, $routeParams})
+      $rootScope.$digest()
+      expect(controller.submitPost).toBeInstanceOf(Function)
+      expect(blogService.get).toHaveBeenCalledWith(okOID)
+      expect(controller.blogpost.title).toBe('title')
+      expect(controller.blogpost.content).toBe('content')
+    })
+  })
+
   describe('logoutController', () => {
     it('Should log us out', () => {
       authService.loggedin = true
-      var controller = $controller('logout', {authService:authService})
+      const controller = $controller('logout', {authService})
       expect(authService.logout).toHaveBeenCalled()    
       expect($location.path()).toBe('/home')  
     })
 
     it('Should just go home cos we\'re not logged in', () => {
       authService.loggedin = false
-      var controller = $controller('logout', {authService:authService})
+      const controller = $controller('logout', {authService})
       expect(authService.logout).not.toHaveBeenCalled()  
       expect($location.path()).toBe('/home')
     })
@@ -80,7 +199,7 @@ describe('Client main', () => {
   describe('loginController', () => {
     it('Should log us in', () => {
       authService.loggedin = false
-      var controller = $controller('login', {authService:authService})
+      const controller = $controller('login', {authService:authService})
       expect(controller.login).toBeInstanceOf(Function)
       controller.login()
       $rootScope.$digest()
@@ -89,7 +208,7 @@ describe('Client main', () => {
 
     it('Should just go home cos we\'re already logged in', () => {
       authService.loggedin = true
-      var controller = $controller('login', {authService:authService})
+      const controller = $controller('login', {authService:authService})
       expect(controller.login).toBeUndefined()
       expect($location.path()).toBe('/home')
     })

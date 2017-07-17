@@ -141,55 +141,54 @@
         id = $routeParams.id
       }
     }
+    
+    vm.blogposts = []
 
     blogService.get(id)
       .then(posts => {
-        vm.blogposts = []
-        posts.data.forEach((post, ndx) => {
+
+        for (let post of posts.data) {
           vm.blogposts.push(post)
-        });
+        }
       })
       .catch(err => console.error)
 
-    vm.postDelete = postDelete
-
-    function postDelete(id) {
+    vm.postDelete = id => {
       blogService.delete(id)
         .then(() => {
           vm.blogposts = $filter('filter')(vm.blogposts, {'_id': '!' + id})
           $location.path('/home')
         })
-        .catch(err => console.error)
+        .catch(console.error)
     }
 
-    vm.postEdit = postEdit
-
-    function postEdit(id) {
-      $location.path('/edit/' + id)
+    vm.postEdit = id => {
+      $location.path(`/edit/${id}`)
     }
   }
 })();
 
 (function() {
   angular.module('colonApp').controller('new', newController)
-  newController.$inject = ['$http', '$location', 'authService', 'blogService']
+  newController.$inject = ['$location', 'authService', 'blogService']
 
-  function newController($http, $location, authService, blogService) {
+  function newController($location, authService, blogService) {
     const vm = this
 
     if (!authService.isLoggedIn()) {
       $location.path('/login')
-    }
-    vm.blogpost = {
-      date: new Date()
-    }
-
-    vm.submitPost = blogpost => {
-      blogService.new(blogpost)
+    } else {
+      vm.blogpost = {
+        date: new Date()
+      }
+      
+      vm.submitPost = blogpost => {
+        blogService.new(blogpost)
         .then(id => {
           $location.path('/post/'+ id)
         })
-        .catch(err => console.error)
+        .catch(console.error)
+      }
     }
   }
 })();
@@ -203,32 +202,33 @@
 
     if (!authService.isLoggedIn()) {
       $location.path('/login')
-    }
+    } else {
+      let id
 
-    let id
-
-    if (angular.isDefined($routeParams.id)) {
-      const oIDRegEx = /[0-9a-fA-F]{24}/i
-      if (!oIDRegEx.test($routeParams.id)) {
-        $location.path('/home')
-      } else {
-        id = $routeParams.id
+      if (angular.isDefined($routeParams.id)) {
+        const oIDRegEx = /^[a-f\d]{24}$/i
+        if (!oIDRegEx.test($routeParams.id)) {
+          return $location.path('/home')
+          
+        } else {
+          id = $routeParams.id
+        }
       }
-    }
 
-    blogService.get(id)
-      .then(posts => {
-        vm.blogpost = posts.data[0]
-      })
-      .catch(err => console.error)
-
-
-    vm.submitPost = blogpost => {
-      blogService.edit(id, blogpost)
-        .then(id => {
-          $location.path('/post/'+ id)
+      blogService.get(id)
+        .then(posts => {
+          vm.blogpost = posts.data[0]
         })
-        .catch(err => console.error)
+        .catch(console.error)
+
+
+      vm.submitPost = blogpost => {
+        blogService.edit(id, blogpost)
+          .then(id => {
+            $location.path('/post/'+ id)
+          })
+          .catch(console.error)
+      }
     }
   }
 })();

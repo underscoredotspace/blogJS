@@ -13,16 +13,19 @@
     "build": "grunt min",
     "build:watch": "grunt",
     "start": "node app/server",
-    "dev": "nodemon app/server & grunt",
+    "start:watch": "nodemon app/server",
+    "dev": "yarn build:watch & yarn start:watch",
     "test": "jest",
-    "test:dev": "jest --watch --notify",
-    "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls"
+    "test:watch": "jest --watchAll --notify",
+    "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls",
+    "cover:view": "open coverage/lcov-report/index.htm"
   },
   "jest": {
     "collectCoverage": true,
     "collectCoverageFrom": [
       "app/{client/src,server}/*.js"
-    ]
+    ],
+    "roots": ["app/client/src", "app/server", "app/test"]
   },
   "dependencies": {
     "angular": "^1.6.5",
