@@ -167,6 +167,14 @@ describe('Client main', () => {
       expect($location.path()).toBe('/login')
     })
 
+    it('Redirect to /home when bad id given', () => {
+      authService.loggedin = true
+      const $routeParams = {id:'zzz'}
+      const controller = $controller('edit', {authService, blogService, $routeParams})
+      $rootScope.$digest()
+      expect($location.path()).toBe('/home')
+    })
+
     it('Load edit post page when logged in', () => {
       authService.loggedin = true
       const $routeParams = {id:okOID}
@@ -177,6 +185,22 @@ describe('Client main', () => {
       expect(blogService.get).toHaveBeenCalledWith(okOID)
       expect(controller.blogpost.title).toBe('title')
       expect(controller.blogpost.content).toBe('content')
+      controller.submitPost(okOID, controller.blogpost)
+      $rootScope.$digest()
+      expect()
+    })
+
+    it('submits edited post', () => {
+      authService.loggedin = true
+      const $routeParams = {id:okOID}
+      promiseResolve = {data: [{title: 'title', content: 'content'}]}
+      const controller = $controller('edit', {authService, blogService, $routeParams})
+      $rootScope.$digest()
+      promiseResolve = okOID
+      controller.submitPost(controller.blogpost)
+      $rootScope.$digest()
+      expect(blogService.edit).toHaveBeenCalledWith(okOID, {title: 'title', content: 'content'})
+      expect($location.path()).toBe(`/post/${okOID}`)
     })
   })
 

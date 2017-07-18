@@ -209,7 +209,6 @@
         const oIDRegEx = /^[a-f\d]{24}$/i
         if (!oIDRegEx.test($routeParams.id)) {
           return $location.path('/home')
-          
         } else {
           id = $routeParams.id
         }
