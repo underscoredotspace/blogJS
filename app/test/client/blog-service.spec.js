@@ -6,8 +6,9 @@ window.showdown = require('showdown')
 require('ng-showdown')
 require('highlightjs')
 require('angular-mocks')
-require('../../client/src/00-main.js')
-require('../../client/src/01-blog-service.js')
+require('../../client/src/00-config.js')
+require('../../client/src/01-main.js')
+require('../../client/src/02-blog-service.js')
 
 describe('blogService: Completes API calls for blog posts', () => {
   let blogService, $httpBackend, $rootScope

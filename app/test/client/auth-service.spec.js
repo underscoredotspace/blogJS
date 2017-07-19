@@ -4,23 +4,30 @@ require('angular-route')
 require('angular-sanitize')
 window.showdown = require('showdown')
 require('ng-showdown')
-require('highlightjs')
+window.hljs = ('highlightjs')
 require('angular-mocks')
-require('../../client/src/00-main.js')
-require('../../client/src/02-auth-service.js')
+
+require('../../client/src/00-config.js')
+require('../../client/src/01-main.js')
+require('../../client/src/03-auth-service.js')
 
 describe('authService: Controls authentication', () => {
-  let authService, $httpBackend, $rootScope
+  let authService, $httpBackend, $cookies, $controller
+
   beforeEach(() => {
     angular.mock.module('colonApp')
 
     inject(function($injector) {
       authService = $injector.get('authService')
       $httpBackend = $injector.get('$httpBackend')
+      $cookies = $injector.get('$cookies')
+      $controller = $injector.get('$controller')
     })
-  })
 
+  })
+  
   afterEach(() => {
+    $cookies.remove('qqBlog')
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
   })
@@ -34,6 +41,11 @@ describe('authService: Controls authentication', () => {
   it('should return logged in status as false', () => {
     expect(authService.isLoggedIn()).toBeFalsy()
   })
+
+  // it('should return logged in status as true', () => {
+  //   $cookies.put('qqBlog', true)
+  //   expect(authService.isLoggedIn()).toBeTruthy()
+  // })
 
   it('should log user in', () => {
     const login = $httpBackend.expectPOST('/api/login').respond({loggedin: true})

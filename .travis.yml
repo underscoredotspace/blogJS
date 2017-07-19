@@ -4,6 +4,7 @@ node_js:
 
 cache:
   yarn: true
+  apt: true
   directories:
     - "node_modules"
 

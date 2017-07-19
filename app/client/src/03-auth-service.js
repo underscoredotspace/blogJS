@@ -4,14 +4,16 @@ authService.$inject = ['$http', '$cookies', '$q', '$rootScope']
 function authService($http, $cookies, $q, $rootScope) {
   let loggedIn = false
 
-  if ($cookies.get('qqBlog')) {
-    loggedIn = true
-  }
+  console.log($cookies.getAll())
 
   return {
     login,
     logout,
     isLoggedIn
+  }
+
+  if ($cookies.get('qqBlog')) {
+    loggedIn = true
   }
 
   function login(code) {

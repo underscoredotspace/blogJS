@@ -18,7 +18,7 @@
     "test": "jest",
     "test:watch": "jest --watchAll --notify",
     "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls",
-    "cover:view": "open coverage/lcov-report/index.htm"
+    "cover:view": "open coverage/lcov-report/index.html"
   },
   "jest": {
     "collectCoverage": true,

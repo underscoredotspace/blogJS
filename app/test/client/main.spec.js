@@ -3,14 +3,14 @@ describe('Client main', () => {
   require('angular-cookies')
   require('angular-route')
   require('angular-sanitize')
+  window.hljs = require('highlightjs')
   window.showdown = require('showdown')
   require('ng-showdown')
-  require('highlightjs')
   require('angular-mocks')
+  require('../../client/src/00-config.js')
+  require('../../client/src/01-main.js')
 
-  require('../../client/src/00-main.js')
-
-  let promiseOk, promiseResolve, $rootScope, $controller, $location, $filter, $q
+  let promiseOk, promiseResolve, $rootScope, $controller, $location, $filter, $q, $showdown
   
   const authService = {
     loggedin: false,
