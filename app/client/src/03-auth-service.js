@@ -2,18 +2,10 @@ angular.module('colonApp').service('authService', authService)
 
 authService.$inject = ['$http', '$cookies', '$q', '$rootScope']
 function authService($http, $cookies, $q, $rootScope) {
-  let loggedIn = false
-
-  console.log($cookies.getAll())
-
   return {
     login,
     logout,
     isLoggedIn
-  }
-
-  if ($cookies.get('qqBlog')) {
-    loggedIn = true
   }
 
   function login(code) {
@@ -26,7 +18,6 @@ function authService($http, $cookies, $q, $rootScope) {
     return $http(options)
     .then(res => {
       if (res.data.loggedin === true) {
-        loggedIn = true
         $rootScope.$broadcast('auth-status')
         return $q.resolve(res)
       } else {
@@ -36,15 +27,19 @@ function authService($http, $cookies, $q, $rootScope) {
   }
 
   function logout() {
+    $cookies.remove('qqBlog')
     return $http.get('/api/logout')
     .then(res => {
-      loggedIn = false
-      $rootScope.$broadcast('auth-status', loggedIn)
+      $rootScope.$broadcast('auth-status')
       return $q.resolve(res)
     })
   }
 
   function isLoggedIn() {
-    return loggedIn
+    if ($cookies.get('qqBlog')) {
+      return true
+    } else {
+      return false
+    }
   }
 }

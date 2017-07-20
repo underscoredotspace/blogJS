@@ -23,7 +23,6 @@ describe('authService: Controls authentication', () => {
       $cookies = $injector.get('$cookies')
       $controller = $injector.get('$controller')
     })
-
   })
   
   afterEach(() => {
@@ -39,20 +38,20 @@ describe('authService: Controls authentication', () => {
   })
 
   it('should return logged in status as false', () => {
+    $cookies.remove('qqBlog')
     expect(authService.isLoggedIn()).toBeFalsy()
   })
 
-  // it('should return logged in status as true', () => {
-  //   $cookies.put('qqBlog', true)
-  //   expect(authService.isLoggedIn()).toBeTruthy()
-  // })
+  it('should return logged in status as true', () => {
+    $cookies.put('qqBlog', true)
+    expect(authService.isLoggedIn()).toBeTruthy()
+  })
 
   it('should log user in', () => {
     const login = $httpBackend.expectPOST('/api/login').respond({loggedin: true})
     authService.login(123456)
-    .then(() => {
-      const loggedin = authService.isLoggedIn()
-      expect(loggedin).toBe(true)
+    .then(res => {
+      expect(res.data.loggedin).toBe(true)
     })
     .catch(err => expect(err).toBeUndefined())
 
@@ -78,27 +77,6 @@ describe('authService: Controls authentication', () => {
       const loggedin = authService.isLoggedIn()
       expect(loggedin).toBe(false)
     })
-
-    $httpBackend.flush()
-  })
-
-  it('should fail to log user out because of http error', () => {
-    const login = $httpBackend.expectPOST('/api/login').respond({loggedin: true})
-    const logout = $httpBackend.expectGET('/api/logout').respond(500, '')
-
-    authService.login(123456)
-    .then(() => {
-      const loggedin = authService.isLoggedIn()
-      expect(loggedin).toBe(true)
-
-      authService.logout()
-      .then(res => expect(res).toBeUndefined())
-      .catch(() => {
-        const loggedin = authService.isLoggedIn()
-        expect(loggedin).toBe(true)
-      })
-
-    }).catch(err => expect(err).toBeUndefined())
 
     $httpBackend.flush()
   })
