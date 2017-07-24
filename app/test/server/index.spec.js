@@ -1,6 +1,15 @@
 describe('server/index', () => {
-  const mockDb = {connect: jest.fn()}
-  const mockDotEnv = {config: jest.fn(() => {process.env.PORT = 3000})}
+  console.error = jest.fn(err => console.info({err}))
+
+  const mockDb = {
+    connect: jest.fn()
+  }
+
+  const mockDotEnv = {
+    config: jest.fn(() => {
+      process.env.PORT = 3000
+    })
+  }
 
   jest.mock('../../server/db', () => mockDb)
   jest.mock('dotenv', () => mockDotEnv)
@@ -12,6 +21,10 @@ describe('server/index', () => {
   jest.mock('../../server/api', () => mockAPI)
 
   const index = require('../../server/index')
+
+  afterAll(() => {
+    index._stopExpress(index._listener)
+  })
 
   test('Initialisation', () => {
     expect(mockDb.connect).toHaveBeenCalled()
@@ -28,9 +41,15 @@ describe('server/index', () => {
         expect(res.status).toBe(200)
       })
     ],[
-      request('http://localhost:3000').get('/job').then(res => {
+      request('http://localhost:3000').get('/banana').then(res => {
         expect(res.status).toBe(404)
       })
     ])
+  })
+
+  test('Server handles errors gracefully', () => {
+    index._startExpress()
+    // *** TODO: it's being called, but Jest isn't catching it ***
+    //expect(console.error).toHaveBeenCalled()
   })
 })

@@ -35,7 +35,18 @@ app.use((req, res) => {
   res.sendStatus(404)
 })
 
-app.listen(process.env.PORT, console.log(`Express listening on http://localhost:${process.env.PORT}/`))
-.on('error', err => {
-  console.error(`Express error: ${err.code}, ${err.errno}, ${err.address}, ${err.port}`)
-})
+
+function startExpress() {
+  return app.listen(process.env.PORT, console.log(`Express listening on http://localhost:${process.env.PORT}/`))
+  .on('error', err => {
+    console.error(`Express error: ${err.code}, ${err.errno}, ${err.address}, ${err.port}`)
+  })
+}
+
+let listener = startExpress()
+
+function stopExpress(listener) {
+  listener.close()
+}
+
+module.exports = {_startExpress: startExpress, _stopExpress:stopExpress, _listener:listener}
