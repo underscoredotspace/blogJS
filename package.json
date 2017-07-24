@@ -23,9 +23,15 @@
   "jest": {
     "collectCoverage": true,
     "collectCoverageFrom": [
-      "app/{client/src,server}/*.js"
+      "app/client/src/*.js",
+      "app/server/*.js",
+      "app/server/**/*.js"
     ],
-    "roots": ["app/client/src", "app/server", "app/test"]
+    "roots": [
+      "app/client/src",
+      "app/server/",
+      "app/test"
+    ]
   },
   "dependencies": {
     "angular": "^1.6.5",
@@ -37,7 +43,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
     "highlightjs": "^9.10.0",
-    "mongodb": "^2.2.27",
+    "mongoose": "^4.11.3",
     "ng-showdown": "^1.1.0",
     "on-headers": "^1.0.1",
     "otp.js": "^1.1.0",

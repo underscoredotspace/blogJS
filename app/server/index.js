@@ -1,61 +1,41 @@
 'use strict'
+require('dotenv').config()
+const db = require('./db')
+db.connect()
+
 const express = require('express')
 const app = express()
 
-if (!process.env.MONGO_ADDR) {
-  require('dotenv').config()
-  if (!process.env.MONGO_ADDR) {
-    throw(new Error('Environment variable "MONGO_ADDR" must point to your mongodb'))
-  }
-}
+app.use(
+  express.static('app/client/build'),
+  express.static('app/client/view')
+)
+app.use('/lib', 
+  express.static('node_modules/angular'),
+  express.static('node_modules/angular-cookies'),
+  express.static('node_modules/angular-route'),
+  express.static('node_modules/angular-sanitize'),
+  express.static('node_modules/showdown/dist'),
+  express.static('node_modules/ng-showdown/dist'),
+  express.static('node_modules/highlightjs')
+)
 
-require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
-  if (err) {
-    throw(err)
-  } else {
-    console.info('Connected to mongo')
-    
-    const onHeaders = require('on-headers')
+const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
 
-    app.use((req, res, next) => {
-      onHeaders(res, function() {
-        this.removeHeader('Cache-Control')
-      })
-      next()
-    })
-   
-    const cookieParser = require('cookie-parser')
-    app.use(cookieParser('7hIseGuy.H3_f$&*5'))
-    
-    const bodyParser = require('body-parser')
-    app.use(bodyParser.urlencoded({ extended: false }))
-    app.use(bodyParser.json())
+app.use(
+  cookieParser('7hIseGuy.H3_f$&*5'),
+  bodyParser.urlencoded({ extended: false }),
+  bodyParser.json()
+)
+app.set('json spaces', 2)
+app.use('/api', require('./api'))
 
-    app.use(
-      express.static('app/client/build'),
-      express.static('app/client/view'),
-      
-      express.static('node_modules/angular'),
-      express.static('node_modules/angular-cookies'),
-      express.static('node_modules/angular-route'),
-      express.static('node_modules/angular-sanitize'),
-      express.static('node_modules/showdown/dist'),
-      express.static('node_modules/ng-showdown/dist'),
-      express.static('node_modules/highlightjs')
-    )
-    
-    app.set('json spaces', 2)
-    app.use('/api', require('./api'))
+app.use((req, res) => {
+  res.sendStatus(404)
+})
 
-    app.use((req, res) => {
-      res.sendStatus(404)
-    })
-  
-    // listen for requests :)
-    const listener = app.listen(process.env.PORT, function () {
-      console.info(`Your app is listening on http://localhost:${listener.address().port}`)
-    }).on('error', (err) => {
-      throw(err)
-    })
-  }
+app.listen(process.env.PORT, console.log(`Express listening on http://localhost:${process.env.PORT}/`))
+.on('error', err => {
+  console.error(`Express error: ${err.code}, ${err.errno}, ${err.address}, ${err.port}`)
 })

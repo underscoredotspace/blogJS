@@ -10,6 +10,7 @@
 - [X] Global blog service so that controllers can be much cleaner
 - [ ] Get route set up with related controler rather than in config
 - [X] Break down codeHighlight() for Showdown. Separate completely? 
+- [X] Pagination
 
 # New Posts/Admin
 - [ ] Autosave drafts to local storage

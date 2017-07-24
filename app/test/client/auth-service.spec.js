@@ -9,7 +9,7 @@ require('angular-mocks')
 
 require('../../client/src/00-config.js')
 require('../../client/src/01-main.js')
-require('../../client/src/03-auth-service.js')
+require('../../client/src/04-auth-service.js')
 
 describe('authService: Controls authentication', () => {
   let authService, $httpBackend, $cookies, $controller

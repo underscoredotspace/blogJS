@@ -8,19 +8,10 @@
   <link rel="icon" href="favicon.ico" type="image/icon">
   <title>underscore . space</title>
 
-  <!-- Styles & Scripts -->
+  <!-- Styles -->
   <link href="style.css" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Quicksand|Source+Code+Pro:400,700|Source+Sans+Pro:400,700" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/sunburst.min.css" rel="stylesheet" type="text/css">
-  
-  <script src="angular.min.js"></script>
-  <script src="angular-cookies.min.js"></script>
-  <script src="angular-route.min.js"></script>
-  <script src="angular-sanitize.min.js"></script>
-  <script src="showdown.min.js"></script>
-  <script src="highlight.pack.min.js"></script>
-  <script src="ng-showdown.min.js"></script>
-  <script src="app.min.js"></script>
 </head>
 
 <body data-ng-controller="blogController as blog">
@@ -29,12 +20,21 @@
     <div id="blog-menu">
       <a href="#!/about" class="blog-menu-item">About</a>
       <a href="#!/home" class="blog-menu-item">Home</a>
-      <a href="#!/new" class="blog-menu-item" data-ng-show="blog.loggedin">New</a>
+      <!-- <a href="#!/new" class="blog-menu-item" data-ng-show="blog.loggedin">New</a>
       <a href="#!/login" class="blog-menu-item" data-ng-show="!blog.loggedin">Log in</a>
-      <a href="#!/logout" class="blog-menu-item" data-ng-show="blog.loggedin">Log out</a>
+      <a href="#!/logout" class="blog-menu-item" data-ng-show="blog.loggedin">Log out</a> -->
     </div>
     <div class="blog-error" data-ng-show="error" data-ng-bind="error"></div>
     <div class="blog-body" data-ng-view></div>
   </div>
+
+  <script src="lib/angular.min.js"></script>
+  <script src="lib/angular-cookies.min.js"></script>
+  <script src="lib/angular-route.min.js"></script>
+  <script src="lib/angular-sanitize.min.js"></script>
+  <script src="lib/showdown.min.js"></script>
+  <script src="lib/highlight.pack.min.js"></script>
+  <script src="lib/ng-showdown.min.js"></script>
+  <script src="app.min.js"></script>
 </body>
 </html>

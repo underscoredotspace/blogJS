@@ -13,17 +13,17 @@
       new: newPost
     }
 
-    function getPost(id) {
-      let post
-      if (!id) {
-        post = 'latest/2'
-      } else {
-        post = 'post/' + id
+    function getPost({id, page} = {}) {
+      let post = '/api/blog/'
+      if (page) {
+        post += page
+      } else if (id) {
+        post += `id/${id}`
       }
 
       const options = {
         method: 'get',
-        url: '/api/' + post,
+        url: post,
         headers: {'Content-Type': 'application/json'}
       }
 

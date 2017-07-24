@@ -8,7 +8,7 @@ require('highlightjs')
 require('angular-mocks')
 require('../../client/src/00-config.js')
 require('../../client/src/01-main.js')
-require('../../client/src/02-blog-service.js')
+require('../../client/src/03-blog-service.js')
 
 describe('blogService: Completes API calls for blog posts', () => {
   let blogService, $httpBackend, $rootScope
@@ -30,16 +30,30 @@ describe('blogService: Completes API calls for blog posts', () => {
     expect(blogService.get).toEqual(jasmine.any(Function))
   })
 
-  it('should get latest 2 posts', () => {
-    const getLatest5 = $httpBackend.expectGET('/api/latest/2').respond([])
+  it('should get latest posts', () => {
+    const getLatest5 = $httpBackend.expectGET('/api/blog/').respond([])
     blogService.get()
     .then($httpBackend.flush())
     .catch(err => expect(err).toBeUndefined())
   })
 
+  it('should get page 2 of posts', () => {
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond([])
+    blogService.get({page:2})
+    .then($httpBackend.flush())
+    .catch(err => expect(err).toBeUndefined())
+  })
+
+  it('should get page 2 of posts and ignore id', () => {
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond([])
+    blogService.get({page:2, id:'592c78780e0322032c845430'})
+    .then($httpBackend.flush())
+    .catch(err => expect(err).toBeUndefined())
+  })
+
   it('should get single post', () => {
-    const getSinglePost = $httpBackend.expectGET('/api/post/592c78780e0322032c845430').respond([])
-    blogService.get('592c78780e0322032c845430')
+    const getSinglePost = $httpBackend.expectGET('/api/blog/id/592c78780e0322032c845430').respond([])
+    blogService.get({id:'592c78780e0322032c845430'})
     .then($httpBackend.flush())
     .catch(err => expect(err).toBeUndefined())
   })
