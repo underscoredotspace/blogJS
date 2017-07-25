@@ -36,16 +36,30 @@ app.use((req, res) => {
 })
 
 
-function startExpress() {
-  return app.listen(process.env.PORT, console.log(`Express listening on http://localhost:${process.env.PORT}/`))
-  .on('error', err => {
-    console.error(`Express error: ${err.code}, ${err.errno}, ${err.address}, ${err.port}`)
+const startExpress = () =>  new Promise((resolve, reject) => {
+  const listen = app.listen(process.env.PORT)
+
+  listen.on('error', err => {
+    console.error(err)
   })
-}
+  
+  if (listen.listening) {
+    resolve(listen)
+  } else {
+    reject('Express error')
+  }
+})
 
-let listener = startExpress()
+let listener
 
-function stopExpress(listener) {
+startExpress().then(
+  listen => {
+    listener = listen
+    console.log('Express is listening')
+  }
+).catch(console.error)
+
+function stopExpress() {
   listener.close()
 }
 

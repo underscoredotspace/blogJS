@@ -1,6 +1,4 @@
 describe('server/index', () => {
-  console.error = jest.fn(err => console.info({err}))
-
   const mockDb = {
     connect: jest.fn()
   }
@@ -27,12 +25,13 @@ describe('server/index', () => {
   })
 
   test('Initialisation', () => {
-    expect(mockDb.connect).toHaveBeenCalled()
-    expect(mockDotEnv.config).toHaveBeenCalled()
+      expect(mockDb.connect).toHaveBeenCalled()
+      expect(mockDotEnv.config).toHaveBeenCalled()
   })
 
   test('Server running', () => {
-    return Promise.all([
+    return Promise.all(
+    [
       request('http://localhost:3000').get('/').then(res => {
         expect(res.status).toBe(200)
       })
@@ -44,12 +43,15 @@ describe('server/index', () => {
       request('http://localhost:3000').get('/banana').then(res => {
         expect(res.status).toBe(404)
       })
-    ])
-  })
+    ]
+  )
+})
 
-  test('Server handles errors gracefully', () => {
-    index._startExpress()
-    // *** TODO: it's being called, but Jest isn't catching it ***
-    //expect(console.error).toHaveBeenCalled()
+  test('Server handles errors gracefully', (done) => {
+    console.log(index._listener)
+    index._startExpress().then(console.error).catch(err => {
+      expect(err).toBe('Express error')
+      done()
+    })
   })
 })
