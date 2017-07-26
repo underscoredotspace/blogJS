@@ -6,6 +6,7 @@ describe('server/index', () => {
   const mockDotEnv = {
     config: jest.fn(() => {
       process.env.PORT = 3000
+      process.env.COOKIE_SECRET = '7hIseGuy.H3_f$&*5'
     })
   }
 
@@ -47,11 +48,33 @@ describe('server/index', () => {
   )
 })
 
-  test('Server handles errors gracefully', (done) => {
-    console.log(index._listener)
-    index._startExpress().then(console.error).catch(err => {
-      expect(err).toBe('Express error')
-      done()
+  test('Server handles errors gracefully', () => {
+    return index._startExpress(express()).then(listen => {
+      expect(listen).toBeUndefined()
+    }).catch(err => {
+      expect(err.hasOwnProperty('code')).toBeTruthy()
+      expect(err.code).toBe('EADDRINUSE')
+    })
+  })
+
+  test('Server can\'t open, but didn\'t fire error event', () => {
+    const fakeExpress = {
+      listening: false,
+      listen: port => fakeExpress,
+      on: () => null
+    }
+    return index._startExpress(fakeExpress).then(listen => {
+      expect(listen).toBeUndefined()
+    }).catch(err => {
+      expect(JSON.stringify(err)).toBe('{\"err\":\"timeout\"}')
+    })
+  })
+
+  test('Server listen request didn\'t include required Express App', () => {
+    return index._startExpress().then(listen => {
+      expect(listen).toBeUndefined()
+    }).catch(err => {
+      expect(JSON.stringify(err)).toBe('{\"err\":\"Express app required\"}')
     })
   })
 })

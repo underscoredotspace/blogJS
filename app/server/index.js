@@ -24,7 +24,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 
 app.use(
-  cookieParser('7hIseGuy.H3_f$&*5'),
+  cookieParser(process.env.COOKIE_SECRET),
   bodyParser.urlencoded({ extended: false }),
   bodyParser.json()
 )
@@ -35,29 +35,32 @@ app.use((req, res) => {
   res.sendStatus(404)
 })
 
-
-const startExpress = () =>  new Promise((resolve, reject) => {
-  const listen = app.listen(process.env.PORT)
-
-  listen.on('error', err => {
-    console.error(err)
-  })
-  
-  if (listen.listening) {
-    resolve(listen)
+const startExpress = (expressApp, port = process.env.PORT) =>  new Promise((resolve, reject) => {
+  if (!expressApp || !expressApp.hasOwnProperty('listen')) {
+    reject({err: 'Express app required'})
   } else {
-    reject('Express error')
+    const listen = expressApp.listen(port)  
+    if (listen && listen.listening) {
+      resolve(listen)
+    } else {
+      let timeout = setTimeout(() => {
+        reject({err: 'timeout'})
+      }, 1000)
+      listen.on('error', err => {
+        clearTimeout(timeout)
+        reject(err)
+      })
+    }
   }
 })
 
 let listener
 
-startExpress().then(
-  listen => {
-    listener = listen
-    console.log('Express is listening')
-  }
-).catch(console.error)
+startExpress(app).then(listen => {
+  listener = listen
+  listen.on('error', console.error)
+  console.log('Express is listening')
+}).catch(console.error)
 
 function stopExpress() {
   listener.close()
