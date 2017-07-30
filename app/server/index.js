@@ -29,7 +29,7 @@ app.use(
   bodyParser.json()
 )
 app.set('json spaces', 2)
-app.use('/api', require('./api'))
+app.use('/api', require('./routes/api'))
 
 app.use((req, res) => {
   res.sendStatus(404)

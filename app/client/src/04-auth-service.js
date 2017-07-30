@@ -2,6 +2,8 @@ angular.module('colonApp').service('authService', authService)
 
 authService.$inject = ['$http', '$cookies', '$q', '$rootScope']
 function authService($http, $cookies, $q, $rootScope) {
+  const authPath = '/api/auth'
+
   return {
     login,
     logout,
@@ -10,7 +12,7 @@ function authService($http, $cookies, $q, $rootScope) {
 
   function login(code) {
     const options = {
-      url: '/api/login',
+      url: `${authPath}/login`,
       method: 'POST',
       data: {code},
       headers: {'Content-Type': 'application/json'}
@@ -28,7 +30,7 @@ function authService($http, $cookies, $q, $rootScope) {
 
   function logout() {
     $cookies.remove('qqBlog')
-    return $http.get('/api/logout')
+    return $http.get(`${authPath}/logout`)
     .then(res => {
       $rootScope.$broadcast('auth-status')
       return $q.resolve(res)

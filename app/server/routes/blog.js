@@ -1,5 +1,5 @@
 const route = require('express').Router()
-const blog = require('./models/blog-model')
+const blog = require('../models/blog-model')
 
 const BLOG_LIMIT = 3
 

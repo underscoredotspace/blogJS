@@ -48,7 +48,7 @@ describe('authService: Controls authentication', () => {
   })
 
   it('should log user in', () => {
-    const login = $httpBackend.expectPOST('/api/login').respond({loggedin: true})
+    const login = $httpBackend.expectPOST('/api/auth/login').respond({loggedin: true})
     authService.login(123456)
     .then(res => {
       expect(res.data.loggedin).toBe(true)
@@ -59,7 +59,7 @@ describe('authService: Controls authentication', () => {
   })
 
   it('should fail to log user in', () => {
-    const login = $httpBackend.expectPOST('/api/login').respond({err: false, valid: false, verified: true})
+    const login = $httpBackend.expectPOST('/api/auth/login').respond({err: false, valid: false, verified: true})
     authService.login(123456)
     .then(res => expect(res).toBeUndefined())
     .catch(() => {
@@ -71,7 +71,7 @@ describe('authService: Controls authentication', () => {
   })
 
   it('should log the user out', () => {
-    const logout = $httpBackend.expectGET('/api/logout').respond([])
+    const logout = $httpBackend.expectGET('/api/auth/logout').respond([])
     authService.logout()
     .then(() => {
       const loggedin = authService.isLoggedIn()

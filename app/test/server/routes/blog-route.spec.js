@@ -32,9 +32,9 @@ describe('Blog API', () => {
     findById: mockPromise
   }
   
-  jest.mock('../../server/models/blog-model', () => mockBlog)
+  jest.mock('../../../server/models/blog-model', () => mockBlog)
   
-  app.use('/api/blog', require('../../server/blog'))
+  app.use('/api/blog', require('../../../server/routes/blog'))
   
   beforeEach(() => {
     jest.clearAllMocks()

@@ -17,7 +17,7 @@ describe('server/index', () => {
   const express = require('express')
 
   const mockAPI = express.Router()
-  jest.mock('../../server/api', () => mockAPI)
+  jest.mock('../../server/routes/api', () => mockAPI)
 
   const index = require('../../server/index')
 
