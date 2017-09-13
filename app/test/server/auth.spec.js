@@ -4,7 +4,7 @@ describe('OTP Auth', () => {
   }
 
   jest.mock('otp.js', () => mockOtp)
-  // jest.mock('../../server/models/user-model')
+  jest.mock('../../server/models/user-model')
 
   const auth = require('../../server/auth')
 

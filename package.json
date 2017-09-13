@@ -12,7 +12,7 @@
   "scripts": {
     "build": "grunt min",
     "build:watch": "grunt",
-    "start": "node app/server",
+    "start": "pm2 start app/server",
     "start:watch": "nodemon app/server",
     "dev": "yarn build:watch & yarn start:watch",
     "test": "jest",
@@ -47,6 +47,7 @@
     "ng-showdown": "^1.1.0",
     "on-headers": "^1.0.1",
     "otp.js": "^1.1.0",
+    "pm2": "^2.6.1",
     "showdown": "^1.7.1",
     "uuid": "^3.1.0"
   },
@@ -58,8 +59,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "jest": "^20.0.4",
     "nodemon": "^1.11.0",
-    "supertest": "^3.0.0",
-    "yarn": "^0.27.5"
+    "supertest": "^3.0.0"
   },
   "repository": {
     "type": "git",
