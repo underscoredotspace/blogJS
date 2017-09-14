@@ -1,7 +1,7 @@
 const OTP = require('otp.js')
 const GA = OTP.googleAuthenticator
 const user = require('./models/user-model')
-const otpMatcher = /^\d{6$}/
+const otpMatcher = /^\d{6}$/
 
 function checkCode(code = '') {
   return new Promise((resolve, reject) => {
@@ -9,9 +9,10 @@ function checkCode(code = '') {
       return reject('Invalid code')
     }
 
-    getSecret(secret => {
-      if (Math.abs(GA.verify(code, secret).delta) <=1) {
-        return resolve()
+    getSecret().then(secret => {
+      const verified = GA.verify(code, secret)
+      if (verified && Math.abs(verified.delta) <=1) {
+        return resolve(true)
       } else {
         return reject('Incorrect code')
       }
@@ -20,10 +21,7 @@ function checkCode(code = '') {
 }
 
 function getSecret() {
-  return user.findOne().then(res => {
-    console.log(res)
-    return res.secret
-  })
+  return user.findOne().then(res => res.secret)
 }
 
 module.exports = {checkCode, _getSecret: getSecret}
