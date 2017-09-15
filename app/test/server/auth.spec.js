@@ -1,10 +1,16 @@
 describe('OTP Auth', () => {
   const mockOtp = {
+    ok: true,
     delta: 0,
-    googleAuthenticator: jest.fn(() => mockOtp),
-    verify: jest.fn((code, secret) => {
-      return {delta: mockOtp.delta}
-    })
+    googleAuthenticator: {
+      verify: jest.fn((code, secret) => {
+        if (mockOtp.ok) {
+          return {delta: mockOtp.delta}
+        } else {
+          return null
+        }
+      })
+    }
   }
 
   jest.mock('otp.js', () => mockOtp)
@@ -25,10 +31,15 @@ describe('OTP Auth', () => {
 
   const auth = require('../../server/auth')
 
+  beforeEach(() => {
+    mockOtp.ok = true
+    mockUserModel.ok = true
+    mockOtp.delta = 0
+  })
+
   describe('getSecret', () => {
     test('ok', () => {
       expect.assertions(1)
-      mockUserModel.ok = true
       return auth._getSecret().then(secret => {
         expect(secret).toBe(1)
       })
@@ -44,6 +55,13 @@ describe('OTP Auth', () => {
   })
 
   describe('checkCode', () => {
+    test('ok', () => {
+      expect.assertions(1)
+      return auth.checkCode('123456').then(res => {
+        expect(res).toBeTruthy()
+      })
+    })
+
     test('code not valid', () => {
       expect.assertions(1)
       return auth.checkCode('>23a5').catch(err => {
@@ -51,11 +69,34 @@ describe('OTP Auth', () => {
       })
     })
 
-    // test('ok', () => {
-    //   expect.assertions(1)
-    //   return auth.checkCode('123456').then(res => {
-    //     expect(res).toBeTruthy()
-    //   })
-    // })
+    test('Missing code', () => {
+      expect.assertions(1)
+      return auth.checkCode().catch(err => {
+        expect(err).toBe('Invalid code')
+      })
+    })
+
+    test('Invalid code', () => {
+      expect.assertions(1)
+      return auth.checkCode('>23a5').catch(err => {
+        expect(err).toBe('Invalid code')
+      })
+    })
+
+    test('Incorrect code', () => {
+      expect.assertions(1)
+      mockOtp.ok = false
+      return auth.checkCode('123456').catch(err => {
+        expect(err).toBe('Incorrect code')
+      })
+    })
+
+    test('Stale code', () => {
+      expect.assertions(1)
+      mockOtp.delta = -3
+      return auth.checkCode('123456').catch(err => {
+        expect(err).toBe('Incorrect code')
+      })
+    })
   })
 })
