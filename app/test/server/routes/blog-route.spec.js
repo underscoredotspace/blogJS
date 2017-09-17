@@ -48,6 +48,7 @@ describe('Blog API', () => {
 
   describe('GET', () => {
     test('Latest posts',  () => {
+      expect.assertions(5)
       mockBlog.limit = mockPromise
 
       return request(app).get('/api/blog').then(res => {
@@ -60,6 +61,7 @@ describe('Blog API', () => {
     })
 
     test('Latest posts with page number 1',  () => {
+      expect.assertions(5)
       mockBlog.limit = mockPromise
 
       return request(app).get('/api/blog/1').then(res => {
@@ -72,6 +74,7 @@ describe('Blog API', () => {
     })
 
     test('Latest posts with page number 2',  () => {
+      expect.assertions(5)
       mockBlog.limit = mockPromise
 
       return request(app).get('/api/blog/2').then(res => {
@@ -84,6 +87,7 @@ describe('Blog API', () => {
     })
 
     test('Handle failure in blog/ & blog/:page',  () => {
+      expect.assertions(6)
       mockPromiseOk = false
       mockBlog.limit = mockPromise
 
@@ -98,6 +102,7 @@ describe('Blog API', () => {
     })
 
     test('Specific post',  () => {
+      expect.assertions(2)
       return request(app).get('/api/blog/id/2').then(res => {
         expect(res.status).toBe(200)
         expect(mockBlog.findById).toHaveBeenCalledWith('2')
@@ -105,6 +110,7 @@ describe('Blog API', () => {
     })
 
     test('Handle failure in blog/id/:id',  () => {
+      expect.assertions(3)
       mockPromiseOk = false
       return request(app).get('/api/blog/id/2').then(res => {
         expect(res.status).toBe(400)
@@ -112,7 +118,5 @@ describe('Blog API', () => {
         expect(mockBlog.findById).toHaveBeenCalledWith('2')
       })
     })
-
   })
-
 })

@@ -42,7 +42,7 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get page 2 of posts', () => {
     expect.assertions(1)
-    const getLatest5 = $httpBackend.expectGET('/api/blog/page/2').respond([])
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond([])
     blogService.get({page:2}).then(res => {
       expect(res.status).toBe(200)
     })
@@ -52,7 +52,7 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get page 2 of posts and ignore id', () => {
     expect.assertions(1)
-    const getLatest5 = $httpBackend.expectGET('/api/blog/page/2').respond([])
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond([])
     blogService.get({page:2, id:'592c78780e0322032c845430'}).then(res => {
       expect(res.status).toBe(200)
     })

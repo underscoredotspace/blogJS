@@ -17,7 +17,7 @@
     function getPost({id, page} = {}) {
       let post = blogPath
       if (page) {
-        post += `/page/${page}`
+        post += `/${page}`
       } else if (id) {
         post += `/id/${id}`
       }
