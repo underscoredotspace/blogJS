@@ -16,7 +16,7 @@
     "start:watch": "nodemon app/server",
     "dev": "yarn build:watch & yarn start:watch",
     "test": "jest",
-    "test:watch": "jest --watchAll --notify",
+    "test:watch": "yarn build:watch & jest --watchAll --notify",
     "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls",
     "cover:view": "open coverage/lcov-report/index.html"
   },
