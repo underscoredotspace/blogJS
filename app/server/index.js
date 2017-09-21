@@ -1,61 +1,69 @@
 'use strict'
+require('dotenv').config()
+const db = require('./db')
+db.connect()
+
 const express = require('express')
 const app = express()
 
-if (!process.env.MONGO_ADDR) {
-  require('dotenv').config()
-  if (!process.env.MONGO_ADDR) {
-    throw(new Error('Environment variable "MONGO_ADDR" must point to your mongodb'))
-  }
-}
+app.use(
+  express.static('app/client/build'),
+  express.static('app/client/view')
+)
+app.use('/lib', 
+  express.static('node_modules/angular'),
+  express.static('node_modules/angular-cookies'),
+  express.static('node_modules/angular-route'),
+  express.static('node_modules/angular-sanitize'),
+  express.static('node_modules/showdown/dist'),
+  express.static('node_modules/ng-showdown/dist'),
+  express.static('node_modules/highlightjs')
+)
 
-require('./mongo').connect(process.env.MONGO_ADDR, (err) => {
-  if (err) {
-    throw(err)
+const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
+
+app.use(
+  cookieParser(process.env.COOKIE_SECRET),
+  bodyParser.urlencoded({ extended: false }),
+  bodyParser.json()
+)
+app.set('json spaces', 2)
+app.use('/api', require('./routes/api'))
+
+app.use((req, res) => {
+  res.sendStatus(404)
+})
+
+const startExpress = (expressApp, port = process.env.PORT) =>  new Promise((resolve, reject) => {
+  if (!expressApp || !expressApp.hasOwnProperty('listen')) {
+    reject({err: 'Express app required'})
   } else {
-    console.info('Connected to mongo')
-    
-    const onHeaders = require('on-headers')
-
-    app.use((req, res, next) => {
-      onHeaders(res, function() {
-        this.removeHeader('Cache-Control')
+    const listen = expressApp.listen(port)  
+    if (listen && listen.listening) {
+      resolve(listen)
+    } else {
+      let timeout = setTimeout(() => {
+        reject({err: 'timeout'})
+      }, 1000)
+      listen.on('error', err => {
+        clearTimeout(timeout)
+        reject(err)
       })
-      next()
-    })
-   
-    const cookieParser = require('cookie-parser')
-    app.use(cookieParser('7hIseGuy.H3_f$&*5'))
-    
-    const bodyParser = require('body-parser')
-    app.use(bodyParser.urlencoded({ extended: false }))
-    app.use(bodyParser.json())
-
-    app.use(
-      express.static('app/client/build'),
-      express.static('app/client/view'),
-      
-      express.static('node_modules/angular'),
-      express.static('node_modules/angular-cookies'),
-      express.static('node_modules/angular-route'),
-      express.static('node_modules/angular-sanitize'),
-      express.static('node_modules/showdown/dist'),
-      express.static('node_modules/ng-showdown/dist'),
-      express.static('node_modules/highlightjs')
-    )
-    
-    app.set('json spaces', 2)
-    app.use('/api', require('./api'))
-
-    app.use((req, res) => {
-      res.sendStatus(404)
-    })
-  
-    // listen for requests :)
-    const listener = app.listen(process.env.PORT, function () {
-      console.info(`Your app is listening on http://localhost:${listener.address().port}`)
-    }).on('error', (err) => {
-      throw(err)
-    })
+    }
   }
 })
+
+let listener
+
+startExpress(app).then(listen => {
+  listener = listen
+  listen.on('error', console.error)
+  console.log('Express is listening')
+}).catch(console.error)
+
+function stopExpress() {
+  listener.close()
+}
+
+module.exports = {_startExpress: startExpress, _stopExpress:stopExpress, _listener:listener}

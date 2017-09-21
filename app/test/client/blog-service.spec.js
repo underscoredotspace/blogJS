@@ -8,7 +8,7 @@ require('highlightjs')
 require('angular-mocks')
 require('../../client/src/00-config.js')
 require('../../client/src/01-main.js')
-require('../../client/src/02-blog-service.js')
+require('../../client/src/03-blog-service.js')
 
 describe('blogService: Completes API calls for blog posts', () => {
   let blogService, $httpBackend, $rootScope
@@ -26,117 +26,149 @@ describe('blogService: Completes API calls for blog posts', () => {
     $httpBackend.verifyNoOutstandingRequest()
   });
 
-  it('should be a function', () => {
+  test('should be a function', () => {
     expect(blogService.get).toEqual(jasmine.any(Function))
   })
 
-  it('should get latest 2 posts', () => {
-    const getLatest5 = $httpBackend.expectGET('/api/latest/2').respond([])
-    blogService.get()
-    .then($httpBackend.flush())
-    .catch(err => expect(err).toBeUndefined())
+  test('should get latest posts', () => {
+    expect.assertions(1)
+    const getLatest5 = $httpBackend.expectGET('/api/blog').respond([])
+    blogService.get().then(res => {
+      expect(res.status).toBe(200)
+    })
+
+    $httpBackend.flush()
   })
 
-  it('should get single post', () => {
-    const getSinglePost = $httpBackend.expectGET('/api/post/592c78780e0322032c845430').respond([])
-    blogService.get('592c78780e0322032c845430')
-    .then($httpBackend.flush())
-    .catch(err => expect(err).toBeUndefined())
+  test('should get page 2 of posts', () => {
+    expect.assertions(1)
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond([])
+    blogService.get({page:2}).then(res => {
+      expect(res.status).toBe(200)
+    })
+
+    $httpBackend.flush()
   })
 
-  it('should delete single post', () => {
-    const deletePost = $httpBackend.expect('DELETE', '/api/post/592c78780e0322032c845430').respond([])
-    blogService.delete('592c78780e0322032c845430')
-    .then($httpBackend.flush())
-    .catch(err => expect(err).toBeUndefined())
+  test('should get page 2 of posts and ignore id', () => {
+    expect.assertions(1)
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond([])
+    blogService.get({page:2, id:'592c78780e0322032c845430'}).then(res => {
+      expect(res.status).toBe(200)
+    })
+
+    $httpBackend.flush()
   })
 
-  it('should edit a post', () => {
-    const editPost = $httpBackend.expect('PATCH', '/api/post/592c78780e0322032c845430').respond([])
+  test('should get single post', () => {
+    expect.assertions(1)
+    const getSinglePost = $httpBackend.expectGET('/api/blog/id/592c78780e0322032c845430').respond([])
+    blogService.get({id:'592c78780e0322032c845430'}).then(res => {
+      expect(res.status).toBe(200)
+    })
+
+    $httpBackend.flush()
+  })
+
+  test('should delete single post', () => {
+    expect.assertions(1)
+    const deletePost = $httpBackend.expect('DELETE', '/api/blog/592c78780e0322032c845430').respond([])
+    blogService.delete('592c78780e0322032c845430').then(res => {
+      expect(res.status).toBe(200)
+    })
+
+    $httpBackend.flush()
+  })
+
+  test('should edit a post', () => {
+    expect.assertions(1)
+    const editPost = $httpBackend.expect('PATCH', '/api/blog/592c78780e0322032c845430')
+      .respond({id:'592c78780e0322032c845430'})
     const post = {
       title: 'A title that is long enought to post',
       content: 'Content. You know, the nonsense you expect people to read. '
     }
     blogService.edit('592c78780e0322032c845430', post)
-    .then($httpBackend.flush())
-    .catch(err => expect(err).toBeUndefined())
+      .then(id => expect(id).toBe('592c78780e0322032c845430'))
+
+    $httpBackend.flush()
   })
 
-  it('should make a new post', () => {
-    const newPost = $httpBackend.expect('POST', '/api/post').respond({id:'592c78780e0322032c845430'})
+  test('should make a new post', () => {
+    expect.assertions(1)
+    const newPost = $httpBackend.expect('POST', '/api/blog').respond({id:'592c78780e0322032c845430'})
     const blogpost = {
       title: 'A title that is long enought to post',
       content: 'Content. You know, the nonsense you expect people to read. '
     }
     blogService.new(blogpost)
       .then(id => expect(id).toBe('592c78780e0322032c845430'))
-      .catch(err => expect(err).toBeUndefined())
 
       $httpBackend.flush()
   })
 
   // Failing conditions
-  it('should fail to delete single post due to missing id', () => {
+  test('should fail to delete single post due to missing id', () => {
+    expect.assertions(1)
     blogService.delete()
-    .then(res => expect(res).toBeUndefined())
-    .catch(err => expect(err).toBe('Post ID required'))
+      .catch(err => expect(err).toBe('Post ID required'))
   })
 
-  it('should fail to edit a post because post param is missing', () => {
+  test('should fail to edit a post because post param is missing', () => {
+    expect.assertions(1)
     blogService.edit('592c78780e0322032c845430')
-    .then(res => expect(res).toBeUndefined())
-    .catch(err => expect(err).toBe('Edited post required'))
+      .catch(err => expect(err).toBe('Edited post required'))
   })
 
-  it('should fail to edit a post because post id is missing', () => {
+  test('should fail to edit a post because post id is missing', () => {
+    expect.assertions(1)
     blogService.edit()
-    .then(res => expect(res).toBeUndefined())
-    .catch(err => expect(err).toBe('Post ID required'))
+      .catch(err => expect(err).toBe('Post ID required'))
   })
 
-  it('should fail to edit a post because title is too short', () => {
+  test('should fail to edit a post because title is too short', () => {
+    expect.assertions(1)
     const post = {
       title: 'Hi',
       content: 'Content. You know, the nonsense you expect people to read. '
     }
     blogService.edit('592c78780e0322032c845430', post)
-    .then(res => expect(res).toBeUndefined())
-    .catch(err => expect(err).toBe('Title or content too short'))
+      .catch(err => expect(err).toBe('Title or content too short'))
   })
 
-  it('should fail to edit a post because content is too short', () => {
+  test('should fail to edit a post because content is too short', () => {
+    expect.assertions(1)
     const blogpost = {
       title: 'A title that is long enought to post',
       content: 'Hi'
     }
     blogService.edit('592c78780e0322032c845430', blogpost)
-    .then(res => expect(res).toBeUndefined())
-    .catch(err => expect(err).toBe('Title or content too short'))
+      .catch(err => expect(err).toBe('Title or content too short'))
   })
 
-  it('should fail to make a new post because blogpost param is missing', () => {
+  test('should fail to make a new post because blogpost param is missing', () => {
+    expect.assertions(1)
     blogService.new()
-      .then(id => expect(id).toBeUndefined())
       .catch(err => expect(err).toBe('New post required'))
   })
 
-  it('should fail to make new post because title is too short', () => {
+  test('should fail to make new post because title is too short', () => {
+    expect.assertions(1)
     const blogpost = {
       title: 'Hi',
       content: 'Content. You know, the nonsense you expect people to read. '
     }
     blogService.new(blogpost)
-    .then(id => expect(id).toBeUndefined())
-    .catch(err => expect(err).toBe('Title or content too short'))
+      .catch(err => expect(err).toBe('Title or content too short'))
   })
 
-  it('should fail to make new post because content is too short', () => {
+  test('should fail to make new post because content is too short', () => {
+    expect.assertions(1)
     const blogpost = {
       title: 'A title that is long enought to post',
       content: 'Hi'
     }
     blogService.new(blogpost)
-    .then(id => expect(id).toBeUndefined())
-    .catch(err => expect(err).toBe('Title or content too short'))
+      .catch(err => expect(err).toBe('Title or content too short'))
   })
 })

@@ -9,7 +9,7 @@ require('angular-mocks')
 
 require('../../client/src/00-config.js')
 require('../../client/src/01-main.js')
-require('../../client/src/03-auth-service.js')
+require('../../client/src/04-auth-service.js')
 
 describe('authService: Controls authentication', () => {
   let authService, $httpBackend, $cookies, $controller
@@ -48,20 +48,19 @@ describe('authService: Controls authentication', () => {
   })
 
   it('should log user in', () => {
-    const login = $httpBackend.expectPOST('/api/login').respond({loggedin: true})
+    expect.assertions(1)
+    const login = $httpBackend.expectPOST('/api/user/login').respond('OK')
     authService.login(123456)
     .then(res => {
-      expect(res.data.loggedin).toBe(true)
+      expect(res.status).toBe(200)
     })
-    .catch(err => expect(err).toBeUndefined())
-
     $httpBackend.flush()
   })
 
   it('should fail to log user in', () => {
-    const login = $httpBackend.expectPOST('/api/login').respond({err: false, valid: false, verified: true})
+    expect.assertions(1)
+    const login = $httpBackend.expectPOST('/api/user/login').respond(()=> [403,'Incorrect code'])
     authService.login(123456)
-    .then(res => expect(res).toBeUndefined())
     .catch(() => {
       const loggedin = authService.isLoggedIn()
       expect(loggedin).toBe(false)
@@ -71,7 +70,8 @@ describe('authService: Controls authentication', () => {
   })
 
   it('should log the user out', () => {
-    const logout = $httpBackend.expectGET('/api/logout').respond([])
+    expect.assertions(1)
+    const logout = $httpBackend.expectGET('/api/user/logout').respond([])
     authService.logout()
     .then(() => {
       const loggedin = authService.isLoggedIn()

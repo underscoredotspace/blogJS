@@ -80,7 +80,7 @@ describe('Client main', () => {
       $rootScope.$digest()
       expect(controller.postEdit).toBeInstanceOf(Function)
       expect(controller.postDelete).toBeInstanceOf(Function)
-      expect(blogService.get).toHaveBeenCalledWith(undefined)
+      expect(blogService.get).toHaveBeenCalledWith({id: undefined, page: undefined})
       expect(controller.blogposts[1]).toBe('test2')
       expect(controller.blogposts.length).toBe(2)
     })
@@ -92,7 +92,7 @@ describe('Client main', () => {
       $rootScope.$digest()
       expect(controller.postEdit).toBeInstanceOf(Function)
       expect(controller.postDelete).toBeInstanceOf(Function)
-      expect(blogService.get).toHaveBeenCalledWith(routeParams.id)
+      expect(blogService.get).toHaveBeenCalledWith({page: undefined, id:routeParams.id})
       expect(controller.blogposts[0]).toBe('test')
     })
 
@@ -101,6 +101,17 @@ describe('Client main', () => {
       const controller = $controller('post', {blogService, $routeParams:routeParams})
       $rootScope.$digest()
       expect($location.path()).toBe('/home')
+    })
+
+    it('should load page 2', () => {
+      promiseResolve = {data:['test']}
+      const routeParams = {page: 2}
+      const controller = $controller('post', {blogService, $routeParams:routeParams})
+      $rootScope.$digest()
+      expect(controller.postEdit).toBeInstanceOf(Function)
+      expect(controller.postDelete).toBeInstanceOf(Function)
+      expect(blogService.get).toHaveBeenCalledWith({page: 2, id: undefined})
+      expect(controller.blogposts[0]).toBe('test')
     })
 
     it('test edit', () => {
@@ -182,7 +193,7 @@ describe('Client main', () => {
       const controller = $controller('edit', {authService, blogService, $routeParams})
       $rootScope.$digest()
       expect(controller.submitPost).toBeInstanceOf(Function)
-      expect(blogService.get).toHaveBeenCalledWith(okOID)
+      expect(blogService.get).toHaveBeenCalledWith({id: okOID})
       expect(controller.blogpost.title).toBe('title')
       expect(controller.blogpost.content).toBe('content')
       controller.submitPost(okOID, controller.blogpost)

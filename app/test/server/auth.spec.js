@@ -1,210 +1,123 @@
-describe('OTP Auth Service', () => {
-  const okSecret = 'EQZGCJBQGUSGEZRWGNGUE2BWPJKGMSSSORSHQWJZJ4XU25LRJNHFIULZNREUO5LSLFCEEZ2HGFZEM3LGNVKFKY2XGZYVC2KX'
-  let mockDb
-
-  mockDb = {
-    data: null,
-    collection: jest.fn().mockImplementation(() => mockDb),
-    find: jest.fn().mockImplementation(() => mockDb),
-    insert: jest.fn(),
-    toArray: jest.fn().mockImplementation(cb => cb(null, mockDb.data))
+describe('OTP Auth', () => {
+  const mockOtp = {
+    ok: true,
+    delta: 0,
+    googleAuthenticator: {
+      verify: jest.fn((code, secret) => {
+        if (mockOtp.ok) {
+          return {delta: mockOtp.delta}
+        } else {
+          return null
+        }
+      })
+    }
   }
 
-  jest.mock('../../server/mongo', () => mockDb)
+  jest.mock('otp.js', () => mockOtp)
+
+  const mockUserModel = {
+    ok: null,
+    resolveVal: 1,
+    user: jest.fn(() => mockUserModel),
+    findOne: jest.fn(() => new Promise((resolve, reject)=> {
+      if (mockUserModel.ok) {
+        return resolve({secret:mockUserModel.resolveVal}) 
+      } else {
+        return reject('error')
+      }
+    }))
+  }
+  jest.mock('../../server/models/user-model', () => mockUserModel)
 
   const auth = require('../../server/auth')
 
   beforeEach(() => {
-    mockDb.data = []
-    jest.clearAllMocks()
+    mockOtp.ok = true
+    mockUserModel.ok = true
+    mockOtp.delta = 0
   })
 
-  describe('Get secret', () => {
-    it('should return the secret', () => {
-      mockDb.data = [{secret: '123', verified: true}]
-      auth._getSecret((err, secret, verified) => {
-        expect(err).toBe(null)
-        expect(secret).toBe('123')
-        expect(verified).toBe(true)
+  describe('getSecret', () => {
+    test('ok', () => {
+      expect.assertions(1)
+      auth._getSecret().then(secret => {
+        expect(secret).toBe(1)
       })
     })
 
-    it('should return the secret, but show that user isn\'t verified yet', () => {
-      mockDb.data = [{secret: '123', verified: false}]
-      auth._getSecret((err, secret, verified) => {
-        expect(err).toBe(null)
-        expect(secret).toBe('123')
-        expect(verified).toBe(false)
-      })
-    })
-
-    it('should fail to return the secret cos there\s two records in table', () => {
-      mockDb.data = [{one:1}, {two:2}]
-      auth._getSecret((err, secret, verified) => {
-        expect(err).toBe('too many records in admin collection')
-        expect(secret).toBeUndefined()
-        expect(verified).toBeUndefined()
-      })
-    })
-
-    it('should fail to return the secret cos there\s a bad record in table', () => {
-      mockDb.data = [{one:1}]
-      auth._getSecret((err, secret, verified) => {
-        expect(err).toBe('problem with admin record')
-        expect(secret).toBeUndefined()
-        expect(verified).toBeUndefined()
-      })
-    })
-
-    it('should return a new unverified secret cos there\'s no records in table', (done) => {
-      mockDb.data = []
-      auth._getSecret((err, secret, verified) => {
-        expect(err).toBe(null)
-        const secretRegEx = /[A-Z0-9]{95}/
-        expect(secretRegEx.test(secret)).toBe(true)
-        expect(verified).toBe(false)
-        expect(mockDb.insert).toHaveBeenCalled()
-        done()
+    test('not ok', () => {
+      expect.assertions(1)
+      mockUserModel.ok = false
+      auth._getSecret().catch(err => {
+        expect(err).toBe('error')
       })
     })
   })
 
-  describe('Get code', () => {
-    it('Should return OTP code and store new secret', (done) => {
-      mockDb.data = []
-      auth.getCode((err, code, verified) => {
-        expect(err).toBe(null)
-        expect(verified).toBe(false)
-        const codeRegEx = /[0-9]{6}/
-        expect(codeRegEx.test(code)).toBe(true)
-        expect(mockDb.insert).toHaveBeenCalled()
-        done()
+  describe('checkCode', () => {
+    test('ok', () => {
+      expect.assertions(2)
+      auth.checkCode('123456').then(res => {
+        expect(res).toBeTruthy()
+      })
+      mockOtp.delta = -1
+      auth.checkCode('123450').then(res => {
+        expect(res).toBeTruthy()
       })
     })
 
-    it('Should return OTP code using existing verified secret', (done) => {
-      mockDb.data = [{secret: okSecret, verified: true}]
-      auth.getCode((err, code, verified) => {
-        expect(err).toBe(null)
-        expect(verified).toBe(true)
-        const codeRegEx = /[0-9]{6}/
-        expect(codeRegEx.test(code)).toBe(true)
-        expect(mockDb.insert).not.toHaveBeenCalled()
-        done()
+    test('code not valid', () => {
+      expect.assertions(1)
+      auth.checkCode('>23a5').catch(err => {
+        expect(err).toBe('Invalid code')
       })
     })
 
-    it('Should return OTP code using existing unverified secret', (done) => {
-      mockDb.data = [{secret: okSecret, verified: false}]
-      auth.getCode((err, code, verified) => {
-        expect(err).toBe(null)
-        expect(verified).toBe(false)
-        const codeRegEx = /[0-9]{6}/
-        expect(codeRegEx.test(code)).toBe(true)
-        expect(mockDb.insert).not.toHaveBeenCalled()
-        done()
-      })
-    })
-  })
-
-  describe('Validate code', () => {
-    let req
-    
-    const res = {
-      status: jest.fn().mockImplementation(() => res),
-      json: jest.fn().mockImplementation(() => res)
-    }, next = jest.fn()
-
-    beforeEach(() => {
-      req = {body:{code: null}}
-      jest.clearAllMocks()
-    })
-
-    it('should validate OTP code is digits and 6 long', () => {
-      req.body.code = '123456'  
-      auth.validateCode(req, res, next)
-      expect(next).toHaveBeenCalled()
-      expect(res.status).not.toHaveBeenCalledWith()
-      expect(res.json).not.toHaveBeenCalled()
-    })
-
-    it('should fail to validate a OTP code that is not 6 digits long', () => {
-      req.body.code = '12345'  
-      auth.validateCode(req, res, next)
-      expect(next).not.toHaveBeenCalled()
-      expect(res.status).toHaveBeenCalledWith(401)
-      expect(res.json).toHaveBeenCalledWith({err: 'Invalid code'})
-    })
-
-    it('should fail to validate a OTP code that is not digits', () => {
-      req.body.code = '$abc'  
-      auth.validateCode(req, res, next)
-      expect(next).not.toHaveBeenCalled()
-      expect(res.status).toHaveBeenCalledWith(401)
-      expect(res.json).toHaveBeenCalledWith({err: 'Invalid code'})
-    })
-  })
-
-  describe('Check code', () => {
-    it('should return true when provided valid code', (done) => {
-      mockDb.data = [{secret: okSecret, verified: false}]
-      let myCode
-
-      auth.getCode((err, code, verified) => {
-        myCode = code
-      })
-
-      auth.checkCode(myCode, (err, pass) => {
-        expect(pass).toBe(true)
-        done()
+    test('Missing code', () => {
+      expect.assertions(1)
+      auth.checkCode().catch(err => {
+        expect(err).toBe('Invalid code')
       })
     })
 
-    it('should return false when provided invalid code', (done) => {
-      mockDb.data = [{secret: okSecret, verified: false}]
-      let myCode
-
-      auth.getCode((err, code, verified) => {
-        myCode = (Number(code) + 1).toString()
-        if (myCode.length < 6) {
-          const diff = 6 - myCode.length
-          for(let i=0; i<diff; i++) {
-            myCode = '0' + myCode
-          }
-        }
-      })
-
-      auth.checkCode(myCode, (err, pass) => {
-        expect(pass).toBe(false)
-        done()
+    test('Invalid code', () => {
+      expect.assertions(1)
+      auth.checkCode('>23a5').catch(err => {
+        expect(err).toBe('Invalid code')
       })
     })
 
-    it('should return error when provided valid code for the second time', (done) => {
-      mockDb.data = [{secret: okSecret, verified: false}]
-      let myCode
-
-      auth.getCode((err, code, verified) => {
-        myCode = code
+    test('Incorrect code', () => {
+      expect.assertions(1)
+      mockOtp.ok = false
+      auth.checkCode('123457').catch(err => {
+        expect(err).toBe('Incorrect code')
       })
-
-      auth.checkCode(myCode, () => {})
-      auth.checkCode(myCode, (err, pass) => {
-        expect(err).toBe('Wait for next code')
-        expect(pass).toBeUndefined()
-        done()
-      })
-
     })
 
+    test('Stale code', () => {
+      expect.assertions(1)
+      mockOtp.delta = -2
+      auth.checkCode('123458').catch(err => {
+        expect(err).toBe('Incorrect code')
+      })
+    })
+
+    test('Reused code', () => {
+      expect.assertions(1)
+
+      auth.checkCode('123459')
+      auth.checkCode('123459').catch(err => {
+        expect(err).toBe('Invalid code')
+      })
+    })
   })
 
   describe('Check cookie', () => {
     let req = {body:{}, signedCookies: {}}
     
     const res = {
-      status: jest.fn().mockImplementation(() => res),
-      json: jest.fn().mockImplementation(() => res)
+      sendStatus: jest.fn().mockImplementation(() => res)
     }, next = jest.fn()
 
     beforeEach(() => {
@@ -212,30 +125,21 @@ describe('OTP Auth Service', () => {
       jest.clearAllMocks()
     })
 
-    it('should call next() cos we set cookie', () => {
+    test('Valid cookie', () => {
+      expect.assertions(2)
       req.signedCookies = {'qqBlog':'true'}
       auth.checkCookie(req, res, next)
       expect(next).toHaveBeenCalled()
-      expect(res.status).not.toHaveBeenCalled()
-      expect(res.json).not.toHaveBeenCalled()
+      expect(res.sendStatus).not.toHaveBeenCalled()
     })
 
-    it('should return error cos we didn\'t set cookie', () => {
+    test('Missing cookie', () => {
+      expect.assertions(2)
       req.signedCookies = {}
       auth.checkCookie(req, res, next)
-      expect(res.status).toHaveBeenCalledWith(401)
-      expect(res.json).toHaveBeenCalledWith({err: 'Must be logged in'})
+      expect(res.sendStatus).toHaveBeenCalledWith(401)
       expect(next).not.toHaveBeenCalled()
     })
   })
-
-  describe('Get QR', () => {
-    it('should give a QR SVG', () => {
-      auth.qrCode((err, QR) => {
-        const qrRegEx = /<svg.+\/><\/svg>/
-        expect(qrRegEx.test(QR)).toBe(true)
-      })
-    })
-  })
-
+  
 })

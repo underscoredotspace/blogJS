@@ -16,18 +16,20 @@
     "start:watch": "nodemon app/server",
     "dev": "yarn build:watch & yarn start:watch",
     "test": "jest",
-    "test:watch": "jest --watchAll --notify",
+    "test:watch": "yarn build:watch & jest --watchAll --notify",
     "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls",
     "cover:view": "open coverage/lcov-report/index.html"
   },
   "jest": {
     "collectCoverage": true,
     "collectCoverageFrom": [
-      "app/{client/src,server}/*.js"
+      "app/client/src/*.js",
+      "app/server/*.js",
+      "app/server/**/*.js"
     ],
     "roots": [
       "app/client/src",
-      "app/server",
+      "app/server/",
       "app/test"
     ]
   },
@@ -41,12 +43,13 @@
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
     "highlightjs": "^9.10.0",
-    "mongodb": "^2.2.27",
+    "mongoose": "^4.11.3",
     "ng-showdown": "^1.1.0",
     "on-headers": "^1.0.1",
     "otp.js": "^1.1.0",
     "pm2": "^2.6.1",
-    "showdown": "^1.7.1"
+    "showdown": "^1.7.1",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "angular-mocks": "^1.6.5",

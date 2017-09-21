@@ -5,6 +5,7 @@
   blogService.$inject = ['$http', '$q']
 
   function blogService($http, $q, $showdown) {
+    let blogPath = '/api/blog'
 
     return {
       get: getPost,
@@ -13,17 +14,17 @@
       new: newPost
     }
 
-    function getPost(id) {
-      let post
-      if (!id) {
-        post = 'latest/2'
-      } else {
-        post = 'post/' + id
+    function getPost({id, page} = {}) {
+      let post = blogPath
+      if (page) {
+        post += `/${page}`
+      } else if (id) {
+        post += `/id/${id}`
       }
 
       const options = {
         method: 'get',
-        url: '/api/' + post,
+        url: post,
         headers: {'Content-Type': 'application/json'}
       }
 
@@ -37,7 +38,7 @@
 
       const options = {
         method: 'delete',
-        url: '/api/post/' + id,
+        url: `${blogPath}/${id}`,
         headers: {'Content-Type': 'application/json'}
       }
 
@@ -55,13 +56,13 @@
       
       const options = {
         method: 'PATCH',
-        url: '/api/post/' + id,
+        url: `${blogPath}/${id}`,
         data: {blogpost},
         headers: {'Content-Type': 'application/json'}
       }
 
       return $http(options)
-        .then(res => $q.resolve(res.data.id))
+        .then(res => $q.resolve(id))
     }
 
     function newPost(blogpost) {
@@ -73,7 +74,7 @@
 
       const options = {
         method: 'POST',
-        url: '/api/post',
+        url: blogPath,
         data: {blogpost},
         headers: {'Content-Type': 'application/json'}
       }

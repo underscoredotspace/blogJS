@@ -1,6 +1,6 @@
 {
 	"jasmine": true,
-	"predef": ["inject", "jest"],
+	"predef": ["inject", "jest", "test"],
 	"asi": true,
 
 	// Per John Papa's style guide apart from above
