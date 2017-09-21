@@ -30,10 +30,31 @@ route.post('/', auth.checkCookie, (req, res) => {
     return 
   }
 
-  const blogPost = req.body.blogPost
-  Blog.create(blogPost)
-    .then(newPost => {
-      res.json({id:newPost.id})
+  const blogpost = req.body.blogpost
+  Blog.create(blogpost)
+    .then(blogpost => {
+      res.json({id:blogpost.id})
+    })
+    .catch(err => errHandle(err, res))
+})
+
+route.delete('/:id', auth.checkCookie, (req, res) => {
+  Blog.findByIdAndRemove(req.params.id)
+    .then(blogpost => {
+      res.sendStatus(200)
+    })
+    .catch(err => errHandle(err, res))
+})
+
+route.patch('/:id', auth.checkCookie, (req, res) => {
+  if (req.body.blogpost.title.length < 5 || req.body.blogpost.content.length <5) {
+    res.status(400).json({err: 'Post or title not long enough'})
+    return 
+  }
+  
+  Blog.findByIdAndUpdate(req.params.id, req.body.blogpost)
+    .then(blogpost => {
+      res.sendStatus(200)
     })
     .catch(err => errHandle(err, res))
 })

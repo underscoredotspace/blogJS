@@ -62,7 +62,7 @@
       }
 
       return $http(options)
-        .then(res => $q.resolve(res.data.id))
+        .then(res => $q.resolve(id))
     }
 
     function newPost(blogpost) {

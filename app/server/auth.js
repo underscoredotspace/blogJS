@@ -28,7 +28,7 @@ function getSecret() {
 }
 
 function checkCookie (req, res, next) {
-  if(req.signedCookies['qqBlog']==='true') {
+  if(req.signedCookies['qqBlog']) {
     next()
   } else {
     res.sendStatus(401)
