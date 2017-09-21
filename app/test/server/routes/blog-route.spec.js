@@ -29,10 +29,17 @@ describe('Blog API', () => {
     sort: mockReturn,
     skip: mockReturn,
     limit: mockReturn,
-    findById: mockPromise
+    findById: mockPromise,
+    create: mockPromise
   }
   
   jest.mock('../../../server/models/blog-model', () => mockBlog)
+
+  const mockAuth = {
+    checkCookie: jest.fn(((req, res, next) => next()))
+  }
+
+  jest.mock('../../../server/auth', () => mockAuth)
   
   app.use('/api/blog', require('../../../server/routes/blog'))
   
@@ -92,7 +99,7 @@ describe('Blog API', () => {
       mockBlog.limit = mockPromise
 
       return request(app).get('/api/blog').then(res => {
-        expect(res.status).toBe(400)
+        expect(res.status).toBe(500)
         expect(res.text).toBe('{\"err\":\"name\",\"message\":\"message\"}')
         expect(mockBlog.find).toHaveBeenCalled()
         expect(mockBlog.sort).toHaveBeenCalledWith({date:-1})
@@ -113,9 +120,81 @@ describe('Blog API', () => {
       expect.assertions(3)
       mockPromiseOk = false
       return request(app).get('/api/blog/id/2').then(res => {
-        expect(res.status).toBe(400)
+        expect(res.status).toBe(500)
         expect(res.text).toBe('{\"err\":\"name\",\"message\":\"message\"}')
         expect(mockBlog.findById).toHaveBeenCalledWith('2')
+      })
+    })
+  })
+
+  describe('POST', () => {
+    test('make a new post', () => {
+      expect.assertions(1)
+      const blogpost = {
+        title: 'A title that is long enought to post',
+        content: 'Content. You know, the nonsense you expect people to read. '
+      }
+
+      mockResolve = {
+        id: '592c78780e0322032c845430',
+        title: blogpost.title,
+        content: blogpost.content
+      }
+
+      return request(app).post('/api/blog').send({blogpost}).then(res => {
+        expect(res.text).toBe('{\"id\":\"592c78780e0322032c845430\"}')
+      })
+    })
+
+    test('fail to make a new post as title is too short', () => {
+      expect.assertions(1)
+      const blogpost = {
+        title: 'No',
+        content: 'Content. You know, the nonsense you expect people to read. '
+      }
+
+      return request(app).post('/api/blog').send({blogpost}).then(res => {
+        expect(res.status).toBe(400)
+      })
+    })
+
+    test('fail to make a new post as content is too short', () => {
+      expect.assertions(1)
+      const blogpost = {
+        title: 'A title that is long enought to post',
+        content: 'No'
+      }
+
+      return request(app).post('/api/blog').send({blogpost}).then(res => {
+        expect(res.status).toBe(400)
+      })
+    })
+
+    test('fail to make a new post as title and content are too short', () => {
+      expect.assertions(1)
+      const blogpost = {
+        title: 'No',
+        content: 'No'
+      }
+
+      return request(app).post('/api/blog').send({blogpost}).then(res => {
+        expect(res.status).toBe(400)
+      })
+    })
+
+    test('Handle db error in POST /api/blog ',  () => {
+      expect.assertions(3)
+      mockPromiseOk = false
+      
+      const blogpost = {
+        title: 'A title that is long enought to post',
+        content: 'Content. You know, the nonsense you expect people to read. '
+      }
+
+      return request(app).post('/api/blog').send({blogpost}).then(res => {
+        expect(res.status).toBe(500)
+        expect(res.text).toBe('{\"err\":\"name\",\"message\":\"message\"}')
+        expect(mockBlog.create).toHaveBeenCalled()
       })
     })
   })

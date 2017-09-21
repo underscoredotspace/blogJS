@@ -40,7 +40,7 @@ describe('OTP Auth', () => {
   describe('getSecret', () => {
     test('ok', () => {
       expect.assertions(1)
-      return auth._getSecret().then(secret => {
+      auth._getSecret().then(secret => {
         expect(secret).toBe(1)
       })
     })
@@ -48,7 +48,7 @@ describe('OTP Auth', () => {
     test('not ok', () => {
       expect.assertions(1)
       mockUserModel.ok = false
-      return auth._getSecret().catch(err => {
+      auth._getSecret().catch(err => {
         expect(err).toBe('error')
       })
     })
@@ -56,29 +56,33 @@ describe('OTP Auth', () => {
 
   describe('checkCode', () => {
     test('ok', () => {
-      expect.assertions(1)
-      return auth.checkCode('123456').then(res => {
+      expect.assertions(2)
+      auth.checkCode('123456').then(res => {
+        expect(res).toBeTruthy()
+      })
+      mockOtp.delta = -1
+      auth.checkCode('123450').then(res => {
         expect(res).toBeTruthy()
       })
     })
 
     test('code not valid', () => {
       expect.assertions(1)
-      return auth.checkCode('>23a5').catch(err => {
+      auth.checkCode('>23a5').catch(err => {
         expect(err).toBe('Invalid code')
       })
     })
 
     test('Missing code', () => {
       expect.assertions(1)
-      return auth.checkCode().catch(err => {
+      auth.checkCode().catch(err => {
         expect(err).toBe('Invalid code')
       })
     })
 
     test('Invalid code', () => {
       expect.assertions(1)
-      return auth.checkCode('>23a5').catch(err => {
+      auth.checkCode('>23a5').catch(err => {
         expect(err).toBe('Invalid code')
       })
     })
@@ -86,17 +90,56 @@ describe('OTP Auth', () => {
     test('Incorrect code', () => {
       expect.assertions(1)
       mockOtp.ok = false
-      return auth.checkCode('123456').catch(err => {
+      auth.checkCode('123457').catch(err => {
         expect(err).toBe('Incorrect code')
       })
     })
 
     test('Stale code', () => {
       expect.assertions(1)
-      mockOtp.delta = -3
-      return auth.checkCode('123456').catch(err => {
+      mockOtp.delta = -2
+      auth.checkCode('123458').catch(err => {
         expect(err).toBe('Incorrect code')
       })
     })
+
+    test('Reused code', () => {
+      expect.assertions(1)
+
+      auth.checkCode('123459')
+      auth.checkCode('123459').catch(err => {
+        expect(err).toBe('Invalid code')
+      })
+    })
   })
+
+  describe('Check cookie', () => {
+    let req = {body:{}, signedCookies: {}}
+    
+    const res = {
+      sendStatus: jest.fn().mockImplementation(() => res)
+    }, next = jest.fn()
+
+    beforeEach(() => {
+      req = req = {body:{}, signedCookies: {}}
+      jest.clearAllMocks()
+    })
+
+    test('Valid cookie', () => {
+      expect.assertions(2)
+      req.signedCookies = {'qqBlog':'true'}
+      auth.checkCookie(req, res, next)
+      expect(next).toHaveBeenCalled()
+      expect(res.sendStatus).not.toHaveBeenCalled()
+    })
+
+    test('Missing cookie', () => {
+      expect.assertions(2)
+      req.signedCookies = {}
+      auth.checkCookie(req, res, next)
+      expect(res.sendStatus).toHaveBeenCalledWith(401)
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
+  
 })

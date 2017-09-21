@@ -2,12 +2,15 @@ const OTP = require('otp.js')
 const GA = OTP.googleAuthenticator
 const user = require('./models/user-model')
 const otpMatcher = /^\d{6}$/
+let lastCode
 
 function checkCode(code = '') {
   return new Promise((resolve, reject) => {
-    if (!otpMatcher.test(code)) {
+    if (!otpMatcher.test(code) || (code === lastCode)) {
       return reject('Invalid code')
     }
+
+    lastCode = code
 
     getSecret().then(secret => {
       const verified = GA.verify(code, secret)
@@ -24,4 +27,12 @@ function getSecret() {
   return user.findOne().then(res => res.secret)
 }
 
-module.exports = {checkCode, _getSecret: getSecret}
+function checkCookie (req, res, next) {
+  if(req.signedCookies['qqBlog']==='true') {
+    next()
+  } else {
+    res.sendStatus(401)
+  }
+}
+
+module.exports = {checkCode, _getSecret: getSecret, checkCookie}

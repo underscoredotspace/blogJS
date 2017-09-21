@@ -9,6 +9,6 @@ const blogSchema = new mongoose.Schema({
   }
 }, {collection: 'blog'})
 
-const Blog = mongoose.model('blog', blogSchema)
+const blog = mongoose.model('blog', blogSchema)
 
-module.exports = Blog
+module.exports = blog
