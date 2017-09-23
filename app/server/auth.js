@@ -4,6 +4,13 @@ const user = require('./models/user-model')
 const otpMatcher = /^\d{6}$/
 let lastCode
 
+function printSetupCode() {
+  return getSecret()
+    .then(secret => {
+      console.info(GA.gen(secret))
+    })
+}
+
 function checkCode(code = '') {
   return new Promise((resolve, reject) => {
     if (!otpMatcher.test(code) || (code === lastCode)) {
@@ -35,4 +42,4 @@ function checkCookie (req, res, next) {
   }
 }
 
-module.exports = {checkCode, _getSecret: getSecret, checkCookie}
+module.exports = {checkCode, _getSecret: getSecret, checkCookie, printSetupCode}

@@ -9,8 +9,8 @@ describe('Root of API', () => {
     res.send('something')
   })
 
-  jest.mock('../../server/routes/blog', () => mockBlog)
-  app.use('/api', require('../../server/routes/api'))
+  jest.mock('../../../server/routes/blog', () => mockBlog)
+  app.use('/api', require('../../../server/routes/api'))
 
   test('Request to /api/blog', () => {
     return request(app).get('/api/blog').then(res => {

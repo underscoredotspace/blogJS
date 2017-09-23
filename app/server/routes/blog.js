@@ -1,6 +1,5 @@
 const route = require('express').Router()
 const Blog = require('../models/blog-model')
-const mongoose = require('mongoose')
 const auth = require('../auth')
 
 const BLOG_LIMIT = 3

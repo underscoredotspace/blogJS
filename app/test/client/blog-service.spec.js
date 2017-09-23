@@ -24,7 +24,7 @@ describe('blogService: Completes API calls for blog posts', () => {
   afterEach(() => {
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
-  });
+  })
 
   test('should be a function', () => {
     expect(blogService.get).toEqual(jasmine.any(Function))

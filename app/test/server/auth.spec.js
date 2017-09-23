@@ -9,7 +9,8 @@ describe('OTP Auth', () => {
         } else {
           return null
         }
-      })
+      }),
+      gen: jest.fn(() => '123456')
     }
   }
 
@@ -140,6 +141,10 @@ describe('OTP Auth', () => {
       expect(res.sendStatus).toHaveBeenCalledWith(401)
       expect(next).not.toHaveBeenCalled()
     })
+  })
+
+  test('Print setup code', () => {
+    return auth.printSetupCode()
   })
   
 })
