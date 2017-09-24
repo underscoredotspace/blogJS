@@ -10,7 +10,8 @@ describe('OTP Auth', () => {
           return null
         }
       }),
-      gen: jest.fn(() => '123456')
+      gen: jest.fn(() => '123456'),
+      qrCode: jest.fn(() => 'qr')
     }
   }
 
@@ -113,6 +114,35 @@ describe('OTP Auth', () => {
       auth.checkCode('123459').catch(err => {
         expect(err).toBe('Invalid code')
       })
+    })
+  })
+
+  describe('genQR', () => {
+    test('genQR ok', () => {
+      expect.assertions(1)
+      mockUserModel.resolveVal = {secret:1,verified:false}
+      auth.genQR()
+        .then(qr => {
+          expect(qr).toBe('qr')
+        })
+    })
+
+    test('genQR not ok', () => {
+      expect.assertions(1)
+      mockUserModel.ok = false
+      return auth.genQR()
+        .catch(err => {
+          expect(err).toBe('error')
+        })
+    })
+
+    test('genQR not ok cos user already verified', () => {
+      expect.assertions(1)
+      mockUserModel.resolveVal = {secret:1,verified:true}
+      return auth.genQR()
+        .catch(err => {
+          expect(err).toBe('User verified')
+        })
     })
   })
 

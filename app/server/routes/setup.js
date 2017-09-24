@@ -14,9 +14,15 @@ route.get('/code', (req, res) => {
 })
                   
 route.post('/qr', (req, res) => {
-  auth.checkCode(req.body.code)
-    .then(() => res.send({qr:'yes'}))
-    .catch(() => res.sendStatus(403))
+  auth.genQR(req.body.code)
+    .then(qr => res.send({qr}))
+    .catch(err => {
+      if (err === 'User verified') {
+        res.sendStatus(403)
+      } else {
+        res.sendStatus(500)
+      }
+    })
 })
 
 route.post('/verify', (req, res) => {

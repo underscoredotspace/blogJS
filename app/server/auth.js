@@ -34,6 +34,19 @@ function checkCode(code = '') {
   })
 }
 
+function genQR() {
+  const user = 'user', org = 'blog'
+  
+  return getUser()
+    .then(user => {
+      if (user.verified) {
+        throw('User verified')
+      } else {
+        return GA.qrCode(user, org, user.secret)
+      }
+    })
+}
+
 function getUser() {
   return user.findOne().then(res => {
     return {
@@ -51,4 +64,4 @@ function checkCookie (req, res, next) {
   }
 }
 
-module.exports = {checkCode, _getUser: getUser, checkCookie, printSetupCode}
+module.exports = {checkCode, _getUser: getUser, checkCookie, printSetupCode, genQR}

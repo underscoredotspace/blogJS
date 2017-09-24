@@ -23,7 +23,8 @@ describe('Setup API', () => {
 
   const mockAuth = {
     printSetupCode: mockPromise,
-    checkCode: mockPromise
+    checkCode: mockPromise,
+    genQR: mockPromise
   }
 
   jest.mock('../../../server/auth', () => mockAuth)
@@ -76,6 +77,16 @@ describe('Setup API', () => {
   test('Request QR code fail', () => {
     expect.assertions(1)
     mockPromiseOk = false
+    return request(app).post('/api/setup/qr').send({code:'123456'})
+      .then(res => {
+        expect(res.status).toBe(500)
+      })
+  })
+
+  test('Request QR code fail because already verified', () => {
+    expect.assertions(1)
+    mockPromiseOk = false
+    mockReject = 'User verified'
     return request(app).post('/api/setup/qr').send({code:'123456'})
       .then(res => {
         expect(res.status).toBe(403)
