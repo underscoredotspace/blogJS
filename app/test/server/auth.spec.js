@@ -18,11 +18,11 @@ describe('OTP Auth', () => {
 
   const mockUserModel = {
     ok: null,
-    resolveVal: 1,
+    resolveVal: null,
     user: jest.fn(() => mockUserModel),
     findOne: jest.fn(() => new Promise((resolve, reject)=> {
       if (mockUserModel.ok) {
-        return resolve({secret:mockUserModel.resolveVal}) 
+        return resolve(mockUserModel.resolveVal) 
       } else {
         return reject('error')
       }
@@ -35,21 +35,23 @@ describe('OTP Auth', () => {
   beforeEach(() => {
     mockOtp.ok = true
     mockUserModel.ok = true
+    mockUserModel.resolveVal = {secret:1,verified:true}
     mockOtp.delta = 0
   })
 
-  describe('getSecret', () => {
+  describe('getUser', () => {
     test('ok', () => {
-      expect.assertions(1)
-      auth._getSecret().then(secret => {
-        expect(secret).toBe(1)
+      expect.assertions(2)
+      auth._getUser().then(user => {
+        expect(user.secret).toBe(1)
+        expect(user.verified).toBe(true)
       })
     })
 
     test('not ok', () => {
       expect.assertions(1)
       mockUserModel.ok = false
-      auth._getSecret().catch(err => {
+      auth._getUser().catch(err => {
         expect(err).toBe('error')
       })
     })
@@ -59,11 +61,11 @@ describe('OTP Auth', () => {
     test('ok', () => {
       expect.assertions(2)
       auth.checkCode('123456').then(res => {
-        expect(res).toBeTruthy()
+        expect(res.verified).toBeTruthy()
       })
       mockOtp.delta = -1
       auth.checkCode('123450').then(res => {
-        expect(res).toBeTruthy()
+        expect(res.verified).toBeTruthy()
       })
     })
 
@@ -143,8 +145,19 @@ describe('OTP Auth', () => {
     })
   })
 
-  test('Print setup code', () => {
-    return auth.printSetupCode()
+  describe('Print setup code', () => {
+    test('Ok', () => {
+      mockUserModel.resolveVal = {secret:1,verified:false}
+      return auth.printSetupCode()
+    })
+
+    test('Already verified', () => {
+      mockUserModel.resolveVal = {secret:1,verified:true}
+      return auth.printSetupCode()
+        .catch(err => {
+          expect(err).toBe('User verified')
+        })
+    })
   })
   
 })

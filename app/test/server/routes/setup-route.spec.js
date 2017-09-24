@@ -8,8 +8,8 @@ describe('Setup API', () => {
   app.use(bodyParser.urlencoded({extended: true}))
   
   let mockResolve = [], 
-  mockReject = {name:'name', message: 'message'}, 
-  mockPromiseOk = true
+    mockReject = {name:'name', message: 'message'}, 
+    mockPromiseOk = true
   
   const mockPromise = jest.fn(() => {
     return new Promise((resolve, reject) => {
@@ -22,7 +22,8 @@ describe('Setup API', () => {
   })
 
   const mockAuth = {
-    printSetupCode: jest.fn(() => mockPromise)
+    printSetupCode: mockPromise,
+    checkCode: mockPromise
   }
 
   jest.mock('../../../server/auth', () => mockAuth)
@@ -45,19 +46,28 @@ describe('Setup API', () => {
       })
   })
 
+  test('Request to print setup code fail because already verified', () => {
+    expect.assertions(1)
+    mockPromiseOk = false
+    mockReject = 'User verified'
+    return request(app).get('/api/setup/code')
+      .then(res => {
+        expect(res.status).toBe(403)
+      })
+  })
+
   test('Request to print setup code fail', () => {
     expect.assertions(1)
     mockPromiseOk = false
     return request(app).get('/api/setup/code')
       .then(res => {
-        // expect console.error?
-        expect(res.status).toBe(200)
+        expect(res.status).toBe(500)
       })
   })
 
   test('Request QR code', () => {
     expect.assertions(1)
-    return request(app).post('/api/setup/qr').send({code:'12345'})
+    return request(app).post('/api/setup/qr').send({code:'123456'})
       .then(res => {
         expect(res.status).toBe(200)
       })
@@ -65,17 +75,27 @@ describe('Setup API', () => {
 
   test('Request QR code fail', () => {
     expect.assertions(1)
-    return request(app).post('/api/setup/qr').send({code:'12345'})
+    mockPromiseOk = false
+    return request(app).post('/api/setup/qr').send({code:'123456'})
       .then(res => {
-        expect(res.status).toBe(200)
+        expect(res.status).toBe(403)
       })
   })
 
   test('Request verify code', () => {
     expect.assertions(1)
-    return request(app).post('/api/setup/verify').send({code:'12345'})
+    return request(app).post('/api/setup/verify').send({code:'123456'})
       .then(res => {
         expect(res.status).toBe(200)
+      })
+  })
+
+  test('Request verify code fail', () => {
+    expect.assertions(1)
+    mockPromiseOk = false
+    return request(app).post('/api/setup/verify').send({code:'123456'})
+      .then(res => {
+        expect(res.status).toBe(403)
       })
   })
 })

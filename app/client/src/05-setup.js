@@ -4,28 +4,26 @@
 
   function setupController(setupService, $routeParams, $location, $sce) {
     const vm = this
-    vm.step = '1'
+
+    vm.init = function() {
+      setupService.printSetupCode()
+        .then(() => vm.step = '1')
+        .catch(() => $location.path('/home'))
+    }
 
     vm.getQR = function(setupCode) {
-      setupService.getQR(setupCode)
-        .then(qr => {
-          vm.qr = $sce.trustAsHtml(qr)
-          vm.step = '2'
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      setupService.getQR(setupCode).then(qr => {
+        vm.qr = $sce.trustAsHtml(qr)
+        vm.step = '2'
+      })
+      .catch(err => console.error)
     }
 
     vm.verify = function(gaCode) {
-      setupService.verify(gaCode)
-      .then(() => {
+      setupService.verify(gaCode).then(() => {
         vm.qr = undefined
         vm.step = '3'
-      })
-      .catch(err => {
-        console.log(err)
-      })
+      }).catch(err => console.error)
     }
   }
 })();
@@ -38,7 +36,12 @@
     const setupPath = '/api/setup'
     return {
       getQR, 
-      verify
+      verify,
+      printSetupCode
+    }
+
+    function printSetupCode() {
+      return $http.get(`${setupPath}/code`)
     }
 
     function getQR(code) {

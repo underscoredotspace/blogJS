@@ -5,9 +5,13 @@ const otpMatcher = /^\d{6}$/
 let lastCode
 
 function printSetupCode() {
-  return getSecret()
-    .then(secret => {
-      console.info(GA.gen(secret))
+  return getUser()
+    .then(user => {
+      if (user.verified) {
+        throw('User verified')
+      } else {
+        console.info(GA.gen(user.secret))
+      }
     })
 }
 
@@ -19,10 +23,10 @@ function checkCode(code = '') {
 
     lastCode = code
 
-    getSecret().then(secret => {
-      const verified = GA.verify(code, secret)
+    getUser().then(user => {
+      const verified = GA.verify(code, user.secret)
       if (verified && Math.abs(verified.delta) <=1) {
-        return resolve(true)
+        return resolve({verified:user.verified})
       } else {
         return reject('Incorrect code')
       }
@@ -30,8 +34,13 @@ function checkCode(code = '') {
   })
 }
 
-function getSecret() {
-  return user.findOne().then(res => res.secret)
+function getUser() {
+  return user.findOne().then(res => {
+    return {
+      secret: res.secret,
+      verified: res.verified
+    }
+  })
 }
 
 function checkCookie (req, res, next) {
@@ -42,4 +51,4 @@ function checkCookie (req, res, next) {
   }
 }
 
-module.exports = {checkCode, _getSecret: getSecret, checkCookie, printSetupCode}
+module.exports = {checkCode, _getUser: getUser, checkCookie, printSetupCode}

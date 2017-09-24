@@ -29,6 +29,17 @@ describe('Setup', () => {
         setupService = $injector.get('setupService')
       })
     })
+
+    test('Print setup code', () => {
+      expect.assertions(1)
+      const getQR = $httpBackend.expectGET('/api/setup/code').respond([])
+      setupService.printSetupCode()
+        .then(res => {
+          expect(res.status).toBe(200)
+        })
+
+      $httpBackend.flush()
+    })
     
     test('Get QR', () => {
       expect.assertions(1)
@@ -85,7 +96,8 @@ describe('Setup', () => {
 
     const setupService = {
       getQR: jest.fn().mockImplementation(fakePromise),
-      verify: jest.fn().mockImplementation(fakePromise)
+      verify: jest.fn().mockImplementation(fakePromise),
+      printSetupCode: jest.fn().mockImplementation(fakePromise)
     }
 
     function fakePromise() {
@@ -109,8 +121,17 @@ describe('Setup', () => {
       promiseOk = true
     })
     
-    test('steps', () => {
+    test('Init', () => {
+      promiseOk = false
       setupController = $controller('setup', {setupService})
+      setupController.init()
+      $rootScope.$digest()
+      expect($location.path()).toBe('/home')
+    })
+
+    test('Init when already verified', () => {
+      setupController = $controller('setup', {setupService})
+      setupController.init()
       $rootScope.$digest()
       expect(setupController.step).toBe('1')
     })
@@ -132,7 +153,7 @@ describe('Setup', () => {
       setupController.getQR('123456')
       $rootScope.$digest()
       expect(setupController.qr).toBeUndefined()
-      expect(setupController.step).toBe('1')
+      expect(setupController.step).toBeUndefined()
     })
 
     test('Verify code', () => {
