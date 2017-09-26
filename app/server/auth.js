@@ -1,35 +1,24 @@
-const OTP = require('otp.js')
-const GA = OTP.googleAuthenticator
-const User = require('./models/user-model')
-const otpMatcher = /^\d{6}$/
+const GA = require('otplib/authenticator'),
+  crypto = require('crypto'),
+  qrcode = require('qrcode'),
+  User = require('./models/user-model'),
+  otpMatcher = /^\d{6}$/
+  GA.options = {crypto}
+
 let lastCode
 
 function newSecret() {
-  const crypto = require('crypto')
-  const bcrypt = require('bcrypt')
-
+  const secret = GA.generateSecret()
   return new Promise((resolve, reject) => {
-    crypto.randomBytes(256, (err, buf) => {
-      if (err) {
-        return reject(err)
+    return User.create({
+      secret, verified: false
+    }).then(user => {
+      return {
+        secret: user.secret,
+        verified: user.verified
       }
-      
-      bcrypt.hash(buf.toString(), 5, (err, hash) => {
-        if (err) {
-          return reject(err)
-        }
-
-        return User.create({
-          secret: GA.encode(hash), verified: false
-        }).then(user => {
-          return {
-            secret: user.secret,
-            verified: user.verified
-          }
-        })
-        .catch(err => console.error({err: err.name, message: err.message}))
-      })
     })
+    .catch(err => console.error({err: err.name, message: err.message}))
   })
 }
 
@@ -39,7 +28,7 @@ function printSetupCode() {
       if (user.verified) {
         throw('User verified')
       } else {
-        const code = GA.gen(user.secret)
+        const code = GA.generate(user.secret)
         console.info(code)
         lastCode = code
       }
@@ -55,11 +44,8 @@ function checkCode(code = '') {
     lastCode = code
 
     getUser().then(user => {
-      const verified = GA.verify(code, user.secret)
-      if (verified && Math.abs(verified.delta) <=1) {
-        if (!user.verified) {
-          verifyUser().then(() => user.verifed = true)
-        }
+      const codeOk = GA.check(code, user.secret, {step:90})
+      if (codeOk) {
         return resolve({verified:user.verified})
       } else {
         return reject('Incorrect code')
@@ -70,15 +56,21 @@ function checkCode(code = '') {
 
 function genQR() {
   const userName = 'user', org = 'blog'
-  
-  return getUser()
-    .then(user => {
+  return new Promise((resolve, reject) => {
+    getUser().then(user => {
       if (user.verified) {
-        throw('User verified')
+        return reject('User verified')
       } else {
-        return GA.qrCode(userName, org, user.secret)
+        const key = GA.keyuri(userName, org, user.secret)
+        qrcode.toString(key, {type:'svg'}, (err, qr) => {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(qr)
+        })
       }
     })
+  })
 }
 
 function getUser() {
@@ -99,6 +91,7 @@ function getUser() {
 
 function verifyUser() {
   return User.findOneAndUpdate({}, {verified:true})
+    .then(user => user.verified)
 }
 
 function checkCookie (req, res, next) {
@@ -109,4 +102,4 @@ function checkCookie (req, res, next) {
   }
 }
 
-module.exports = {checkCode, _getUser: getUser, _newSecret: newSecret, checkCookie, printSetupCode, genQR}
+module.exports = {checkCode, _getUser: getUser, _newSecret: newSecret, checkCookie, printSetupCode, genQR, verifyUser}

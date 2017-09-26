@@ -24,7 +24,8 @@ describe('Setup API', () => {
   const mockAuth = {
     printSetupCode: mockPromise,
     checkCode: mockPromise,
-    genQR: mockPromise
+    genQR: mockPromise,
+    verifyUser: mockPromise
   }
 
   jest.mock('../../../server/auth', () => mockAuth)

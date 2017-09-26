@@ -27,6 +27,7 @@ route.post('/qr', (req, res) => {
 
 route.post('/verify', (req, res) => {
   auth.checkCode(req.body.code)
+    .then(() => auth.verifyUser())
     .then(verified => res.send(verified))
     .catch(() => res.sendStatus(403))
 })

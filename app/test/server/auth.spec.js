@@ -1,27 +1,32 @@
 describe('OTP Auth', () => {
-  const mockOtp = {
-    ok: true,
-    delta: 0,
-    googleAuthenticator: {
-      verify: jest.fn((code, secret) => {
-        if (mockOtp.ok) {
-          return {delta: mockOtp.delta}
-        } else {
-          return null
-        }
-      }),
-      gen: jest.fn(() => '123456'),
-      qrCode: jest.fn(() => 'qr')
-    }
+  const mockGA = {
+    generateSecret: jest.fn().mockReturnValue('1'),
+    generate: jest.fn().mockReturnValue('002800'),
+    check: jest.fn().mockReturnValue(true),
+    keyuri: jest.fn().mockReturnValue('anImage')
   }
 
-  jest.mock('otp.js', () => mockOtp)
+  jest.mock('otplib/authenticator', () => mockGA)
+
+  const mockQR = {
+    err: null,
+    toString: jest.fn().mockImplementation((code, options, cb) => cb(mockQR.err, 'qr'))
+  }
+
+  jest.mock('qrcode', () => mockQR)
 
   const mockUserModel = {
     ok: null,
     resolveVal: null,
     user: jest.fn(() => mockUserModel),
     findOne: jest.fn(() => new Promise((resolve, reject)=> {
+      if (mockUserModel.ok) {
+        return resolve(mockUserModel.resolveVal) 
+      } else {
+        return reject('error')
+      }
+    })),
+    findOneAndUpdate: jest.fn(() => new Promise((resolve, reject)=> {
       if (mockUserModel.ok) {
         return resolve(mockUserModel.resolveVal) 
       } else {
@@ -34,10 +39,9 @@ describe('OTP Auth', () => {
   const auth = require('../../server/auth')
 
   beforeEach(() => {
-    mockOtp.ok = true
     mockUserModel.ok = true
     mockUserModel.resolveVal = {secret:1,verified:true}
-    mockOtp.delta = 0
+    mockGA.check.mockReturnValue(true)
   })
 
   describe('getUser', () => {
@@ -59,60 +63,49 @@ describe('OTP Auth', () => {
   })
 
   describe('checkCode', () => {
-    test('ok', () => {
-      expect.assertions(2)
-      auth.checkCode('123456').then(res => {
-        expect(res.verified).toBeTruthy()
-      })
-      mockOtp.delta = -1
-      auth.checkCode('123450').then(res => {
-        expect(res.verified).toBeTruthy()
+    test('checkCode ok', () => {
+      expect.assertions(1)
+      return auth.checkCode('123456').then(user => {
+        expect(user.verified).toBeTruthy()
       })
     })
 
-    test('code not valid', () => {
+    test('checkCode not valid', () => {
       expect.assertions(1)
-      auth.checkCode('>23a5').catch(err => {
+      return auth.checkCode('>23a5').catch(err => {
         expect(err).toBe('Invalid code')
       })
     })
 
-    test('Missing code', () => {
+    test('checkCode Missing code', () => {
       expect.assertions(1)
-      auth.checkCode().catch(err => {
+      return auth.checkCode().catch(err => {
         expect(err).toBe('Invalid code')
       })
     })
 
-    test('Invalid code', () => {
+    test('checkCode Invalid code', () => {
       expect.assertions(1)
-      auth.checkCode('>23a5').catch(err => {
+      return auth.checkCode('>23a5').catch(err => {
         expect(err).toBe('Invalid code')
       })
     })
 
-    test('Incorrect code', () => {
+    test('checkCode Incorrect code', () => {
       expect.assertions(1)
-      mockOtp.ok = false
-      auth.checkCode('123457').catch(err => {
+      mockGA.check.mockReturnValueOnce(false)
+      return auth.checkCode('123457').catch(err => {
         expect(err).toBe('Incorrect code')
       })
     })
 
-    test('Stale code', () => {
-      expect.assertions(1)
-      mockOtp.delta = -2
-      auth.checkCode('123458').catch(err => {
-        expect(err).toBe('Incorrect code')
-      })
-    })
-
-    test('Reused code', () => {
+    test('checkCode Reused code', () => {
       expect.assertions(1)
 
-      auth.checkCode('123459')
-      auth.checkCode('123459').catch(err => {
-        expect(err).toBe('Invalid code')
+      return auth.checkCode('123459').then(() => {
+        return auth.checkCode('123459').catch(err => {
+          expect(err).toBe('Invalid code')
+        })
       })
     })
   })
@@ -121,20 +114,20 @@ describe('OTP Auth', () => {
     test('genQR ok', () => {
       expect.assertions(1)
       mockUserModel.resolveVal = {secret:1,verified:false}
-      auth.genQR()
+      return auth.genQR()
         .then(qr => {
           expect(qr).toBe('qr')
         })
     })
 
-    test('genQR not ok', () => {
-      expect.assertions(1)
-      mockUserModel.ok = false
-      return auth.genQR()
-        .catch(err => {
-          expect(err).toBe('error')
-        })
-    })
+    // test('genQR not ok', () => {
+    //   expect.assertions(1)
+    //   mockUserModel.ok = false
+    //   return auth.genQR()
+    //     .catch(err => {
+    //       expect(err).toBe('error')
+    //     })
+    // })
 
     test('genQR not ok cos user already verified', () => {
       expect.assertions(1)
@@ -187,6 +180,16 @@ describe('OTP Auth', () => {
         .catch(err => {
           expect(err).toBe('User verified')
         })
+    })
+  })
+
+  describe('Verify user', () => {
+    test('Verify user ok', () => {
+      expect.assertions(2)
+      auth.verifyUser().then(verifed => {
+        expect(verifed).toBeTruthy()
+        expect(mockUserModel.findOneAndUpdate).toHaveBeenCalledWith({}, {verified:true})
+      })
     })
   })
   
