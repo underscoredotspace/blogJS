@@ -9,24 +9,22 @@ let lastCode
 
 function newSecret() {
   const secret = GA.generateSecret()
-  return new Promise((resolve, reject) => {
-    return User.create({
-      secret, verified: false
-    }).then(user => {
-      return {
-        secret: user.secret,
-        verified: user.verified
-      }
+
+  return User.create({
+    secret, verified: false
+  }).then(user => ({
+      secret: user.secret,
+      verified: user.verified
     })
-    .catch(err => console.error({err: err.name, message: err.message}))
-  })
+  )
+  .catch(err => console.error({err: err.name, message: err.message}))
 }
 
 function printSetupCode() {
   return getUser()
     .then(user => {
       if (user.verified) {
-        throw('User verified')
+        throw({'403':'User verified'})
       } else {
         const code = GA.generate(user.secret)
         console.info(code)
@@ -38,7 +36,7 @@ function printSetupCode() {
 function checkCode(code = '') {
   return new Promise((resolve, reject) => {
     if (!otpMatcher.test(code) || (code === lastCode)) {
-      return reject('Invalid code')
+      return reject({'403':'Invalid code'})
     }
 
     lastCode = code
@@ -48,28 +46,23 @@ function checkCode(code = '') {
       if (codeOk) {
         return resolve({verified:user.verified})
       } else {
-        return reject('Incorrect code')
+        return reject({'403':'Incorrect code'})
       }
     })
   })
 }
 
 function genQR() {
-  const userName = 'user', org = 'blog'
-  return new Promise((resolve, reject) => {
-    getUser().then(user => {
-      if (user.verified) {
-        return reject('User verified')
-      } else {
-        const key = GA.keyuri(userName, org, user.secret)
-        qrcode.toString(key, {type:'svg'}, (err, qr) => {
-          if (err) {
-            return reject(err)
-          }
-          return resolve(qr)
-        })
-      }
-    })
+  return getUser().then(user => {
+    if (user.verified) {
+      throw({'403':'User verified'})
+    }
+
+    const userName = 'user', org = 'blog'
+    const util = require('util')
+    const key = GA.keyuri(userName, org, user.secret)
+    const toStringAsync = util.promisify(qrcode.toString)
+    return toStringAsync(key, {type:'svg'})
   })
 }
 
@@ -80,12 +73,9 @@ function getUser() {
         secret: user.secret,
         verified: user.verified
       }
-    } else {
-      return newSecret()
-        .then(secret => {
-          return {secret, verified: false}
-        })
     }
+    return newSecret()
+      .then(secret => ({secret, verified: false}))
   })
 }
 

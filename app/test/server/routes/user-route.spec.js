@@ -17,7 +17,7 @@ describe('User API', () => {
     err: null,
     checkCode: jest.fn(() => new Promise((resolve, reject) => {
       if (!mockAuth.err) {
-        resolve()
+        resolve({secret:1,verified:true})
       } else {
         reject(mockAuth.err)
       }
@@ -35,7 +35,7 @@ describe('User API', () => {
   const cookieMatch = /^qqBlog=.+$/
   
   test('Logs in', () => { 
-    const code = '123456'
+    const code = '123451'
     return request(app).post('/api/user/login').send({code}).then(res => {
       expect(res.status).toBe(200)
       const [cookie, age, path, expires] = res.headers['set-cookie'].pop().split(';')
@@ -46,7 +46,7 @@ describe('User API', () => {
   })
 
   test('Fails to log in', () => {
-    const code = '123456'
+    const code = '123452'
     mockAuth.err = 'Invalid code'
     return request(app).post('/api/user/login').send({code}).then(res => {
       expect(res.status).toBe(403)
@@ -56,7 +56,7 @@ describe('User API', () => {
   })
   
   test('Logs out', () => {
-    const code = '123456'
+    const code = '123453'
     return request(app).post('/api/user/login').send({code}).then(res => {
       const req = request(app).get('/api/user/logout')
       req.set('Cookie', res.headers['set-cookie'])

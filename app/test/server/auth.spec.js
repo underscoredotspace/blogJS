@@ -16,47 +16,34 @@ describe('OTP Auth', () => {
   jest.mock('qrcode', () => mockQR)
 
   const mockUserModel = {
-    ok: null,
-    resolveVal: null,
     user: jest.fn(() => mockUserModel),
-    findOne: jest.fn(() => new Promise((resolve, reject)=> {
-      if (mockUserModel.ok) {
-        return resolve(mockUserModel.resolveVal) 
-      } else {
-        return reject('error')
-      }
-    })),
-    findOneAndUpdate: jest.fn(() => new Promise((resolve, reject)=> {
-      if (mockUserModel.ok) {
-        return resolve(mockUserModel.resolveVal) 
-      } else {
-        return reject('error')
-      }
-    }))
+    findOne: jest.fn().mockReturnValue(Promise.resolve({secret:1,verified:false})),
+    findOneAndUpdate: jest.fn().mockReturnValue(Promise.resolve({secret:1,verified:false}))
   }
+
   jest.mock('../../server/models/user-model', () => mockUserModel)
 
   const auth = require('../../server/auth')
 
   beforeEach(() => {
-    mockUserModel.ok = true
-    mockUserModel.resolveVal = {secret:1,verified:true}
-    mockGA.check.mockReturnValue(true)
+    jest.clearAllMocks()
   })
 
   describe('getUser', () => {
-    test('ok', () => {
-      expect.assertions(2)
-      auth._getUser().then(user => {
+    test('getUser ok', () => {
+      expect.assertions(3)
+      return auth._getUser().then(user => {
+        expect(mockUserModel.findOne).toHaveBeenCalled()
         expect(user.secret).toBe(1)
-        expect(user.verified).toBe(true)
+        expect(user.verified).toBe(false)
       })
     })
 
-    test('not ok', () => {
-      expect.assertions(1)
-      mockUserModel.ok = false
-      auth._getUser().catch(err => {
+    test('getUser error', () => {
+      expect.assertions(2)
+      mockUserModel.findOne.mockReturnValueOnce(Promise.reject('error'))
+      return auth._getUser().catch(err => {
+        expect(mockUserModel.findOne).toHaveBeenCalled()
         expect(err).toBe('error')
       })
     })
@@ -64,47 +51,48 @@ describe('OTP Auth', () => {
 
   describe('checkCode', () => {
     test('checkCode ok', () => {
-      expect.assertions(1)
+      expect.assertions(2)
+      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
       return auth.checkCode('123456').then(user => {
+        expect(mockUserModel.findOne).toHaveBeenCalled()
         expect(user.verified).toBeTruthy()
       })
     })
 
     test('checkCode not valid', () => {
-      expect.assertions(1)
+      expect.assertions(2)
       return auth.checkCode('>23a5').catch(err => {
-        expect(err).toBe('Invalid code')
+        expect(mockUserModel.findOne).not.toHaveBeenCalled()
+        expect(err).toMatchObject({'403':'Invalid code'})
       })
     })
 
     test('checkCode Missing code', () => {
-      expect.assertions(1)
+      expect.assertions(2)
       return auth.checkCode().catch(err => {
-        expect(err).toBe('Invalid code')
-      })
-    })
-
-    test('checkCode Invalid code', () => {
-      expect.assertions(1)
-      return auth.checkCode('>23a5').catch(err => {
-        expect(err).toBe('Invalid code')
+        expect(mockUserModel.findOne).not.toHaveBeenCalled()
+        expect(err).toMatchObject({'403':'Invalid code'})
       })
     })
 
     test('checkCode Incorrect code', () => {
-      expect.assertions(1)
+      expect.assertions(3)
       mockGA.check.mockReturnValueOnce(false)
+      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
       return auth.checkCode('123457').catch(err => {
-        expect(err).toBe('Incorrect code')
+        expect(mockUserModel.findOne).toHaveBeenCalled()
+        expect(mockGA.check).toHaveBeenCalled()
+        expect(err).toMatchObject({'403':'Incorrect code'})
       })
     })
 
     test('checkCode Reused code', () => {
-      expect.assertions(1)
-
+      expect.assertions(2)
+      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
       return auth.checkCode('123459').then(() => {
         return auth.checkCode('123459').catch(err => {
-          expect(err).toBe('Invalid code')
+          expect(mockUserModel.findOne).toHaveBeenCalledTimes(1)
+          expect(err).toMatchObject({'403':'Invalid code'})
         })
       })
     })
@@ -113,28 +101,29 @@ describe('OTP Auth', () => {
   describe('genQR', () => {
     test('genQR ok', () => {
       expect.assertions(1)
-      mockUserModel.resolveVal = {secret:1,verified:false}
+
       return auth.genQR()
         .then(qr => {
           expect(qr).toBe('qr')
         })
     })
 
-    // test('genQR not ok', () => {
-    //   expect.assertions(1)
-    //   mockUserModel.ok = false
-    //   return auth.genQR()
-    //     .catch(err => {
-    //       expect(err).toBe('error')
-    //     })
-    // })
+    test('genQR not ok', () => {
+      expect.assertions(1)
+      mockUserModel.findOne.mockReturnValueOnce(Promise.reject('error'))
+      return auth.genQR()
+        .catch(err => {
+          expect(err).toBe('error')
+        })
+    })
 
     test('genQR not ok cos user already verified', () => {
       expect.assertions(1)
-      mockUserModel.resolveVal = {secret:1,verified:true}
+
+      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
       return auth.genQR()
         .catch(err => {
-          expect(err).toBe('User verified')
+          expect(err).toMatchObject({'403':'User verified'})
         })
     })
   })
@@ -169,16 +158,20 @@ describe('OTP Auth', () => {
   })
 
   describe('Print setup code', () => {
-    test('Ok', () => {
-      mockUserModel.resolveVal = {secret:1,verified:false}
-      return auth.printSetupCode()
+    test('Print setup code Ok', () => {
+      expect.assertions(1)
+      return auth.printSetupCode().then(() => {
+        expect(mockUserModel.findOne).toHaveBeenCalled()
+      })
     })
 
-    test('Already verified', () => {
-      mockUserModel.resolveVal = {secret:1,verified:true}
+    test('Print setup code not ok as already verified', () => {
+      expect.assertions(2)
+      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
       return auth.printSetupCode()
         .catch(err => {
-          expect(err).toBe('User verified')
+          expect(mockUserModel.findOne).toHaveBeenCalled()
+          expect(err).toMatchObject({'403':'User verified'})
         })
     })
   })
@@ -186,9 +179,10 @@ describe('OTP Auth', () => {
   describe('Verify user', () => {
     test('Verify user ok', () => {
       expect.assertions(2)
-      auth.verifyUser().then(verifed => {
-        expect(verifed).toBeTruthy()
+      mockUserModel.findOneAndUpdate.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
+      return auth.verifyUser().then(verifed => {
         expect(mockUserModel.findOneAndUpdate).toHaveBeenCalledWith({}, {verified:true})
+        expect(verifed).toBeTruthy()
       })
     })
   })
