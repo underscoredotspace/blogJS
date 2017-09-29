@@ -9,12 +9,20 @@ route.post('/login', (req, res) => {
     }
     res.cookie('qqBlog', uuid(), {maxAge: 1000 * 60 * 60, signed: true})
     res.sendStatus(200)
-  }).catch(err => res.status(403).json({err}))
+  }).catch(err => errHandle(err, res))
 })
 
 route.get('/logout', (req, res) => {
   res.clearCookie('qqBlog')
   res.sendStatus(200)
 })
+
+function errHandle(err, res) {
+  console.error(err)
+  if (err.hasOwnProperty('403')) {
+    return res.sendStatus(403)
+  }
+  return res.sendStatus(500)
+}
 
 module.exports = route

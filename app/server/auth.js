@@ -12,12 +12,7 @@ function newSecret() {
 
   return User.create({
     secret, verified: false
-  }).then(user => ({
-      secret: user.secret,
-      verified: user.verified
-    })
-  )
-  .catch(err => console.error({err: err.name, message: err.message}))
+  }).then(user => user.secret)
 }
 
 function printSetupCode() {

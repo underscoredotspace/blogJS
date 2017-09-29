@@ -17,8 +17,9 @@ describe('OTP Auth', () => {
 
   const mockUserModel = {
     user: jest.fn(() => mockUserModel),
-    findOne: jest.fn().mockReturnValue(Promise.resolve({secret:1,verified:false})),
-    findOneAndUpdate: jest.fn().mockReturnValue(Promise.resolve({secret:1,verified:false}))
+    findOne: jest.fn().mockImplementation(() => Promise.resolve({secret:1,verified:false})),
+    findOneAndUpdate: jest.fn().mockImplementation(() => Promise.resolve({secret:1,verified:false})),
+    create: jest.fn().mockImplementation(() => Promise.resolve({secret:1,verified:false}))
   }
 
   jest.mock('../../server/models/user-model', () => mockUserModel)
@@ -39,9 +40,20 @@ describe('OTP Auth', () => {
       })
     })
 
+    test('getUser no users found', () => {
+      expect.assertions(4)
+      mockUserModel.findOne.mockImplementationOnce(() => Promise.resolve(undefined))
+      return auth._getUser().then(user => {
+        expect(mockUserModel.findOne).toHaveBeenCalled()
+        expect(mockUserModel.create).toHaveBeenCalled()
+        expect(user.secret).toBe(1)
+        expect(user.verified).toBe(false)
+      })
+    })
+
     test('getUser error', () => {
       expect.assertions(2)
-      mockUserModel.findOne.mockReturnValueOnce(Promise.reject('error'))
+      mockUserModel.findOne.mockImplementationOnce(() => Promise.reject('error'))
       return auth._getUser().catch(err => {
         expect(mockUserModel.findOne).toHaveBeenCalled()
         expect(err).toBe('error')
@@ -52,7 +64,7 @@ describe('OTP Auth', () => {
   describe('checkCode', () => {
     test('checkCode ok', () => {
       expect.assertions(2)
-      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
+      mockUserModel.findOne.mockImplementationOnce(() => Promise.resolve({secret:1,verified:true}))
       return auth.checkCode('123456').then(user => {
         expect(mockUserModel.findOne).toHaveBeenCalled()
         expect(user.verified).toBeTruthy()
@@ -78,7 +90,7 @@ describe('OTP Auth', () => {
     test('checkCode Incorrect code', () => {
       expect.assertions(3)
       mockGA.check.mockReturnValueOnce(false)
-      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
+      mockUserModel.findOne.mockImplementationOnce(() => Promise.resolve({secret:1,verified:true}))
       return auth.checkCode('123457').catch(err => {
         expect(mockUserModel.findOne).toHaveBeenCalled()
         expect(mockGA.check).toHaveBeenCalled()
@@ -88,7 +100,7 @@ describe('OTP Auth', () => {
 
     test('checkCode Reused code', () => {
       expect.assertions(2)
-      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
+      mockUserModel.findOne.mockImplementationOnce(() => Promise.resolve({secret:1,verified:true}))
       return auth.checkCode('123459').then(() => {
         return auth.checkCode('123459').catch(err => {
           expect(mockUserModel.findOne).toHaveBeenCalledTimes(1)
@@ -110,7 +122,7 @@ describe('OTP Auth', () => {
 
     test('genQR not ok', () => {
       expect.assertions(1)
-      mockUserModel.findOne.mockReturnValueOnce(Promise.reject('error'))
+      mockUserModel.findOne.mockImplementationOnce(() => Promise.reject('error'))
       return auth.genQR()
         .catch(err => {
           expect(err).toBe('error')
@@ -120,7 +132,7 @@ describe('OTP Auth', () => {
     test('genQR not ok cos user already verified', () => {
       expect.assertions(1)
 
-      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
+      mockUserModel.findOne.mockImplementationOnce(() => Promise.resolve({secret:1,verified:true}))
       return auth.genQR()
         .catch(err => {
           expect(err).toMatchObject({'403':'User verified'})
@@ -167,7 +179,7 @@ describe('OTP Auth', () => {
 
     test('Print setup code not ok as already verified', () => {
       expect.assertions(2)
-      mockUserModel.findOne.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
+      mockUserModel.findOne.mockImplementationOnce(() => Promise.resolve({secret:1,verified:true}))
       return auth.printSetupCode()
         .catch(err => {
           expect(mockUserModel.findOne).toHaveBeenCalled()
@@ -179,7 +191,7 @@ describe('OTP Auth', () => {
   describe('Verify user', () => {
     test('Verify user ok', () => {
       expect.assertions(2)
-      mockUserModel.findOneAndUpdate.mockReturnValueOnce(Promise.resolve({secret:1,verified:true}))
+      mockUserModel.findOneAndUpdate.mockImplementationOnce(() => Promise.resolve({secret:1,verified:true}))
       return auth.verifyUser().then(verifed => {
         expect(mockUserModel.findOneAndUpdate).toHaveBeenCalledWith({}, {verified:true})
         expect(verifed).toBeTruthy()
