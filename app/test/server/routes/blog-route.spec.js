@@ -65,7 +65,7 @@ describe('Blog API', () => {
         expect(mockBlog.find).toHaveBeenCalled()
         expect(mockBlog.sort).toHaveBeenCalledWith({date:-1})
         expect(mockBlog.skip).toHaveBeenCalledWith(NaN)
-        expect(mockBlog.limit).toHaveBeenCalledWith(3)
+        expect(mockBlog.limit).toHaveBeenCalledWith(4)
       })
     })
 
@@ -78,7 +78,7 @@ describe('Blog API', () => {
         expect(mockBlog.find).toHaveBeenCalled()
         expect(mockBlog.sort).toHaveBeenCalledWith({date:-1})
         expect(mockBlog.skip).toHaveBeenCalledWith(0)
-        expect(mockBlog.limit).toHaveBeenCalledWith(3)
+        expect(mockBlog.limit).toHaveBeenCalledWith(4)
       })
     })
 
@@ -91,7 +91,15 @@ describe('Blog API', () => {
         expect(mockBlog.find).toHaveBeenCalled()
         expect(mockBlog.sort).toHaveBeenCalledWith({date:-1})
         expect(mockBlog.skip).toHaveBeenCalledWith(3)
-        expect(mockBlog.limit).toHaveBeenCalledWith(3)
+        expect(mockBlog.limit).toHaveBeenCalledWith(4)
+      })
+    })
+
+    test('Latest posts with next page', () => {
+      mockResolve = ['1','2','3','4']
+      mockBlog.limit = mockPromise
+      return request(app).get('/api/blog').then(res => {
+        expect(res.text).toBe('{\"posts\":[\"1\",\"2\",\"3\"],\"more\":true}')
       })
     })
 
@@ -106,7 +114,7 @@ describe('Blog API', () => {
         expect(mockBlog.find).toHaveBeenCalled()
         expect(mockBlog.sort).toHaveBeenCalledWith({date:-1})
         expect(mockBlog.skip).toHaveBeenCalledWith()
-        expect(mockBlog.limit).toHaveBeenCalledWith(3)
+        expect(mockBlog.limit).toHaveBeenCalledWith(4)
       })
     })
 

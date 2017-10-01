@@ -74,8 +74,8 @@ describe('Client main', () => {
   })
 
   describe('postController', () => {
-    it('should load latest posts', () => {
-      promiseResolve = {data:['test', 'test2']}
+    it('should load latest posts with no next page', () => {
+      promiseResolve = {posts:['test', 'test2']}
       const controller = $controller('post', {blogService})
       $rootScope.$digest()
       expect(controller.postEdit).toBeInstanceOf(Function)
@@ -85,8 +85,29 @@ describe('Client main', () => {
       expect(controller.blogposts.length).toBe(2)
     })
 
+    it('should load latest posts has next page', () => {
+      expect.assertions(7)
+      promiseResolve = {posts:['test', 'test2'], more:true}
+      const controller = $controller('post', {blogService})
+      $rootScope.$digest()
+      expect(controller.postEdit).toBeInstanceOf(Function)
+      expect(controller.postDelete).toBeInstanceOf(Function)
+      expect(blogService.get).toHaveBeenCalledWith({id: undefined, page: undefined})
+      expect(controller.blogposts[1]).toBe('test2')
+      expect(controller.blogposts.length).toBe(2)
+      expect(controller.prev).toBeUndefined()
+      expect(controller.next).toBe(2)
+    })
+
+    test('Handle error from blogservice.get', () => {
+      promiseOk = false
+      const controller = $controller('post', {blogService})
+      $rootScope.$digest()
+      expect(controller.blogposts).toBeUndefined()
+    })
+
     it('should load specific post', () => {
-      promiseResolve = {data:['test']}
+      promiseResolve = {posts:['test']}
       const routeParams = {id: okOID}
       const controller = $controller('post', {blogService, $routeParams:routeParams})
       $rootScope.$digest()
@@ -94,6 +115,7 @@ describe('Client main', () => {
       expect(controller.postDelete).toBeInstanceOf(Function)
       expect(blogService.get).toHaveBeenCalledWith({page: undefined, id:routeParams.id})
       expect(controller.blogposts[0]).toBe('test')
+      expect(controller.prev).toBeUndefined()
     })
 
     it('should not load specific post cos id is bad', () => {
@@ -104,7 +126,7 @@ describe('Client main', () => {
     })
 
     it('should load page 2', () => {
-      promiseResolve = {data:['test']}
+      promiseResolve = {posts:['test']}
       const routeParams = {page: 2}
       const controller = $controller('post', {blogService, $routeParams:routeParams})
       $rootScope.$digest()
@@ -112,6 +134,7 @@ describe('Client main', () => {
       expect(controller.postDelete).toBeInstanceOf(Function)
       expect(blogService.get).toHaveBeenCalledWith({page: 2, id: undefined})
       expect(controller.blogposts[0]).toBe('test')
+      expect(controller.prev).toBe(1)
     })
 
     it('test edit', () => {
@@ -122,7 +145,7 @@ describe('Client main', () => {
     })
 
     it('test delete while at post/:id', () => {
-      promiseResolve = {data:['test']}
+      promiseResolve = {posts:['test']}
       const routeParams = {id:'595f70031e019e7f2a7aa121'}
       const controller = $controller('post', {blogService, $routeParams:routeParams})
       controller.postDelete('595f70031e019e7f2a7aa121')
@@ -131,7 +154,7 @@ describe('Client main', () => {
     })
 
     it('delete while at home', () => {
-      promiseResolve = {data:[
+      promiseResolve = {posts:[
         {_id: '595f70031e019e7f2a7aa121'},
         {_id: '595f70031e019e7f2a7aa128'}
       ]}
@@ -189,7 +212,7 @@ describe('Client main', () => {
     it('Load edit post page when logged in', () => {
       authService.loggedin = true
       const $routeParams = {id:okOID}
-      promiseResolve = {data: [{title: 'title', content: 'content'}]}
+      promiseResolve = {posts: [{title: 'title', content: 'content'}]}
       const controller = $controller('edit', {authService, blogService, $routeParams})
       $rootScope.$digest()
       expect(controller.submitPost).toBeInstanceOf(Function)
@@ -204,7 +227,7 @@ describe('Client main', () => {
     it('submits edited post', () => {
       authService.loggedin = true
       const $routeParams = {id:okOID}
-      promiseResolve = {data: [{title: 'title', content: 'content'}]}
+      promiseResolve = {posts: [{title: 'title', content: 'content'}]}
       const controller = $controller('edit', {authService, blogService, $routeParams})
       $rootScope.$digest()
       promiseResolve = okOID

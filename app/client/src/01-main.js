@@ -31,7 +31,7 @@
   function postController($routeParams, $location, $filter, blogService) {
     const vm = this
     let id, page
-
+    
     if (angular.isDefined($routeParams.id)) {
       const oIDRegEx = /[0-9a-fA-F]{24}/i
       if (!oIDRegEx.test($routeParams.id)) {
@@ -41,17 +41,18 @@
       }
     }
 
-    if (angular.isDefined($routeParams.page)) {
+if (angular.isDefined($routeParams.page)) {
       page = Number($routeParams.page)
     }
-    
-    vm.blogposts = []
 
     blogService.get({id, page})
-      .then(posts => {
+      .then(blog => {
+        vm.blogposts = blog.posts
 
-        for (let post of posts.data) {
-          vm.blogposts.push(post)
+        if (!id) {
+          if (!page) page = '1'
+          if (blog.more) vm.next = Number(page) + 1
+          if (Number(page) > 1) vm.prev = Number(page) - 1
         }
       })
       .catch(err => console.error)
@@ -79,19 +80,17 @@
     const vm = this
 
     if (!authService.isLoggedIn()) {
-      $location.path('/login')
-    } else {
-      vm.blogpost = {
-        date: new Date()
-      }
-      
-      vm.submitPost = blogpost => {
-        blogService.new(blogpost)
-        .then(id => {
-          $location.path('/post/'+ id)
-        })
-        .catch(console.error)
-      }
+      return $location.path('/login')
+    }
+
+    vm.blogpost = {
+      date: new Date()
+    }
+    
+    vm.submitPost = blogpost => {
+      blogService.new(blogpost)
+      .then(id => $location.path('/post/'+ id))
+      .catch(console.error)
     }
   }
 })();
@@ -104,31 +103,27 @@
     const vm = this
 
     if (!authService.isLoggedIn()) {
-      $location.path('/login')
-    } else {
-      let id
+      return $location.path('/login')
+    }
 
-      const oIDRegEx = /^[a-f\d]{24}$/i
-      if (!oIDRegEx.test($routeParams.id)) {
-        return $location.path('/home')
-      } else {
-        id = $routeParams.id
-      }
+    const oIDRegEx = /^[a-f\d]{24}$/i
+    if (!oIDRegEx.test($routeParams.id)) {
+      return $location.path('/home')
+    }
+  
+    const id = $routeParams.id
 
-      blogService.get({id})
-        .then(posts => {
-          vm.blogpost = posts.data[0]
-        })
+    blogService.get({id})
+      .then(blog => {
+        vm.blogpost = blog.posts[0]
+      })
+      .catch(console.error)
+
+
+    vm.submitPost = blogpost => {
+      blogService.edit(id, blogpost)
+        .then(id => $location.path('/post/'+ id))
         .catch(console.error)
-
-
-      vm.submitPost = blogpost => {
-        blogService.edit(id, blogpost)
-          .then(id => {
-            $location.path('/post/'+ id)
-          })
-          .catch(console.error)
-      }
     }
   }
 })();
@@ -140,13 +135,13 @@
   function loginController($location, authService) {
     const vm = this
     if (authService.isLoggedIn()) {
-      $location.path('/home')
-    } else {
-      vm.login = function(code) {
-        authService.login(code)
-          .then(() => {$location.path('/home')})
-          .catch(console.error)      
-      }
+      return $location.path('/home')
+    }
+
+    vm.login = function(code) {
+      authService.login(code)
+        .then(() => {$location.path('/home')})
+        .catch(console.error)      
     }
   }
 })();
