@@ -24,7 +24,7 @@ describe('blogService: Completes API calls for blog posts', () => {
   afterEach(() => {
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
-  });
+  })
 
   test('should be a function', () => {
     expect(blogService.get).toEqual(jasmine.any(Function))
@@ -32,9 +32,9 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get latest posts', () => {
     expect.assertions(1)
-    const getLatest5 = $httpBackend.expectGET('/api/blog').respond([])
+    const getLatest5 = $httpBackend.expectGET('/api/blog').respond('res')
     blogService.get().then(res => {
-      expect(res.status).toBe(200)
+      expect(res).toBe('res')
     })
 
     $httpBackend.flush()
@@ -42,9 +42,9 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get page 2 of posts', () => {
     expect.assertions(1)
-    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond([])
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond('res')
     blogService.get({page:2}).then(res => {
-      expect(res.status).toBe(200)
+      expect(res).toBe('res')
     })
 
     $httpBackend.flush()
@@ -52,9 +52,9 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get page 2 of posts and ignore id', () => {
     expect.assertions(1)
-    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond([])
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond('res')
     blogService.get({page:2, id:'592c78780e0322032c845430'}).then(res => {
-      expect(res.status).toBe(200)
+      expect(res).toBe('res')
     })
 
     $httpBackend.flush()
@@ -62,9 +62,9 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get single post', () => {
     expect.assertions(1)
-    const getSinglePost = $httpBackend.expectGET('/api/blog/id/592c78780e0322032c845430').respond([])
+    const getSinglePost = $httpBackend.expectGET('/api/blog/id/592c78780e0322032c845430').respond('res')
     blogService.get({id:'592c78780e0322032c845430'}).then(res => {
-      expect(res.status).toBe(200)
+      expect(res).toBe('res')
     })
 
     $httpBackend.flush()

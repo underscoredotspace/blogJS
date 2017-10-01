@@ -14,14 +14,7 @@ describe('User API', () => {
   
 
   const mockAuth = {
-    err: null,
-    checkCode: jest.fn(() => new Promise((resolve, reject) => {
-      if (!mockAuth.err) {
-        resolve()
-      } else {
-        reject(mockAuth.err)
-      }
-    }))
+    checkCode: jest.fn().mockImplementation(() => Promise.resolve({verified:true}))
   }
 
   jest.mock('../../../server/auth', () => mockAuth)
@@ -29,13 +22,12 @@ describe('User API', () => {
   
   beforeEach(() => {
     jest.clearAllMocks()
-    mockAuth.err = null
   })
 
   const cookieMatch = /^qqBlog=.+$/
   
   test('Logs in', () => { 
-    const code = '123456'
+    const code = '123451'
     return request(app).post('/api/user/login').send({code}).then(res => {
       expect(res.status).toBe(200)
       const [cookie, age, path, expires] = res.headers['set-cookie'].pop().split(';')
@@ -45,18 +37,36 @@ describe('User API', () => {
     })
   })
 
-  test('Fails to log in', () => {
-    const code = '123456'
-    mockAuth.err = 'Invalid code'
+  test('Fails to log in due to bad code', () => {
+    const code = '123452'
+    mockAuth.checkCode.mockImplementationOnce(() => Promise.reject({'403':'Invalid code'}))
     return request(app).post('/api/user/login').send({code}).then(res => {
       expect(res.status).toBe(403)
       expect(res.headers['set-cookie']).toBeUndefined()
-      expect(res.text).toBe('{\"err\":\"Invalid code\"}')
+    })
+  })
+
+  test('Fails to log in due to other error', () => {
+    const code = '123452'
+    mockAuth.checkCode.mockImplementationOnce(() => Promise.reject('error'))
+    return request(app).post('/api/user/login').send({code}).then(res => {
+      expect(res.status).toBe(500)
+      expect(res.headers['set-cookie']).toBeUndefined()
+    })
+  })
+
+  test('Refuse to log in because user not verified', () => {
+    const code = '123442'
+    mockAuth.checkCode.mockImplementationOnce(() => Promise.resolve({verified:false}))
+    return request(app).post('/api/user/login').send({code}).then(res => {
+      expect(res.status).toBe(403)
+      expect(res.headers['set-cookie']).toBeUndefined()
+      expect(res.text).toBe('{\"err\":\"Not verified\"}')
     })
   })
   
   test('Logs out', () => {
-    const code = '123456'
+    const code = '123453'
     return request(app).post('/api/user/login').send({code}).then(res => {
       const req = request(app).get('/api/user/logout')
       req.set('Cookie', res.headers['set-cookie'])

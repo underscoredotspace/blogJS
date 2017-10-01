@@ -29,6 +29,7 @@
       }
 
       return $http(options)
+        .then(res => res.data)
     }
 
     function deletePost(id) {

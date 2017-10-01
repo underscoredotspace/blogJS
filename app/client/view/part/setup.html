@@ -1,19 +1,19 @@
-<div class="part">
+<div class="part" ng-init="vm.init()">
   <p data-ng-show="message" data-ng-bind="message"></p>
-  <div data-ng-show="step==1"><form name="one">
+  <div data-ng-show="vm.step==1"><form name="one">
     <label>Enter setup code</label>
-    <input type="text" data-ng-model="setupCode" data-ng-pattern="/[0-9]{6}/" required><br>
-    <button data-ng-click="getQR()" data-ng-disabled="one.$invalid">Submit</button>
+    <input type="text" data-ng-model="setupCode" data-ng-pattern="/^[0-9]{6}$/" required><br>
+    <button type="button" data-ng-click="vm.getQR(setupCode)" data-ng-disabled="one.$invalid">Submit</button>
   </form></div>
   
-  <div data-ng-show="step==2"><form name="two">
-    <div class="qr" data-ng-bind-html="qr"></div>
+  <div data-ng-show="vm.step==2"><form name="two">
+    <div class="qr" data-ng-bind-html="vm.qr"></div>
     <label>Enter Next Code</label>
-    <input type="text" data-ng-model="gaCode" data-ng-pattern="/[0-9]{6}/" required>
-    <button data-ng-click="verify()" data-ng-disabled="two.$invalid">Submit</button>
+    <input type="text" data-ng-model="gaCode" data-ng-pattern="/^[0-9]{6}$/" required>
+    <button type="button" data-ng-click="vm.verify(gaCode)" data-ng-disabled="two.$invalid">Submit</button>
   </form></div>
   
-  <div data-ng-show="step==3">
+  <div data-ng-show="vm.step==3">
     <h1>Success!</h1>
     <p>You're now registered and can start blogging</p>
   </div>

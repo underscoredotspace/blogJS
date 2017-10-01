@@ -16,7 +16,7 @@
     "start:watch": "nodemon app/server",
     "dev": "yarn build:watch & yarn start:watch",
     "test": "jest",
-    "test:watch": "yarn build:watch & jest --watchAll --notify",
+    "test:watch": "jest --watchAll",
     "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls",
     "cover:view": "open coverage/lcov-report/index.html"
   },
@@ -47,7 +47,9 @@
     "ng-showdown": "^1.1.0",
     "on-headers": "^1.0.1",
     "otp.js": "^1.1.0",
+    "otplib": "^6.0.3",
     "pm2": "^2.6.1",
+    "qrcode": "^0.9.0",
     "showdown": "^1.7.1",
     "uuid": "^3.1.0"
   },

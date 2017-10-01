@@ -58,7 +58,8 @@
       })
       .when('/setup/', {
         templateUrl: 'part/setup.html',
-        controller: 'setup'
+        controller: 'setup',
+        controllerAs: 'vm'
       })
       .otherwise({redirectTo:'/home'})
     }

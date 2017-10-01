@@ -1,6 +1,5 @@
 const route = require('express').Router()
 const Blog = require('../models/blog-model')
-const mongoose = require('mongoose')
 const auth = require('../auth')
 
 const BLOG_LIMIT = 3
@@ -9,9 +8,14 @@ route.get(['/:page', '/'], (req, res) => {
   const page = Number(req.params.page)
   const skip = (page * BLOG_LIMIT) - BLOG_LIMIT
 
-  Blog.find().sort({date:-1}).skip(skip).limit(BLOG_LIMIT)
+  Blog.find().sort({date:-1}).skip(skip).limit(BLOG_LIMIT + 1)
     .then(posts => {
-      res.json(posts)
+      let more = false
+      if (posts.length === BLOG_LIMIT + 1) {
+        more = true
+        posts = posts.slice(0, BLOG_LIMIT)
+      }
+      res.json({posts, more})
     })
     .catch(err => errHandle(err, res))
 })
@@ -19,7 +23,7 @@ route.get(['/:page', '/'], (req, res) => {
 route.get('/id/:id', (req, res) => {
   Blog.findById(req.params.id)
     .then(post => {
-      res.json([post])
+      res.json({posts:[post]})
     })
     .catch(err => errHandle(err, res))
 })

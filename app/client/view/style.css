@@ -130,6 +130,12 @@ textarea:focus, input:focus {
   content: "Posted on "
 }
 
+#blog-pages {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .newpost-title, .newpost-content  {
   width: 100%;
 }
