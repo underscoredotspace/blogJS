@@ -6,7 +6,7 @@ const BLOG_LIMIT = 3
 
 route.get(['/:page', '/'], (req, res) => {
   const page = Number(req.params.page)
-  const skip = (page * BLOG_LIMIT) - BLOG_LIMIT
+  const skip = ((page * BLOG_LIMIT) - BLOG_LIMIT) | 0
 
   Blog.find().sort({date:-1}).skip(skip).limit(BLOG_LIMIT + 1)
     .then(posts => {

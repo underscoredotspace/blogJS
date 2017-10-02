@@ -1,20 +1,6 @@
 describe('mongoose connection', () => {
   const mockMongoose = {
-    connect: jest.fn().mockImplementation(mockPromise)
-  }
-
-  let promiseResolve
-
-  function mockPromise() {
-    return new Promise((resolve, reject) => {
-      if (promiseResolve){
-        const mockPromiseReturn = {db: {databaseName: 'dbname'}}
-        resolve(mockPromiseReturn)
-      } else {
-        const mockPromiseReturn = 'error'
-        reject(mockPromiseReturn)
-      }
-    })
+    connect: jest.fn()
   }
 
   jest.mock('mongoose', () => mockMongoose)
@@ -26,13 +12,13 @@ describe('mongoose connection', () => {
   })
 
   it('connects to mongo', () => {
-    promiseResolve = true
+    mockMongoose.connect.mockImplementationOnce(() => Promise.resolve({db: {databaseName: 'dbname'}}))
     db.connect()
     expect(mockMongoose.connect).toHaveBeenCalled()
   })
 
   it('connects to mongo', () => {
-    promiseResolve = false
+    mockMongoose.connect.mockImplementationOnce(() => Promise.reject('error'))
     db.connect()
     expect(mockMongoose.connect).toHaveBeenCalled()
   })

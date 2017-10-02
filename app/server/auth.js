@@ -54,9 +54,9 @@ function genQR() {
     }
 
     const userName = 'user', org = 'blog'
-    const util = require('util')
+    const promisify = require('util').promisify
     const key = GA.keyuri(userName, org, user.secret)
-    const toStringAsync = util.promisify(qrcode.toString)
+    const toStringAsync = promisify(qrcode.toString)
     return toStringAsync(key, {type:'svg'})
   })
 }
