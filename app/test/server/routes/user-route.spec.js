@@ -27,6 +27,7 @@ describe('User API', () => {
   const cookieMatch = /^qqBlog=.+$/
   
   test('Logs in', () => { 
+    expect.assertions(4)
     const code = '123451'
     return request(app).post('/api/user/login').send({code}).then(res => {
       expect(res.status).toBe(200)
@@ -38,6 +39,7 @@ describe('User API', () => {
   })
 
   test('Fails to log in due to bad code', () => {
+    expect.assertions(2)
     const code = '123452'
     mockAuth.checkCode.mockImplementationOnce(() => Promise.reject({'403':'Invalid code'}))
     return request(app).post('/api/user/login').send({code}).then(res => {
@@ -47,6 +49,7 @@ describe('User API', () => {
   })
 
   test('Fails to log in due to other error', () => {
+    expect.assertions(2)
     const code = '123452'
     mockAuth.checkCode.mockImplementationOnce(() => Promise.reject('error'))
     return request(app).post('/api/user/login').send({code}).then(res => {
@@ -56,6 +59,7 @@ describe('User API', () => {
   })
 
   test('Refuse to log in because user not verified', () => {
+    expect.assertions(3)
     const code = '123442'
     mockAuth.checkCode.mockImplementationOnce(() => Promise.resolve({verified:false}))
     return request(app).post('/api/user/login').send({code}).then(res => {
@@ -66,6 +70,7 @@ describe('User API', () => {
   })
   
   test('Logs out', () => {
+    expect.assertions(4)
     const code = '123453'
     return request(app).post('/api/user/login').send({code}).then(res => {
       const req = request(app).get('/api/user/logout')

@@ -6,7 +6,7 @@ describe('server/index', () => {
   const mockDotEnv = {
     config: jest.fn(() => {
       process.env.PORT = 3000
-      process.env.COOKIE_SECRET = '7hIseGuy.H3_f$&*5'
+      process.env.COOKIE_SECRET = '_p00π🙃ßüttHol£'
     })
   }
 
@@ -66,7 +66,7 @@ describe('server/index', () => {
     return index._startExpress(fakeExpress).then(listen => {
       expect(listen).toBeUndefined()
     }).catch(err => {
-      expect(JSON.stringify(err)).toBe('{\"err\":\"timeout\"}')
+      expect(err).toMatchObject({err:'timeout'})
     })
   })
 
@@ -74,7 +74,7 @@ describe('server/index', () => {
     return index._startExpress().then(listen => {
       expect(listen).toBeUndefined()
     }).catch(err => {
-      expect(JSON.stringify(err)).toBe('{\"err\":\"Express app required\"}')
+      expect(err).toMatchObject({err:'Express app required'})
     })
   })
 })

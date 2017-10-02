@@ -10,7 +10,7 @@ describe('OTP Auth', () => {
 
   const mockQR = {
     err: null,
-    toString: jest.fn().mockImplementation((code, options, cb) => cb(mockQR.err, 'qr'))
+    toString: jest.fn((code, options, cb) => cb(mockQR.err, 'qr'))
   }
 
   jest.mock('qrcode', () => mockQR)
@@ -144,7 +144,7 @@ describe('OTP Auth', () => {
     let req = {body:{}, signedCookies: {}}
     
     const res = {
-      sendStatus: jest.fn().mockImplementation(() => res)
+      sendStatus: jest.fn(() => res)
     }, next = jest.fn()
 
     beforeEach(() => {

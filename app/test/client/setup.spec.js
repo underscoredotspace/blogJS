@@ -75,13 +75,17 @@ describe('Setup', () => {
     })
 
     test('Verify code', () => {
+      expect.assertions(1)
       const getQR = $httpBackend.expectPOST('/api/setup/verify').respond('OK')
-      setupService.verify('123456')
+      setupService.verify('123456').then(res => {
+        expect(res.status).toBe(200)
+      })
 
       $httpBackend.flush()
     })
 
     test('Fail to verify code', () => {
+      expect.assertions(1)
       const getQR = $httpBackend.expectPOST('/api/setup/verify').respond(()=> [403,''])
       setupService.verify('123456').catch(res => {
         expect(res.status).toBe(403)
@@ -122,6 +126,7 @@ describe('Setup', () => {
     })
     
     test('Init', () => {
+      expect.assertions(1)
       promiseOk = false
       setupController = $controller('setup', {setupService})
       setupController.init()
@@ -130,6 +135,7 @@ describe('Setup', () => {
     })
 
     test('Init when already verified', () => {
+      expect.assertions(1)
       setupController = $controller('setup', {setupService})
       setupController.init()
       $rootScope.$digest()

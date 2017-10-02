@@ -56,7 +56,8 @@ describe('Client main', () => {
   })
 
   describe('blogController', () => {
-    it('Reflects us being logged in', () => {
+    test('Reflects us being logged in', () => {
+      expect.assertions(2)
       authService.loggedin = true
       const controller = $controller('blogController', {authService:authService})
       $rootScope.$broadcast('auth-status')
@@ -64,7 +65,8 @@ describe('Client main', () => {
       expect(controller.loggedin).toEqual(true);
     })
 
-    it('Reflects us being not logged in', () => {
+    test('Reflects us being not logged in', () => {
+      expect.assertions(2)
       authService.loggedin = false
       var controller = $controller('blogController', {authService:authService})
       $rootScope.$broadcast('auth-status')
@@ -74,7 +76,8 @@ describe('Client main', () => {
   })
 
   describe('postController', () => {
-    it('should load latest posts with no next page', () => {
+    test('should load latest posts with no next page', () => {
+      expect.assertions(5)
       promiseResolve = {posts:['test', 'test2']}
       const controller = $controller('post', {blogService})
       $rootScope.$digest()
@@ -85,7 +88,7 @@ describe('Client main', () => {
       expect(controller.blogposts.length).toBe(2)
     })
 
-    it('should load latest posts has next page', () => {
+    test('should load latest posts has next page', () => {
       expect.assertions(7)
       promiseResolve = {posts:['test', 'test2'], more:true}
       const controller = $controller('post', {blogService})
@@ -100,13 +103,15 @@ describe('Client main', () => {
     })
 
     test('Handle error from blogservice.get', () => {
+      expect.assertions(1)
       promiseOk = false
       const controller = $controller('post', {blogService})
       $rootScope.$digest()
       expect(controller.blogposts).toBeUndefined()
     })
 
-    it('should load specific post', () => {
+    test('should load specific post', () => {
+      expect.assertions(5)
       promiseResolve = {posts:['test']}
       const routeParams = {id: okOID}
       const controller = $controller('post', {blogService, $routeParams:routeParams})
@@ -118,14 +123,16 @@ describe('Client main', () => {
       expect(controller.prev).toBeUndefined()
     })
 
-    it('should not load specific post cos id is bad', () => {
+    test('should not load specific post cos id is bad', () => {
+      expect.assertions(1)
       const routeParams = {id:'zzz'}
       const controller = $controller('post', {blogService, $routeParams:routeParams})
       $rootScope.$digest()
       expect($location.path()).toBe('/home')
     })
 
-    it('should load page 2', () => {
+    test('should load page 2', () => {
+      expect.assertions(5)
       promiseResolve = {posts:['test']}
       const routeParams = {page: 2}
       const controller = $controller('post', {blogService, $routeParams:routeParams})
@@ -137,14 +144,16 @@ describe('Client main', () => {
       expect(controller.prev).toBe(1)
     })
 
-    it('test edit', () => {
+    test('test edit', () => {
+      expect.assertions(1)
       const controller = $controller('post', {blogService})
       controller.postEdit('595f70031e019e7f2a7aa121')
       $rootScope.$digest()
       expect($location.path()).toBe('/edit/595f70031e019e7f2a7aa121')
     })
 
-    it('test delete while at post/:id', () => {
+    test('test delete while at post/:id', () => {
+      expect.assertions(1)
       promiseResolve = {posts:['test']}
       const routeParams = {id:'595f70031e019e7f2a7aa121'}
       const controller = $controller('post', {blogService, $routeParams:routeParams})
@@ -153,7 +162,8 @@ describe('Client main', () => {
       expect($location.path()).toBe('/home')
     })
 
-    it('delete while at home', () => {
+    test('delete while at home', () => {
+      expect.assertions(1)
       promiseResolve = {posts:[
         {_id: '595f70031e019e7f2a7aa121'},
         {_id: '595f70031e019e7f2a7aa128'}
@@ -166,13 +176,15 @@ describe('Client main', () => {
   })
 
   describe('newController', () => {
-    it('Redirect to /login when not logged in', () => {
+    test('Redirect to /login when not logged in', () => {
+      expect.assertions(1)
       const controller = $controller('new', {authService, blogService})
       $rootScope.$digest()
       expect($location.path()).toBe('/login')
     })
 
-    it('Load new post page when logged in', () => {
+    test('Load new post page when logged in', () => {
+      expect.assertions(3)
       authService.loggedin = true
       const controller = $controller('new', {authService, blogService})
       $rootScope.$digest()
@@ -181,7 +193,8 @@ describe('Client main', () => {
       expect(controller.blogpost.hasOwnProperty('date')).toBeTruthy()
     })
 
-    it('Should submit post to API and redirect to new post', () => {
+    test('Should submit post to API and redirect to new post', () => {
+      expect.assertions(2)
       authService.loggedin = true
       const blogpost = {title: 'title', content: 'content'}
       const controller = $controller('new', {authService, blogService})
@@ -195,13 +208,15 @@ describe('Client main', () => {
 
   describe('editController', () => {
 
-    it('Redirect to /login when not logged in', () => {
+    test('Redirect to /login when not logged in', () => {
+      expect.assertions(1)
       const controller = $controller('edit', {authService, blogService})
       $rootScope.$digest()
       expect($location.path()).toBe('/login')
     })
 
-    it('Redirect to /home when bad id given', () => {
+    test('Redirect to /home when bad id given', () => {
+      expect.assertions(1)
       authService.loggedin = true
       const $routeParams = {id:'zzz'}
       const controller = $controller('edit', {authService, blogService, $routeParams})
@@ -209,7 +224,8 @@ describe('Client main', () => {
       expect($location.path()).toBe('/home')
     })
 
-    it('Load edit post page when logged in', () => {
+    test('Load edit post page when logged in', () => {
+      expect.assertions(4)
       authService.loggedin = true
       const $routeParams = {id:okOID}
       promiseResolve = {posts: [{title: 'title', content: 'content'}]}
@@ -219,12 +235,10 @@ describe('Client main', () => {
       expect(blogService.get).toHaveBeenCalledWith({id: okOID})
       expect(controller.blogpost.title).toBe('title')
       expect(controller.blogpost.content).toBe('content')
-      controller.submitPost(okOID, controller.blogpost)
-      $rootScope.$digest()
-      expect()
     })
 
-    it('submits edited post', () => {
+    test('submits edited post', () => {
+      expect.assertions(2)
       authService.loggedin = true
       const $routeParams = {id:okOID}
       promiseResolve = {posts: [{title: 'title', content: 'content'}]}
@@ -239,14 +253,16 @@ describe('Client main', () => {
   })
 
   describe('logoutController', () => {
-    it('Should log us out', () => {
+    test('Should log us out', () => {
+      expect.assertions(2)
       authService.loggedin = true
       const controller = $controller('logout', {authService})
       expect(authService.logout).toHaveBeenCalled()    
       expect($location.path()).toBe('/home')  
     })
 
-    it('Should just go home cos we\'re not logged in', () => {
+    test('Should just go home cos we\'re not logged in', () => {
+      expect.assertions(2)
       authService.loggedin = false
       const controller = $controller('logout', {authService})
       expect(authService.logout).not.toHaveBeenCalled()  
@@ -255,7 +271,8 @@ describe('Client main', () => {
   })
 
   describe('loginController', () => {
-    it('Should log us in', () => {
+    test('Should log us in', () => {
+      expect.assertions(2)
       authService.loggedin = false
       const controller = $controller('login', {authService:authService})
       expect(controller.login).toBeInstanceOf(Function)
@@ -264,7 +281,8 @@ describe('Client main', () => {
       expect($location.path()).toBe('/home')  
     })
 
-    it('Should just go home cos we\'re already logged in', () => {
+    test('Should just go home cos we\'re already logged in', () => {
+      expect.assertions(2)
       authService.loggedin = true
       const controller = $controller('login', {authService:authService})
       expect(controller.login).toBeUndefined()

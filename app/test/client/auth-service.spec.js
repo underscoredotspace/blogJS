@@ -32,17 +32,20 @@ describe('authService: Controls authentication', () => {
   })
 
   it('should contain a functions login, logout and isLoggedIn', () => {
+    expect.assertions(3)
     expect(authService.login).toBeInstanceOf(Function)
     expect(authService.logout).toBeInstanceOf(Function)
     expect(authService.isLoggedIn).toBeInstanceOf(Function)
   })
 
   it('should return logged in status as false', () => {
+    expect.assertions(1)
     $cookies.remove('qqBlog')
     expect(authService.isLoggedIn()).toBeFalsy()
   })
 
   it('should return logged in status as true', () => {
+    expect.assertions(1)
     $cookies.put('qqBlog', true)
     expect(authService.isLoggedIn()).toBeTruthy()
   })

@@ -27,6 +27,7 @@ describe('blogService: Completes API calls for blog posts', () => {
   })
 
   test('should be a function', () => {
+    expect.assertions(1)
     expect(blogService.get).toEqual(jasmine.any(Function))
   })
 

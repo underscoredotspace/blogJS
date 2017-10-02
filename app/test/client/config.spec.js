@@ -19,7 +19,8 @@ describe('showdownConfig', () => {
     })
   })
 
-  it('Showdown/HLJS integration', () => {
+  test('Showdown/HLJS integration', () => {
+    expect.assertions(3)
     expect($showdown.makeHtml('**markdown**')).toBe('<p><strong>markdown</strong></p>')
 
     const codeBlockInline = 'Test ``console.log(\'hello\')`` the inline bit'

@@ -11,13 +11,13 @@ describe('mongoose connection', () => {
     jest.clearAllMocks()
   })
 
-  it('connects to mongo', () => {
+  test('connects to mongo successfully', () => {
     mockMongoose.connect.mockImplementationOnce(() => Promise.resolve({db: {databaseName: 'dbname'}}))
     db.connect()
     expect(mockMongoose.connect).toHaveBeenCalled()
   })
 
-  it('connects to mongo', () => {
+  test('fails to connect to mongo', () => {
     mockMongoose.connect.mockImplementationOnce(() => Promise.reject('error'))
     db.connect()
     expect(mockMongoose.connect).toHaveBeenCalled()

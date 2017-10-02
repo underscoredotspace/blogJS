@@ -73,6 +73,7 @@ describe('Blog API', () => {
     })
 
     test('Latest posts with next page', () => {
+      expect.assertions(1)
       mockBlog.limit.mockImplementationOnce(() => Promise.resolve(['1','2','3','4']))
       return request(app).get('/api/blog').then(res => {
         expect(res.text).toBe('{\"posts\":[\"1\",\"2\",\"3\"],\"more\":true}')
