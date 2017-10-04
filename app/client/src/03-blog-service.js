@@ -4,7 +4,7 @@
   angular.module('colonApp').service('blogService', blogService)
   blogService.$inject = ['$http', '$q']
 
-  function blogService($http, $q, $showdown) {
+  function blogService($http, $q) {
     let blogPath = '/api/blog'
 
     return {

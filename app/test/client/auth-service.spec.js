@@ -1,18 +1,11 @@
 require('angular')
 require('angular-cookies')
-require('angular-route')
-require('angular-sanitize')
-window.showdown = require('showdown')
-require('ng-showdown')
-window.hljs = ('highlightjs')
 require('angular-mocks')
-
-require('../../client/src/00-config.js')
-require('../../client/src/01-main.js')
+angular.module('colonApp', ['ngCookies'])
 require('../../client/src/04-auth-service.js')
 
 describe('authService: Controls authentication', () => {
-  let authService, $httpBackend, $cookies, $controller
+  let authService, $httpBackend, $cookies
 
   beforeEach(() => {
     angular.mock.module('colonApp')
@@ -21,7 +14,6 @@ describe('authService: Controls authentication', () => {
       authService = $injector.get('authService')
       $httpBackend = $injector.get('$httpBackend')
       $cookies = $injector.get('$cookies')
-      $controller = $injector.get('$controller')
     })
   })
   
