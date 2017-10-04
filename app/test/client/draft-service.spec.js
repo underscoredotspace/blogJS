@@ -2,7 +2,7 @@ describe('Draft localStorage Service', () => {
   mockStorage = {
     setItem: jest.fn(),
     removeItem: jest.fn(),
-    getItem: jest.fn(() => '{\"test\":\"ok\"}')
+    getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}')
   }
 
   localStorage = mockStorage
@@ -23,6 +23,7 @@ describe('Draft localStorage Service', () => {
       $rootScope = $injector.get('$rootScope')
       $controller = $injector.get('$controller')
     })
+    jest.clearAllMocks()
   })
 
   test('draftService contain functions init, enabled, load and save', () => {
@@ -49,7 +50,7 @@ describe('Draft localStorage Service', () => {
 
   test('Initialisation error', () => {
     expect.assertions(4)
-    mockStorage.setItem.mockImplementation(() => {throw('error')})
+    mockStorage.setItem.mockImplementationOnce(() => {throw('error')})
     drafts.init().catch(err => {
       expect(err).toMatchObject({localStorage:'error'})
       expect(drafts.enabled()).toBeFalsy()
@@ -67,6 +68,31 @@ describe('Draft localStorage Service', () => {
     expect.assertions(1)
     drafts.load().catch(err => {
       expect(err).toBe('localStorage is not enabled')
+    })
+    $rootScope.$digest()
+  })
+
+  test('Load success', () => {
+    expect.assertions(2)
+    const testDraft = {"title":"title","content":"content"}
+    mockStorage.getItem.mockReturnValueOnce(JSON.stringify(testDraft))
+    drafts.init().then(() => {
+      drafts.load('uuid').then(draft => {
+        expect(mockStorage.getItem).toHaveBeenCalledWith('uuid')
+        expect(draft).toMatchObject(testDraft)
+      })
+    })
+    $rootScope.$digest()
+  })
+
+  test('Save success', () => {
+    expect.assertions(2)
+    const testDraft = {title:'title',content:'content'}
+    drafts.init().then(() => {
+      drafts.save(testDraft).then(uuid => {
+        expect(mockStorage.setItem).toHaveBeenLastCalledWith(uuid, "{\"title\":\"title\",\"content\":\"content\"}")
+        expect(uuid).toBeDefined()
+      })
     })
     $rootScope.$digest()
   })
