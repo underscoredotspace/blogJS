@@ -5,6 +5,7 @@
 
 # New Posts/Admin
 - [ ] Autosave drafts to local storage
+  - Amend routes to '/edit/new' and '/edit/draft/:id'?
 - [ ] Manual save of drafts to DB
 - [ ] Emoji picker
 - [ ] Image/other assets storage/picker

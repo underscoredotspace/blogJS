@@ -2,6 +2,7 @@
 	<input placeholder="Heading" data-ng-model="vm.blogpost.title" class="newpost-title" required data-ng-minlength="5"><br>
 	<textarea placeholder="Post Text" data-ng-model="vm.blogpost.content" class="newpost-content" required data-ng-minlength="5"></textarea><br>
 	<button data-ng-click="vm.submitPost(vm.blogpost)" data-ng-disabled="newPost.$invalid||newPost.$pristine">Submit</button>
+	<button data-ng-click="vm.saveDraft(vm.blogpost)" data-ng-disabled="newPost.$invalid||newPost.$pristine||!vm.draftsEnabled">Save Draft</button>
 	<label class="form-error" data-ng-show="newPost.$invalid">
 		Moar content please
 	</label>

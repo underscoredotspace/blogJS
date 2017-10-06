@@ -1,11 +1,14 @@
 describe('Draft localStorage Service', () => {
-  mockStorage = {
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-    getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}')
+  const mockStorage = {
+    setItem: jest.fn(() => {mockStorage.length++}),
+    removeItem: jest.fn(() => {if (mockStorage.length>0) {mockStorage.length--}}),
+    getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}'),
+    clear: jest.fn(() => {mockStorage.length = 0}),
+    key: jest.fn(() => 0),
+    length: 0
   }
 
-  localStorage = mockStorage
+  window.localStorage = mockStorage
 
   require('angular')
   require('angular-mocks')
@@ -24,14 +27,16 @@ describe('Draft localStorage Service', () => {
       $controller = $injector.get('$controller')
     })
     jest.clearAllMocks()
+    mockStorage.length = 0
   })
 
-  test('draftService contain functions init, enabled, load and save', () => {
-    expect.assertions(4)
+  test('draftService contain functions init, enabled, list, load and save', () => {
+    expect.assertions(5)
     expect(drafts.init).toBeInstanceOf(Function)
     expect(drafts.load).toBeInstanceOf(Function)
     expect(drafts.save).toBeInstanceOf(Function)
     expect(drafts.enabled).toBeInstanceOf(Function)
+    expect(drafts.list).toBeInstanceOf(Function)
   })
 
   test('Initialisation ok', () => {
@@ -102,6 +107,34 @@ describe('Draft localStorage Service', () => {
     drafts.save('test').catch(err => {
       expect(err).toBe('localStorage is not enabled')
     })
+    $rootScope.$digest()
+  })
+
+  test('List drafts returns nothing', () => {
+    expect.assertions(1)
+    drafts.init().then(
+      drafts.list().then(list => {
+        expect(list).toMatchObject([])
+      })
+    )
+    $rootScope.$digest()
+  })
+
+  test('List drafts returns list', () => {
+    expect.assertions(3)
+    mockStorage.length = 3
+    mockStorage.getItem
+      .mockReturnValueOnce(JSON.stringify({test:1}))
+      .mockReturnValueOnce(JSON.stringify({test:2}))
+      .mockReturnValueOnce(JSON.stringify({test:3}))
+
+    drafts.init().then(
+      drafts.list().then(list => {
+        expect(mockStorage.getItem).toHaveBeenCalledTimes(3)
+        expect(mockStorage.key).toHaveBeenCalledTimes(3)
+        expect(list).toMatchObject([{test:1},{test:2},{test:3}])
+      })
+    )
     $rootScope.$digest()
   })
 })

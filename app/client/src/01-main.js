@@ -41,7 +41,7 @@
       }
     }
 
-if (angular.isDefined($routeParams.page)) {
+    if (angular.isDefined($routeParams.page)) {
       page = Number($routeParams.page)
     }
 
@@ -58,6 +58,7 @@ if (angular.isDefined($routeParams.page)) {
       .catch(err => console.error)
 
     vm.postDelete = id => {
+      // TODO: request confirmation
       blogService.delete(id)
         .then(() => {
           vm.blogposts = $filter('filter')(vm.blogposts, {'_id': '!' + id})
@@ -74,9 +75,9 @@ if (angular.isDefined($routeParams.page)) {
 
 (function() {
   angular.module('colonApp').controller('new', newController)
-  newController.$inject = ['$location', 'authService', 'blogService']
+  newController.$inject = ['$location', 'authService', 'blogService', 'drafts']
 
-  function newController($location, authService, blogService) {
+  function newController($location, authService, blogService, drafts) {
     const vm = this
 
     if (!authService.isLoggedIn()) {
@@ -86,20 +87,67 @@ if (angular.isDefined($routeParams.page)) {
     vm.blogpost = {
       date: new Date()
     }
+
+    drafts.init().then(() => {
+      vm.saveDraft = blogpost => {
+        drafts.save(blogpost)
+          .then(id => $location.path('/draft/'+ id))
+          .catch(console.error)
+      }
+    })
+
     
     vm.submitPost = blogpost => {
       blogService.new(blogpost)
-      .then(id => $location.path('/post/'+ id))
-      .catch(console.error)
+        .then(id => $location.path('/post/'+ id))
+        .catch(console.error)
     }
   }
 })();
 
 (function() {
-  angular.module('colonApp').controller('edit', editController)
-  editController.$inject = ['blogService', 'authService', '$routeParams', '$location']
+  angular.module('colonApp').controller('draft', draftController)
+  draftController.$inject = ['drafts', 'blogService', 'authService', '$routeParams', '$location']
 
-  function editController(blogService, authService, $routeParams, $location) {
+  function draftController(drafts, blogService, authService, $routeParams, $location) {
+    const vm = this
+    console.log('hello')
+    
+    if (!authService.isLoggedIn()) {
+      return $location.path('/login')
+    }
+
+    // const oIDRegEx = /^[a-f\d]{24}$/i
+    // if (!oIDRegEx.test($routeParams.id)) {
+    //   return $location.path('/home')
+    // }
+  
+    const id = $routeParams.id
+
+    drafts.init().then(() => {
+      vm.draftsEnabled = true
+
+      drafts.load(id)
+        .then(draft => {
+          console.log(draft)
+          vm.blogpost = draft
+        })
+        .catch(console.error)
+
+      vm.saveDraft = blogpost => {
+        drafts.save(blogpost)
+          .then(id => $location.path('/draft/'+ id))
+          .catch(console.error)
+      }
+    }).catch(console.error)
+  }
+})();
+
+(function() {
+  angular.module('colonApp').controller('edit', editController)
+  editController.$inject = ['blogService', 'authService', 'drafts', '$routeParams', '$location']
+
+  function editController(blogService, authService, drafts, $routeParams, $location) {
     const vm = this
 
     if (!authService.isLoggedIn()) {
@@ -113,12 +161,21 @@ if (angular.isDefined($routeParams.page)) {
   
     const id = $routeParams.id
 
+    drafts.init().then(() => {
+      vm.draftsEnabled = true
+
+      vm.saveDraft = blogpost => {
+        drafts.save(blogpost)
+          .then(id => $location.path('/draft/'+ id))
+          .catch(console.error)
+      }
+    }).catch(console.error)
+
     blogService.get({id})
       .then(blog => {
         vm.blogpost = blog.posts[0]
       })
       .catch(console.error)
-
 
     vm.submitPost = blogpost => {
       blogService.edit(id, blogpost)
@@ -130,13 +187,16 @@ if (angular.isDefined($routeParams.page)) {
 
 (function() {
   angular.module('colonApp').controller('login', loginController)
-  loginController.$inject = ['$location', 'authService']
+  loginController.$inject = ['$location', 'authService', '$rootScope']
 
-  function loginController($location, authService) {
+  function loginController($location, authService, $rootScope) {
     const vm = this
+    $rootScope.$broadcast('auth-status')
+
     if (authService.isLoggedIn()) {
       return $location.path('/home')
     }
+
 
     vm.login = function(code) {
       authService.login(code)

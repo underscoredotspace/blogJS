@@ -9,8 +9,17 @@ describe('Client main', () => {
   require('angular-mocks')
   require('../../client/src/00-config.js')
   require('../../client/src/01-main.js')
+  require('../../client/src/06-draft-service.js')
 
   let promiseOk, promiseResolve, $rootScope, $controller, $location, $filter, $q, $showdown
+
+  mockStorage = {
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}')
+  }
+
+  localStorage = mockStorage
   
   const authService = {
     loggedin: false,

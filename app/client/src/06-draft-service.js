@@ -5,29 +5,56 @@
   function draftService($q) {
     let enabled
 
-    return {
+    const self =  {
       load, 
       save, 
       init,
+      list,
       enabled: () => enabled
     }
+
+    return self
 
     function save(data) {
       if (!enabled) {
         return $q.reject('localStorage is not enabled')
       }
-      const uuid = _uuid()
-      localStorage.setItem(uuid, JSON.stringify(data))
-      return $q.resolve(uuid)
+
+      let id
+      if (data.hasOwnProperty('_id')) {
+        id = data._id
+      } else {
+        id = _uuid()
+      }
+      localStorage.setItem(id, JSON.stringify(data))
+      return $q.resolve(id)
     }
 
-    function load(uuid) {
+    function load(id) {
       if (!enabled) {
         return $q.reject('localStorage is not enabled')
       }
-      const lsData = localStorage.getItem(uuid)
+      const lsData = localStorage.getItem(id)
       const data = JSON.parse(lsData)
       return $q.resolve(data)
+    }
+
+    function list() {
+      if (!enabled) {
+        return $q.reject('localStorage is not enabled')
+      }
+
+      if (localStorage.length === 0) {
+        return $q.resolve([])
+      }
+
+      const list = []
+      for(let ndx = 0; ndx < localStorage.length; ndx++) {
+        self.load(localStorage.key(ndx))
+          .then(draft => list.push(draft))
+          .catch(err => $q.reject('Error getting from localStorage'))
+      }
+      return $q.resolve(list)
     }
 
     function init() {
