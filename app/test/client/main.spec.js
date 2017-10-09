@@ -13,13 +13,13 @@ describe('Client main', () => {
 
   let promiseOk, promiseResolve, $rootScope, $controller, $location, $filter, $q, $showdown
 
-  mockStorage = {
+  const mockStorage = {
     setItem: jest.fn(),
     removeItem: jest.fn(),
     getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}')
   }
 
-  localStorage = mockStorage
+  window.localStorage = mockStorage
   
   const authService = {
     loggedin: false,

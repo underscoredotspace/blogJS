@@ -79,11 +79,11 @@ describe('Draft localStorage Service', () => {
 
   test('Load success', () => {
     expect.assertions(2)
-    const testDraft = {"title":"title","content":"content"}
+    const testDraft = {title:'title',content:'content'}
     mockStorage.getItem.mockReturnValueOnce(JSON.stringify(testDraft))
     drafts.init().then(() => {
-      drafts.load('uuid').then(draft => {
-        expect(mockStorage.getItem).toHaveBeenCalledWith('uuid')
+      drafts.load('id').then(draft => {
+        expect(mockStorage.getItem).toHaveBeenCalledWith('id')
         expect(draft).toMatchObject(testDraft)
       })
     })
@@ -94,9 +94,21 @@ describe('Draft localStorage Service', () => {
     expect.assertions(2)
     const testDraft = {title:'title',content:'content'}
     drafts.init().then(() => {
-      drafts.save(testDraft).then(uuid => {
-        expect(mockStorage.setItem).toHaveBeenLastCalledWith(uuid, "{\"title\":\"title\",\"content\":\"content\"}")
-        expect(uuid).toBeDefined()
+      drafts.save(testDraft).then(id => {
+        expect(mockStorage.setItem).toHaveBeenLastCalledWith(id, '{\"title\":\"title\",\"content\":\"content\"}')
+        expect(id).toBeDefined()
+      })
+    })
+    $rootScope.$digest()
+  })
+
+  test('Save success with id included already', () => {
+    expect.assertions(2)
+    const testDraft = {_id: '1', title:'title',content:'content'}
+    drafts.init().then(() => {
+      drafts.save(testDraft).then(id => {
+        expect(mockStorage.setItem).toHaveBeenLastCalledWith('1', '{\"_id\":\"1\",\"title\":\"title\",\"content\":\"content\"}')
+        expect(id).toBe('1')
       })
     })
     $rootScope.$digest()
@@ -107,16 +119,6 @@ describe('Draft localStorage Service', () => {
     drafts.save('test').catch(err => {
       expect(err).toBe('localStorage is not enabled')
     })
-    $rootScope.$digest()
-  })
-
-  test('List drafts returns nothing', () => {
-    expect.assertions(1)
-    drafts.init().then(
-      drafts.list().then(list => {
-        expect(list).toMatchObject([])
-      })
-    )
     $rootScope.$digest()
   })
 
@@ -135,6 +137,29 @@ describe('Draft localStorage Service', () => {
         expect(list).toMatchObject([{test:1},{test:2},{test:3}])
       })
     )
+    $rootScope.$digest()
+  })
+
+  test('List drafts returns empty list', () => {
+    expect.assertions(3)
+    mockStorage.length = 0
+
+    drafts.init().then(
+      drafts.list().then(list => {
+        expect(mockStorage.getItem).not.toHaveBeenCalled()
+        expect(mockStorage.key).not.toHaveBeenCalled()
+        expect(list).toMatchObject([])
+      })
+    )
+    $rootScope.$digest()
+  })
+
+  test('List drafts returns error as not enabled', () => {
+    expect.assertions(1)
+
+      drafts.list().catch(err => {
+        expect(err).toBe('localStorage is not enabled')
+      })
     $rootScope.$digest()
   })
 })

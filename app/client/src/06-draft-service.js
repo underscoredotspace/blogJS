@@ -24,7 +24,7 @@
       if (data.hasOwnProperty('_id')) {
         id = data._id
       } else {
-        id = _uuid()
+        id = _nuuid()
       }
       localStorage.setItem(id, JSON.stringify(data))
       return $q.resolve(id)
@@ -52,7 +52,7 @@
       for(let ndx = 0; ndx < localStorage.length; ndx++) {
         self.load(localStorage.key(ndx))
           .then(draft => list.push(draft))
-          .catch(err => $q.reject('Error getting from localStorage'))
+          .catch($q.reject)
       }
       return $q.resolve(list)
     }
@@ -70,12 +70,12 @@
       }
     }
 
-    function _uuid() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        let d = new Date().getTime(),
-            r = (d + Math.random()*16)%16 | 0
-        d = Math.floor(d/16)
-        return (c=='x' ? r : (r&0x3|0x8)).toString(16)
+    function _nuuid() {
+      return 'xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx'.replace(/x/g, () => {
+        let d = new Date().getTime()
+        d = d * Math.random()
+        d = Math.floor(d) % 16
+        return d.toString(16)
       })
     }
   }
