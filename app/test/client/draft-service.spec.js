@@ -14,15 +14,15 @@ describe('Draft localStorage Service', () => {
   require('angular-mocks')
 
   const colonApp = angular.module('colonApp', [])
-  require('../../client/src/06-draft-service.js')
+  require('../../client/src/06-localDraft-service.js')
 
-  let drafts, $rootScope, $controller
+  let localDraft, $rootScope, $controller
 
   beforeEach(() => {
     angular.mock.module('colonApp')
 
     inject(function($injector) {
-      drafts = $injector.get('drafts')
+      localDraft = $injector.get('localDraft')
       $rootScope = $injector.get('$rootScope')
       $controller = $injector.get('$controller')
     })
@@ -32,21 +32,21 @@ describe('Draft localStorage Service', () => {
 
   test('draftService contain functions init, enabled, list, load and save', () => {
     expect.assertions(5)
-    expect(drafts.init).toBeInstanceOf(Function)
-    expect(drafts.load).toBeInstanceOf(Function)
-    expect(drafts.save).toBeInstanceOf(Function)
-    expect(drafts.enabled).toBeInstanceOf(Function)
-    expect(drafts.list).toBeInstanceOf(Function)
+    expect(localDraft.init).toBeInstanceOf(Function)
+    expect(localDraft.load).toBeInstanceOf(Function)
+    expect(localDraft.save).toBeInstanceOf(Function)
+    expect(localDraft.enabled).toBeInstanceOf(Function)
+    expect(localDraft.list).toBeInstanceOf(Function)
   })
 
   test('Initialisation ok', () => {
     expect.assertions(3)
-    drafts.init().then(() => {
-      expect(drafts.enabled()).toBeTruthy()
-      drafts.save('test').then(res => {
+    localDraft.init().then(() => {
+      expect(localDraft.enabled()).toBeTruthy()
+      localDraft.save('test').then(res => {
         expect(res).toBeTruthy()
       })
-      drafts.load().then(res => {
+      localDraft.load().then(res => {
         expect(res).toBeTruthy()
       })
     })
@@ -56,13 +56,13 @@ describe('Draft localStorage Service', () => {
   test('Initialisation error', () => {
     expect.assertions(4)
     mockStorage.setItem.mockImplementationOnce(() => {throw('error')})
-    drafts.init().catch(err => {
+    localDraft.init().catch(err => {
       expect(err).toMatchObject({localStorage:'error'})
-      expect(drafts.enabled()).toBeFalsy()
-      drafts.save('test').catch(err => {
+      expect(localDraft.enabled()).toBeFalsy()
+      localDraft.save('test').catch(err => {
         expect(err).toBe('localStorage is not enabled')
       })
-      drafts.load().catch(err => {
+      localDraft.load().catch(err => {
         expect(err).toBe('localStorage is not enabled')
       })
     })
@@ -71,7 +71,7 @@ describe('Draft localStorage Service', () => {
 
   test('Load failure due to init not run', () => {
     expect.assertions(1)
-    drafts.load().catch(err => {
+    localDraft.load().catch(err => {
       expect(err).toBe('localStorage is not enabled')
     })
     $rootScope.$digest()
@@ -81,8 +81,8 @@ describe('Draft localStorage Service', () => {
     expect.assertions(2)
     const testDraft = {title:'title',content:'content'}
     mockStorage.getItem.mockReturnValueOnce(JSON.stringify(testDraft))
-    drafts.init().then(() => {
-      drafts.load('id').then(draft => {
+    localDraft.init().then(() => {
+      localDraft.load('id').then(draft => {
         expect(mockStorage.getItem).toHaveBeenCalledWith('id')
         expect(draft).toMatchObject(testDraft)
       })
@@ -93,8 +93,8 @@ describe('Draft localStorage Service', () => {
   test('Save success', () => {
     expect.assertions(2)
     const testDraft = {title:'title',content:'content'}
-    drafts.init().then(() => {
-      drafts.save(testDraft).then(id => {
+    localDraft.init().then(() => {
+      localDraft.save(testDraft).then(id => {
         expect(mockStorage.setItem).toHaveBeenLastCalledWith(id, '{\"title\":\"title\",\"content\":\"content\"}')
         expect(id).toBeDefined()
       })
@@ -105,8 +105,8 @@ describe('Draft localStorage Service', () => {
   test('Save success with id included already', () => {
     expect.assertions(2)
     const testDraft = {_id: '1', title:'title',content:'content'}
-    drafts.init().then(() => {
-      drafts.save(testDraft).then(id => {
+    localDraft.init().then(() => {
+      localDraft.save(testDraft).then(id => {
         expect(mockStorage.setItem).toHaveBeenLastCalledWith('1', '{\"_id\":\"1\",\"title\":\"title\",\"content\":\"content\"}')
         expect(id).toBe('1')
       })
@@ -116,13 +116,13 @@ describe('Draft localStorage Service', () => {
 
   test('Save failure due to init not run', () => {
     expect.assertions(1)
-    drafts.save('test').catch(err => {
+    localDraft.save('test').catch(err => {
       expect(err).toBe('localStorage is not enabled')
     })
     $rootScope.$digest()
   })
 
-  test('List drafts returns list', () => {
+  test('List localDraft returns list', () => {
     expect.assertions(3)
     mockStorage.length = 3
     mockStorage.getItem
@@ -130,8 +130,8 @@ describe('Draft localStorage Service', () => {
       .mockReturnValueOnce(JSON.stringify({test:2}))
       .mockReturnValueOnce(JSON.stringify({test:3}))
 
-    drafts.init().then(
-      drafts.list().then(list => {
+    localDraft.init().then(
+      localDraft.list().then(list => {
         expect(mockStorage.getItem).toHaveBeenCalledTimes(3)
         expect(mockStorage.key).toHaveBeenCalledTimes(3)
         expect(list).toMatchObject([{test:1},{test:2},{test:3}])
@@ -140,12 +140,12 @@ describe('Draft localStorage Service', () => {
     $rootScope.$digest()
   })
 
-  test('List drafts returns empty list', () => {
+  test('List localDraft returns empty list', () => {
     expect.assertions(3)
     mockStorage.length = 0
 
-    drafts.init().then(
-      drafts.list().then(list => {
+    localDraft.init().then(
+      localDraft.list().then(list => {
         expect(mockStorage.getItem).not.toHaveBeenCalled()
         expect(mockStorage.key).not.toHaveBeenCalled()
         expect(list).toMatchObject([])
@@ -154,10 +154,10 @@ describe('Draft localStorage Service', () => {
     $rootScope.$digest()
   })
 
-  test('List drafts returns error as not enabled', () => {
+  test('List localDraft returns error as not enabled', () => {
     expect.assertions(1)
 
-      drafts.list().catch(err => {
+      localDraft.list().catch(err => {
         expect(err).toBe('localStorage is not enabled')
       })
     $rootScope.$digest()

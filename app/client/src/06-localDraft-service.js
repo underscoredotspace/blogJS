@@ -1,8 +1,8 @@
 (function() {
-  angular.module('colonApp').service('drafts', draftService)
-  draftService.$inject = ['$q']
+  angular.module('colonApp').service('localDraft', localDraft)
+  localDraft.$inject = ['$q']
 
-  function draftService($q) {
+  function localDraft($q) {
     let enabled
 
     const self =  {

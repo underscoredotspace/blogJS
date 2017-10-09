@@ -50,9 +50,9 @@
         vm.blogposts = blog.posts
 
         if (!id) {
-          if (!page) page = '1'
-          if (blog.more) vm.next = Number(page) + 1
-          if (Number(page) > 1) vm.prev = Number(page) - 1
+          if (!page) {page = '1'}
+          if (blog.more) {vm.next = Number(page) + 1}
+          if (Number(page) > 1) {vm.prev = Number(page) - 1}
         }
       })
       .catch(err => console.error)
@@ -75,9 +75,9 @@
 
 (function() {
   angular.module('colonApp').controller('new', newController)
-  newController.$inject = ['$location', 'authService', 'blogService', 'drafts']
+  newController.$inject = ['$location', 'authService', 'blogService', 'localDraft']
 
-  function newController($location, authService, blogService, drafts) {
+  function newController($location, authService, blogService, localDraft) {
     const vm = this
 
     if (!authService.isLoggedIn()) {
@@ -88,9 +88,9 @@
       date: new Date()
     }
 
-    drafts.init().then(() => {
+    localDraft.init().then(() => {
       vm.saveDraft = blogpost => {
-        drafts.save(blogpost)
+        localDraft.save(blogpost)
           .then(id => $location.path('/draft/'+ id))
           .catch(console.error)
       }
@@ -107,9 +107,9 @@
 
 (function() {
   angular.module('colonApp').controller('draft', draftController)
-  draftController.$inject = ['drafts', 'blogService', 'authService', '$routeParams', '$location']
+  draftController.$inject = ['localDraft', 'blogService', 'authService', '$routeParams', '$location']
 
-  function draftController(drafts, blogService, authService, $routeParams, $location) {
+  function draftController(localDraft, blogService, authService, $routeParams, $location) {
     const vm = this
     console.log('hello')
     
@@ -124,10 +124,10 @@
   
     const id = $routeParams.id
 
-    drafts.init().then(() => {
+    localDraft.init().then(() => {
       vm.draftsEnabled = true
 
-      drafts.load(id)
+      localDraft.load(id)
         .then(draft => {
           console.log(draft)
           vm.blogpost = draft
@@ -135,7 +135,7 @@
         .catch(console.error)
 
       vm.saveDraft = blogpost => {
-        drafts.save(blogpost)
+        localDraft.save(blogpost)
           .then(id => $location.path('/draft/'+ id))
           .catch(console.error)
       }
@@ -145,9 +145,9 @@
 
 (function() {
   angular.module('colonApp').controller('edit', editController)
-  editController.$inject = ['blogService', 'authService', 'drafts', '$routeParams', '$location']
+  editController.$inject = ['blogService', 'authService', 'localDraft', '$routeParams', '$location']
 
-  function editController(blogService, authService, drafts, $routeParams, $location) {
+  function editController(blogService, authService, localDraft, $routeParams, $location) {
     const vm = this
 
     if (!authService.isLoggedIn()) {
@@ -161,11 +161,11 @@
   
     const id = $routeParams.id
 
-    drafts.init().then(() => {
+    localDraft.init().then(() => {
       vm.draftsEnabled = true
 
       vm.saveDraft = blogpost => {
-        drafts.save(blogpost)
+        localDraft.save(blogpost)
           .then(id => $location.path('/draft/'+ id))
           .catch(console.error)
       }

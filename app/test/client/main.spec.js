@@ -9,7 +9,7 @@ describe('Client main', () => {
   require('angular-mocks')
   require('../../client/src/00-config.js')
   require('../../client/src/01-main.js')
-  require('../../client/src/06-draft-service.js')
+  require('../../client/src/06-localDraft-service.js')
 
   let promiseOk, promiseResolve, $rootScope, $controller, $location, $filter, $q, $showdown
 
