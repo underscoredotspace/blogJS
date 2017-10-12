@@ -184,36 +184,36 @@ describe('Client main', () => {
     })
   })
 
-  describe('newController', () => {
-    test('Redirect to /login when not logged in', () => {
-      expect.assertions(1)
-      const controller = $controller('new', {authService, blogService})
-      $rootScope.$digest()
-      expect($location.path()).toBe('/login')
-    })
+  // describe('newController', () => {
+  //   test('Redirect to /login when not logged in', () => {
+  //     expect.assertions(1)
+  //     const controller = $controller('new', {authService, blogService})
+  //     $rootScope.$digest()
+  //     expect($location.path()).toBe('/login')
+  //   })
 
-    test('Load new post page when logged in', () => {
-      expect.assertions(3)
-      authService.loggedin = true
-      const controller = $controller('new', {authService, blogService})
-      $rootScope.$digest()
-      expect(controller.submitPost).toBeInstanceOf(Function)
-      expect(controller.blogpost).toBeInstanceOf(Object)
-      expect(controller.blogpost.hasOwnProperty('date')).toBeTruthy()
-    })
+  //   test('Load new post page when logged in', () => {
+  //     expect.assertions(3)
+  //     authService.loggedin = true
+  //     const controller = $controller('new', {authService, blogService})
+  //     $rootScope.$digest()
+  //     expect(controller.submitPost).toBeInstanceOf(Function)
+  //     expect(controller.blogpost).toBeInstanceOf(Object)
+  //     expect(controller.blogpost.hasOwnProperty('date')).toBeTruthy()
+  //   })
 
-    test('Should submit post to API and redirect to new post', () => {
-      expect.assertions(2)
-      authService.loggedin = true
-      const blogpost = {title: 'title', content: 'content'}
-      const controller = $controller('new', {authService, blogService})
-      $rootScope.$digest()
-      controller.submitPost(blogpost)
-      $rootScope.$digest()
-      expect(blogService.new).toHaveBeenCalledWith({content: 'content', title: 'title'})
-      expect($location.path()).toBe('/post/ok')
-    })
-  })
+  //   test('Should submit post to API and redirect to new post', () => {
+  //     expect.assertions(2)
+  //     authService.loggedin = true
+  //     const blogpost = {title: 'title', content: 'content'}
+  //     const controller = $controller('new', {authService, blogService})
+  //     $rootScope.$digest()
+  //     controller.submitPost(blogpost)
+  //     $rootScope.$digest()
+  //     expect(blogService.new).toHaveBeenCalledWith({content: 'content', title: 'title'})
+  //     expect($location.path()).toBe('/post/ok')
+  //   })
+  // })
 
   describe('editController', () => {
 
