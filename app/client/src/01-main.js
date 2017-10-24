@@ -111,17 +111,31 @@
     if ($routeParams.id) {
       vm.submitPost = blogpost => {
         blogService.edit($routeParams.id, blogpost)
-          .then(id => $location.path('/post/'+ id))
+          .then(id => {
+            return localDraft.remove($routeParams.id).then(() => {
+              $location.path('/post/'+ id)
+            })
+          })
           .catch(console.error)
       }
 
       const oIDRegEx = /^[a-f\d]{24}$/i
       if (oIDRegEx.test($routeParams.id)) {
-        blogService.get({id:$routeParams.id})
-        .then(blog => {
-          vm.blogpost = blog.posts[0]
+        localDraft.load($routeParams.id)
+        .then(draft => {
+          if (!draft) {
+            blogService.get({id:$routeParams.id})
+            .then(blog => {
+              vm.blogpost = blog.posts[0]
+              vm.saved = true
+            })
+            .catch(console.error)
+          }
+          vm.blogpost = draft
+          vm.saved = true
         })
         .catch(console.error)
+        
       } else {
         localDraft.load($routeParams.id)
           .then(draft => {
@@ -137,7 +151,11 @@
     } else {
       vm.submitPost = blogpost => {
         blogService.new(blogpost)
-          .then(id => $location.path('/post/'+ id))
+          .then(id => {
+            return localDraft.remove($routeParams.id).then(() => {
+              $location.path('/post/'+ id)
+            })
+          })
           .catch(console.error)
       }
     }

@@ -10,15 +10,6 @@ app.use(
   express.static('app/client/build'),
   express.static('app/client/view')
 )
-app.use('/lib', 
-  express.static('node_modules/angular'),
-  express.static('node_modules/angular-cookies'),
-  express.static('node_modules/angular-route'),
-  express.static('node_modules/angular-sanitize'),
-  express.static('node_modules/showdown/dist'),
-  express.static('node_modules/ng-showdown/dist'),
-  express.static('node_modules/highlightjs')
-)
 
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')

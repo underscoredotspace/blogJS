@@ -10,9 +10,9 @@
       save, 
       init,
       list,
+      remove,
       enabled: () => enabled
     }
-
     return self
 
     function save(data) {
@@ -50,7 +50,8 @@
 
       const list = []
       for(let ndx = 0; ndx < localStorage.length; ndx++) {
-        self.load(localStorage.key(ndx))
+        const key = localStorage.key(ndx)
+        self.load(key)
           .then(draft => list.push(draft))
           .catch($q.reject)
       }
@@ -70,8 +71,12 @@
       }
     }
 
+    function remove() {
+      return
+    }
+
     function _nuuid() {
-      return 'xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx'.replace(/x/g, () => {
+      return 'd-xxxxxxxxxxxxxxxxxxxxxxxx'.replace(/x/g, () => {
         let d = new Date().getTime()
         d = d * Math.random()
         d = Math.floor(d) % 16

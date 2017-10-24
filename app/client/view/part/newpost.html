@@ -1,7 +1,7 @@
 <div class="blog-post" ng-model-options="{debounce:500}"><form name="newPost">
 	<input placeholder="Heading" data-ng-model="vm.blogpost.title" class="newpost-title" required data-ng-minlength="5" data-ng-change="vm.lsSave(vm.blogpost, newPost)"><br>
 	<textarea placeholder="Post Text" data-ng-model="vm.blogpost.content" class="newpost-content" required data-ng-minlength="5" data-ng-change="vm.lsSave(vm.blogpost, newPost)"></textarea><br>
-	<button data-ng-click="vm.submitPost(vm.blogpost)" data-ng-disabled="newPost.$invalid||newPost.$pristine">Submit</button>
+	<button data-ng-click="vm.submitPost(vm.blogpost)" data-ng-disabled="newPost.$invalid">Submit</button>
 	<div id="ls-indicator" ng-class="{saved:vm.saved&&!newPost.$invalid, disabled:!vm.lsEnabled}"></div>
 	<label class="form-error" data-ng-show="newPost.$invalid">
 		Moar content please

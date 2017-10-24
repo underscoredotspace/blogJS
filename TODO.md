@@ -4,8 +4,9 @@
 - [ ] Nice error messages
 
 # New Posts/Admin
-- [ ] Autosave drafts to local storage
-  - Amend routes to '/edit/new' and '/edit/draft/:id'?
+- [X] Autosave drafts to local storage
+  - [ ] Draft gets deleted when you submit
+  - [ ] Show existing drafts on /new and allow selection
 - [ ] Manual save of drafts to DB
 - [ ] Emoji picker
 - [ ] Image/other assets storage/picker

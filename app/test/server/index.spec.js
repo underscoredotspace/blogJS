@@ -26,18 +26,16 @@ describe('server/index', () => {
   })
 
   test('Initialisation', () => {
-      expect(mockDb.connect).toHaveBeenCalled()
-      expect(mockDotEnv.config).toHaveBeenCalled()
+    expect.assertions(2)
+    expect(mockDb.connect).toHaveBeenCalled()
+    expect(mockDotEnv.config).toHaveBeenCalled()
   })
 
   test('Server running', () => {
+    expect.assertions(2)
     return Promise.all(
     [
       request('http://localhost:3000').get('/').then(res => {
-        expect(res.status).toBe(200)
-      })
-    ],[
-      request('http://localhost:3000').get('/lib/angular.js').then(res => {
         expect(res.status).toBe(200)
       })
     ],[
@@ -49,31 +47,28 @@ describe('server/index', () => {
 })
 
   test('Server handles errors gracefully', () => {
-    return index._startExpress(express()).then(listen => {
-      expect(listen).toBeUndefined()
-    }).catch(err => {
+    expect.assertions(2)
+    return index._startExpress(express()).catch(err => {
       expect(err.hasOwnProperty('code')).toBeTruthy()
       expect(err.code).toBe('EADDRINUSE')
     })
   })
 
   test('Server can\'t open, but didn\'t fire error event', () => {
+    expect.assertions(1)
     const fakeExpress = {
       listening: false,
       listen: port => fakeExpress,
       on: () => null
     }
-    return index._startExpress(fakeExpress).then(listen => {
-      expect(listen).toBeUndefined()
-    }).catch(err => {
+    return index._startExpress(fakeExpress).catch(err => {
       expect(err).toMatchObject({err:'timeout'})
     })
   })
 
   test('Server listen request didn\'t include required Express App', () => {
-    return index._startExpress().then(listen => {
-      expect(listen).toBeUndefined()
-    }).catch(err => {
+    expect.assertions(1)
+    return index._startExpress().catch(err => {
       expect(err).toMatchObject({err:'Express app required'})
     })
   })
