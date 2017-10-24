@@ -112,9 +112,9 @@
       vm.submitPost = blogpost => {
         blogService.edit($routeParams.id, blogpost)
           .then(id => {
-            return localDraft.remove($routeParams.id).then(() => {
+            // return localDraft.remove($routeParams.id).then(() => {
               $location.path('/post/'+ id)
-            })
+            // })
           })
           .catch(console.error)
       }

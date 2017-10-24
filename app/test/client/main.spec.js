@@ -250,6 +250,7 @@ describe('Client main', () => {
     test('submits edited post', () => {
       expect.assertions(2)
       authService.loggedin = true
+      mockStorage.getItem.mockReturnValueOnce(null)
       const $routeParams = {id:okOID}
       promiseResolve = {posts: [{title: 'title', content: 'content'}]}
       const controller = $controller('edit', {authService, blogService, $routeParams})
