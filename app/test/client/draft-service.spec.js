@@ -157,9 +157,44 @@ describe('Draft localStorage Service', () => {
   test('List localDraft returns error as not enabled', () => {
     expect.assertions(1)
 
-      localDraft.list().catch(err => {
-        expect(err).toBe('localStorage is not enabled')
-      })
+    localDraft.list().catch(err => {
+      expect(err).toBe('localStorage is not enabled')
+    })
+    $rootScope.$digest()
+  })
+
+  test('Remove a localDraft', () => {
+    expect.assertions(1)
+    mockStorage.getItem
+      .mockReturnValueOnce(JSON.stringify('something'))
+      .mockReturnValueOnce(null)
+
+    localDraft.remove('123').then(res => {
+      expect(res).toBe('123 deleted')
+    })
+    $rootScope.$digest()
+  })
+
+  test('Remove a localDraft fails as it does not exist', () => {
+    expect.assertions(1)
+    mockStorage.getItem
+      .mockReturnValueOnce(null)
+
+    localDraft.remove('123').catch(err => {
+      expect(err).toMatchObject({localStorage:'123 doesn\'t exist'})
+    })
+    $rootScope.$digest()
+  })
+
+  test('Remove a localDraft fails to delete', () => {
+    expect.assertions(1)
+    mockStorage.getItem
+      .mockReturnValueOnce(JSON.stringify('something'))
+      .mockReturnValueOnce(JSON.stringify('something'))
+
+    localDraft.remove('123').catch(err => {
+      expect(err).toMatchObject({localStorage:'Failed to delete 123'})
+    })
     $rootScope.$digest()
   })
 })

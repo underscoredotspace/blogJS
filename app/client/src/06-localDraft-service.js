@@ -71,8 +71,17 @@
       }
     }
 
-    function remove() {
-      return
+    function remove(id) {
+      if (!localStorage.getItem(id)) {
+        return $q.reject({localStorage:`${id} doesn't exist`})
+      }
+      
+      localStorage.removeItem(id)
+      if (!localStorage.getItem(id)) {
+        return $q.resolve(`${id} deleted`)
+      }
+
+      return $q.reject({localStorage:`Failed to delete ${id}`})
     }
 
     function _nuuid() {
