@@ -6,7 +6,9 @@ module.exports = function(grunt) {
       },
       blog: {
         files: {
-          'app/client/build/app.min.js': ['app/client/src/*.js'],
+          'app/client/build/app.min.js': [
+            'app/client/src/*.js'
+          ],
           'app/client/build/lib.min.js': [
             'node_modules/angular/angular.min.js',
             'node_modules/angular-cookies/angular-cookies.min.js',
@@ -15,7 +17,6 @@ module.exports = function(grunt) {
             'node_modules/showdown/dist/showdown.min.js',
             'node_modules/ng-showdown/dist/ng-showdown.min.js',
             'node_modules/highlightjs/highlight.pack.min.js'
-            
           ]
         }
       }

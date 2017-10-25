@@ -96,10 +96,8 @@
 
       localDraft.save(blogpost)
         .then(id => {
-          if (angular.isUndefined(blogpost._id)) {
-            blogpost._id = id
-          }
-          console.log('saved')
+          blogpost._id = id
+          console.log(`Draft ${id} saved`)
           vm.saved = true
         })
         .catch(err => {
@@ -108,56 +106,39 @@
         })
     }
 
-    if ($routeParams.id) {
+    if ($routeParams.id) {  //-> /edit/:id
+      const postID = $routeParams.id
+
+      // Set up submitPost func for edit route
       vm.submitPost = blogpost => {
-        blogService.edit($routeParams.id, blogpost)
-          .then(id => {
-            // return localDraft.remove($routeParams.id).then(() => {
-              $location.path('/post/'+ id)
-            // })
-          })
-          .catch(console.error)
+        blogService.edit(postID, blogpost).then(id => {
+          localDraft.remove(postID).catch(console.error)
+          $location.path('/post/'+ id)
+        }).catch(console.error)
       }
 
-      const oIDRegEx = /^[a-f\d]{24}$/i
-      if (oIDRegEx.test($routeParams.id)) {
-        localDraft.load($routeParams.id)
-        .then(draft => {
-          if (!draft) {
-            blogService.get({id:$routeParams.id})
-            .then(blog => {
-              vm.blogpost = blog.posts[0]
-              vm.saved = true
-            })
-            .catch(console.error)
-          }
-          vm.blogpost = draft
-          vm.saved = true
-        })
-        .catch(console.error)
-        
-      } else {
-        localDraft.load($routeParams.id)
-          .then(draft => {
-            if (!draft) {
-              console.error('Invalid draft ID')
-              return $location.path('/home')
-            }
-            vm.blogpost = draft
+      // Attempt to load draft from LS
+      localDraft.load($routeParams.id).then(draft => {
+        if (!draft) {
+          // No draft found, so load from DB
+          blogService.get({id:$routeParams.id}).then(blog => {
+            vm.blogpost = blog.posts[0]
             vm.saved = true
-          })
-          .catch(console.error)
-      }
-    } else {
+          }).catch(console.error)
+        }
+        vm.blogpost = draft
+        vm.saved = true
+      }).catch(console.error)
+    } else {  //-> /new
+      // Set up submitPost func for edit route
       vm.submitPost = blogpost => {
-        blogService.new(blogpost)
-          .then(id => {
-            return localDraft.remove($routeParams.id).then(() => {
-              $location.path('/post/'+ id)
-            })
-          })
-          .catch(console.error)
+        const draftID = blogpost._id
+        blogService.new(blogpost).then(id => {
+          localDraft.remove(draftID).catch(console.error)
+          $location.path('/post/'+ id)
+        }).catch(console.error)
       }
+      // get list of drafts from localStorage
     }
   }
 })();

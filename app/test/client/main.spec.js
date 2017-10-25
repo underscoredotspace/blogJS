@@ -184,53 +184,12 @@ describe('Client main', () => {
     })
   })
 
-  // describe('newController', () => {
-  //   test('Redirect to /login when not logged in', () => {
-  //     expect.assertions(1)
-  //     const controller = $controller('new', {authService, blogService})
-  //     $rootScope.$digest()
-  //     expect($location.path()).toBe('/login')
-  //   })
-
-  //   test('Load new post page when logged in', () => {
-  //     expect.assertions(3)
-  //     authService.loggedin = true
-  //     const controller = $controller('new', {authService, blogService})
-  //     $rootScope.$digest()
-  //     expect(controller.submitPost).toBeInstanceOf(Function)
-  //     expect(controller.blogpost).toBeInstanceOf(Object)
-  //     expect(controller.blogpost.hasOwnProperty('date')).toBeTruthy()
-  //   })
-
-  //   test('Should submit post to API and redirect to new post', () => {
-  //     expect.assertions(2)
-  //     authService.loggedin = true
-  //     const blogpost = {title: 'title', content: 'content'}
-  //     const controller = $controller('new', {authService, blogService})
-  //     $rootScope.$digest()
-  //     controller.submitPost(blogpost)
-  //     $rootScope.$digest()
-  //     expect(blogService.new).toHaveBeenCalledWith({content: 'content', title: 'title'})
-  //     expect($location.path()).toBe('/post/ok')
-  //   })
-  // })
-
   describe('editController', () => {
-
     test('Redirect to /login when not logged in', () => {
       expect.assertions(1)
       const controller = $controller('edit', {authService, blogService})
       $rootScope.$digest()
       expect($location.path()).toBe('/login')
-    })
-
-    test('Redirect to /home when bad id given', () => {
-      expect.assertions(1)
-      authService.loggedin = true
-      const $routeParams = {id:'zzz'}
-      const controller = $controller('edit', {authService, blogService, $routeParams})
-      $rootScope.$digest()
-      expect($location.path()).toBe('/home')
     })
 
     test('Load edit post page when logged in', () => {
@@ -247,10 +206,41 @@ describe('Client main', () => {
       expect(controller.blogpost.content).toBe('content')
     })
 
+    test('load edit post page and get existing draft', () => {
+      expect.assertions(3)
+      authService.loggedin = true
+      mockStorage.getItem.mockReturnValueOnce(JSON.stringify({id:okOID, title:'title', content: 'content'}))
+      const $routeParams = {id:okOID}
+      const controller = $controller('edit', {authService, blogService, $routeParams})
+      $rootScope.$digest()
+      expect(blogService.get).not.toHaveBeenCalled()
+      expect(controller.blogpost.title).toBe('title')
+      expect(controller.blogpost.content).toBe('content')
+    })
+
+    test('submit new post', () => {
+      expect.assertions(2)
+      mockStorage.getItem
+        .mockReturnValueOnce({id:123, test:'something'})
+        .mockReturnValueOnce(null)
+      const blogPost = {_id: '123', title: 'title', content: 'content'}
+      authService.loggedin = true
+      const controller = $controller('edit', {authService, blogService})
+      controller.blogpost = blogPost
+      $rootScope.$digest()
+      controller.submitPost(controller.blogpost)
+      $rootScope.$digest()
+      expect(blogService.new).toHaveBeenCalledWith(blogPost)
+      expect(mockStorage.removeItem).toHaveBeenCalled()
+    })
+
     test('submits edited post', () => {
       expect.assertions(2)
       authService.loggedin = true
-      mockStorage.getItem.mockReturnValueOnce(null)
+      mockStorage.getItem
+        .mockReturnValueOnce(null)
+        .mockReturnValueOnce({id:123, test:'something'})
+        .mockReturnValueOnce(null)
       const $routeParams = {id:okOID}
       promiseResolve = {posts: [{title: 'title', content: 'content'}]}
       const controller = $controller('edit', {authService, blogService, $routeParams})
@@ -260,6 +250,62 @@ describe('Client main', () => {
       $rootScope.$digest()
       expect(blogService.edit).toHaveBeenCalledWith(okOID, {title: 'title', content: 'content'})
       expect($location.path()).toBe(`/post/${okOID}`)
+    })
+
+    test('save localDraft', () => {
+      expect.assertions(2)
+      authService.loggedin = true
+      const blogPost = {title: 'title', content: 'content'}
+      const controller = $controller('edit', {authService, blogService})
+      $rootScope.$digest()
+      controller.blogpost = blogPost
+      controller.lsSave(blogPost, {'$valid':true})
+      $rootScope.$digest()
+      expect(blogPost._id.substr(0,2)).toBe('d-')
+      expect(controller.saved).toBeTruthy()
+    })
+
+    test('localDraft not saved as post is not valid yet', () => {
+      expect.assertions(2)
+      authService.loggedin = true
+      const blogPost = {title: 'title', content: 'content'}
+      const controller = $controller('edit', {authService, blogService})
+      $rootScope.$digest()
+      controller.blogpost = blogPost
+      controller.lsSave(blogPost, {'$valid':false})
+      $rootScope.$digest()
+      expect(blogPost._id).toBeUndefined()
+      expect(controller.saved).toBeFalsy()
+    })
+
+    test('localDraft not saved due to ls error', () => {
+      expect.assertions(2)
+      authService.loggedin = true
+      const blogPost = {title: 'title', content: 'content'}
+      const controller = $controller('edit', {authService, blogService})
+      $rootScope.$digest()
+      controller.blogpost = blogPost
+      mockStorage.setItem.mockImplementationOnce(() => {
+        throw('oh fuck')
+      })
+      controller.lsSave(blogPost, {'$valid':true})
+      $rootScope.$digest()
+      expect(blogPost._id).toBeUndefined()
+      expect(controller.saved).toBeFalsy()
+    })
+
+    test('localDraft not saved as draftService unavailable', () => {
+      expect.assertions(2)
+      authService.loggedin = true
+      
+      const controller = $controller('edit', {authService, blogService})
+      $rootScope.$digest()
+      mockStorage.setItem.mockClear()
+      controller.lsEnabled = false
+      const blogPost = {title: 'title', content: 'content'}
+      controller.lsSave(blogPost, {'$valid':true})
+      expect(mockStorage.setItem).not.toBeCalled()
+      expect(controller.saved).toBeFalsy()
     })
   })
 

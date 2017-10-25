@@ -26,8 +26,12 @@
       } else {
         id = _nuuid()
       }
-      localStorage.setItem(id, JSON.stringify(data))
-      return $q.resolve(id)
+      try {
+        localStorage.setItem(id, JSON.stringify(data))
+        return $q.resolve(id)
+      } catch (err) {
+        return $q.reject({localStorage:err})
+      }
     }
 
     function load(id) {
