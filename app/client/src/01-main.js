@@ -41,7 +41,7 @@
       }
     }
 
-if (angular.isDefined($routeParams.page)) {
+    if (angular.isDefined($routeParams.page)) {
       page = Number($routeParams.page)
     }
 
@@ -50,14 +50,15 @@ if (angular.isDefined($routeParams.page)) {
         vm.blogposts = blog.posts
 
         if (!id) {
-          if (!page) page = '1'
-          if (blog.more) vm.next = Number(page) + 1
-          if (Number(page) > 1) vm.prev = Number(page) - 1
+          if (!page) {page = '1'}
+          if (blog.more) {vm.next = Number(page) + 1}
+          if (Number(page) > 1) {vm.prev = Number(page) - 1}
         }
       })
       .catch(err => console.error)
 
     vm.postDelete = id => {
+      // TODO: request confirmation
       blogService.delete(id)
         .then(() => {
           vm.blogposts = $filter('filter')(vm.blogposts, {'_id': '!' + id})
@@ -73,67 +74,83 @@ if (angular.isDefined($routeParams.page)) {
 })();
 
 (function() {
-  angular.module('colonApp').controller('new', newController)
-  newController.$inject = ['$location', 'authService', 'blogService']
-
-  function newController($location, authService, blogService) {
-    const vm = this
-
-    if (!authService.isLoggedIn()) {
-      return $location.path('/login')
-    }
-
-    vm.blogpost = {
-      date: new Date()
-    }
-    
-    vm.submitPost = blogpost => {
-      blogService.new(blogpost)
-      .then(id => $location.path('/post/'+ id))
-      .catch(console.error)
-    }
-  }
-})();
-
-(function() {
   angular.module('colonApp').controller('edit', editController)
-  editController.$inject = ['blogService', 'authService', '$routeParams', '$location']
+  editController.$inject = ['localDraft', 'blogService', 'authService', '$routeParams', '$location']
 
-  function editController(blogService, authService, $routeParams, $location) {
+  function editController(localDraft, blogService, authService, $routeParams, $location) {
     const vm = this
-
+    
     if (!authService.isLoggedIn()) {
       return $location.path('/login')
     }
 
-    const oIDRegEx = /^[a-f\d]{24}$/i
-    if (!oIDRegEx.test($routeParams.id)) {
-      return $location.path('/home')
+    localDraft.init().then(()=>{vm.lsEnabled=true})
+    
+    vm.lsSave = (blogpost, newpost) => {
+      if (!vm.lsEnabled) {return}
+
+      if (!newpost.$valid) {
+        vm.saved = false
+        return
+      }
+
+      localDraft.save(blogpost)
+        .then(id => {
+          blogpost._id = id
+          console.log(`Draft ${id} saved`)
+          vm.saved = true
+        })
+        .catch(err => {
+          console.error(err)
+          vm.saved = false
+        })
     }
-  
-    const id = $routeParams.id
 
-    blogService.get({id})
-      .then(blog => {
-        vm.blogpost = blog.posts[0]
-      })
-      .catch(console.error)
+    if ($routeParams.id) {  //-> /edit/:id
+      const postID = $routeParams.id
 
+      // Set up submitPost func for edit route
+      vm.submitPost = blogpost => {
+        blogService.edit(postID, blogpost).then(id => {
+          localDraft.remove(postID).catch(console.error)
+          $location.path('/post/'+ id)
+        }).catch(console.error)
+      }
 
-    vm.submitPost = blogpost => {
-      blogService.edit(id, blogpost)
-        .then(id => $location.path('/post/'+ id))
-        .catch(console.error)
+      // Attempt to load draft from LS
+      localDraft.load($routeParams.id).then(draft => {
+        if (!draft) {
+          // No draft found, so load from DB
+          blogService.get({id:$routeParams.id}).then(blog => {
+            vm.blogpost = blog.posts[0]
+            vm.saved = true
+          }).catch(console.error)
+        }
+        vm.blogpost = draft
+        vm.saved = true
+      }).catch(console.error)
+    } else {  //-> /new
+      // Set up submitPost func for edit route
+      vm.submitPost = blogpost => {
+        const draftID = blogpost._id
+        blogService.new(blogpost).then(id => {
+          localDraft.remove(draftID).catch(console.error)
+          $location.path('/post/'+ id)
+        }).catch(console.error)
+      }
+      // get list of drafts from localStorage
     }
   }
 })();
 
 (function() {
   angular.module('colonApp').controller('login', loginController)
-  loginController.$inject = ['$location', 'authService']
+  loginController.$inject = ['$location', 'authService', '$rootScope', 'localDraft']
 
-  function loginController($location, authService) {
+  function loginController($location, authService, $rootScope, localDraft) {
     const vm = this
+    $rootScope.$broadcast('auth-status')
+
     if (authService.isLoggedIn()) {
       return $location.path('/home')
     }

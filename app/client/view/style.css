@@ -145,6 +145,21 @@ textarea:focus, input:focus {
   margin: 5px 0;
 }
 
+#ls-indicator {
+  width: 1em;
+  height: 1em;
+  border: black solid 1px;
+  background: orange;
+}
+
+#ls-indicator.disabled {
+  background: hotpink;
+}
+
+#ls-indicator.saved {
+  background: limegreen;
+}
+
 .form-error {
   margin-left: 10px;
   color: hotpink;

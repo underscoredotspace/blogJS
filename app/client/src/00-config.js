@@ -39,8 +39,13 @@
       })
       .when('/new', {
         templateUrl: 'part/newpost.html',
-        controller: 'new',
+        controller: 'edit',
         controllerAs: 'vm',
+      })
+      .when('/new/:id', {
+        templateUrl: 'part/newpost.html',
+        controller: 'edit',
+        controllerAs: 'vm'
       })
       .when('/edit/:id', {
         templateUrl: 'part/newpost.html',

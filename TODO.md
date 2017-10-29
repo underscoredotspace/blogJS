@@ -1,20 +1,12 @@
-# Refactoring
-
-## Server
-- [X] New posts
-- [X] Edit posts
-- [X] Delete posts
-- [X] Setup route
-
 ## Client
-- [X] Split functionality up a bit
-- [X] Global blog service so that controllers can be much cleaner
 - [ ] Get route set up with related controler rather than in config
-- [X] Break down codeHighlight() for Showdown. Separate completely? 
-- [X] Pagination
 - [ ] Make client tests slightly less mental
+- [ ] Nice error messages
+
 # New Posts/Admin
-- [ ] Autosave drafts to local storage
+- [X] Autosave drafts to local storage
+  - [ ] Draft gets deleted when you submit
+  - [ ] Show existing drafts on /new and allow selection
 - [ ] Manual save of drafts to DB
 - [ ] Emoji picker
 - [ ] Image/other assets storage/picker
@@ -23,3 +15,13 @@
 - Templating so others can use this as a framework
 - Deployment upon successful tests
 - Caching
+- Better, more complete Docker setup
+
+# New/Edit Post
+- Routes:
+  - /new
+  - /edit/[postID|nuuID]
+- Automatically saves draft into localStorage
+- Has Submit Post button that sends to database with {visible:true}
+- Has Save Draft button that sends to database with {visible:false}
+- Both buttons clear localStorage record
