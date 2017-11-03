@@ -6,6 +6,10 @@
 	<label class="form-error" data-ng-show="newPost.$invalid">
 		Moar content please
 	</label>
+	<select data-ng-hide="vm.drafts.length===0" data-ng-model="draftID" data-ng-change="vm.loadDraft(draftID)">
+		<option value=""></option>
+		<option data-ng-repeat="draft in vm.drafts" value="{{draft._id}}">{{draft.title}}</option>
+	</select>
 </form></div>
 
 <div class="blog-post" data-ng-hide="newPost.$invalid">

@@ -5,7 +5,7 @@
 
 # New Posts/Admin
 - [X] Autosave drafts to local storage
-  - [ ] Draft gets deleted when you submit
+  - [X] Draft gets deleted when you submit
   - [ ] Show existing drafts on /new and allow selection
 - [ ] Manual save of drafts to DB
 - [ ] Emoji picker
@@ -25,3 +25,7 @@
 - Has Submit Post button that sends to database with {visible:true}
 - Has Save Draft button that sends to database with {visible:false}
 - Both buttons clear localStorage record
+
+# Development
+- [ ] Minify CSS
+- [ ] Separate packing of libs and app
