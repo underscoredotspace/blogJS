@@ -4,10 +4,10 @@ require('angular-route')
 require('angular-sanitize')
 require('angular-mocks')
 require('../../client/src/00-config.js')
-require('../../client/src/01-main.js')
+require('../../client/src/01-controllers.js')
 require('../../client/src/03-blog-service.js')
 
-class Worker {
+window.Worker = class Worker {
   constructor(filename) {
     this.file = filename
   }
@@ -16,7 +16,9 @@ class Worker {
     this.message = message
   }
 
-  // addEve
+  addEventListener(event, callback) {
+    this.event = event
+  }
 }
 
 describe('blogService: Completes API calls for blog posts', () => {
@@ -42,9 +44,14 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get latest posts', () => {
     expect.assertions(1)
-    const getLatest5 = $httpBackend.expectGET('/api/blog').respond('res')
+    const posts = [{
+      '_id':'123', 
+      title: 'title',
+      content: 'content'
+    }]
+    const getLatest5 = $httpBackend.expectGET('/api/blog').respond({posts})
     blogService.get().then(res => {
-      expect(res).toBe('res')
+      expect(res).toMatchObject({posts})
     })
 
     $httpBackend.flush()
@@ -52,9 +59,14 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get page 2 of posts', () => {
     expect.assertions(1)
-    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond('res')
+    const posts = [{
+      '_id':'123', 
+      title: 'title',
+      content: 'content'
+    }]
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond({posts})
     blogService.get({page:2}).then(res => {
-      expect(res).toBe('res')
+      expect(res).toMatchObject({posts})
     })
 
     $httpBackend.flush()
@@ -62,9 +74,14 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get page 2 of posts and ignore id', () => {
     expect.assertions(1)
-    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond('res')
+    const posts = [{
+      '_id':'123', 
+      title: 'title',
+      content: 'content'
+    }]
+    const getLatest5 = $httpBackend.expectGET('/api/blog/2').respond({posts})
     blogService.get({page:2, id:'592c78780e0322032c845430'}).then(res => {
-      expect(res).toBe('res')
+      expect(res).toMatchObject({posts})
     })
 
     $httpBackend.flush()
@@ -72,9 +89,14 @@ describe('blogService: Completes API calls for blog posts', () => {
 
   test('should get single post', () => {
     expect.assertions(1)
-    const getSinglePost = $httpBackend.expectGET('/api/blog/id/592c78780e0322032c845430').respond('res')
+    const posts = [{
+      '_id':'123', 
+      title: 'title',
+      content: 'content'
+    }]
+    const getSinglePost = $httpBackend.expectGET('/api/blog/id/592c78780e0322032c845430').respond({posts})
     blogService.get({id:'592c78780e0322032c845430'}).then(res => {
-      expect(res).toBe('res')
+      expect(res).toMatchObject({posts})
     })
 
     $httpBackend.flush()

@@ -75,7 +75,9 @@
 
 (function() {
   angular.module('colonApp').controller('edit', editController)
-  editController.$inject = ['localDraft', 'blogService', 'authService', 'md2html' , '$routeParams', '$location', '$scope']
+  editController.$inject = [
+    'localDraft', 'blogService', 'authService', 'md2html' , '$routeParams', '$location', '$scope'
+  ]
 
   function editController(localDraft, blogService, authService, md2html, $routeParams, $location, $scope) {
     const vm = this
