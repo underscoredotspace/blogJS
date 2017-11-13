@@ -27,9 +27,11 @@
         id = _nuuid()
       }
       try {
+        data._id = id
         localStorage.setItem(id, JSON.stringify(data))
         return $q.resolve(id)
       } catch (err) {
+        delete data._id
         return $q.reject({localStorage:err})
       }
     }

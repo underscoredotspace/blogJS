@@ -75,14 +75,20 @@
 
 (function() {
   angular.module('colonApp').controller('edit', editController)
-  editController.$inject = ['localDraft', 'blogService', 'authService', '$routeParams', '$location']
+  editController.$inject = [
+    'localDraft', 'blogService', 'authService', 'md2html' , '$routeParams', '$location', '$scope'
+  ]
 
-  function editController(localDraft, blogService, authService, $routeParams, $location) {
+  function editController(localDraft, blogService, authService, md2html, $routeParams, $location, $scope) {
     const vm = this
     
     if (!authService.isLoggedIn()) {
       return $location.path('/login')
     }
+
+    $scope.$watch('vm.blogpost.content', contentMd => {
+      md2html('new', contentMd).then(html => {vm.contentHtml = html})
+    })
 
     localDraft.init().then(()=>{vm.lsEnabled=true})
     
@@ -139,6 +145,16 @@
         }).catch(console.error)
       }
       // get list of drafts from localStorage
+      localDraft.list().then(drafts => {
+        vm.drafts = drafts.filter(draft => draft._id.substr(0,2 === 'd-'))
+        
+        vm.loadDraft = id => {
+          localDraft.load(id).then(draft => {
+            vm.blogpost = draft
+            vm.saved = true
+          }).catch(console.error)
+        }
+      }).catch(console.error)
     }
   }
 })();

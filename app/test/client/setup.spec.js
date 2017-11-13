@@ -7,7 +7,7 @@ require('ng-showdown')
 require('highlightjs')
 require('angular-mocks')
 require('../../client/src/00-config.js')
-require('../../client/src/01-main.js')
+require('../../client/src/01-controllers.js')
 require('../../client/src/05-setup.js')
 
 describe('Setup', () => {

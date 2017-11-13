@@ -95,7 +95,7 @@ describe('Draft localStorage Service', () => {
     const testDraft = {title:'title',content:'content'}
     localDraft.init().then(() => {
       localDraft.save(testDraft).then(id => {
-        expect(mockStorage.setItem).toHaveBeenLastCalledWith(id, '{\"title\":\"title\",\"content\":\"content\"}')
+        expect(mockStorage.setItem).toHaveBeenLastCalledWith(id, `{\"title\":\"title\",\"content\":\"content\",\"_id\":\"${id}\"}`)
         expect(id).toBeDefined()
       })
     })

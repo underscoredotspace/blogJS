@@ -2,9 +2,9 @@
 
 (function() {
   angular.module('colonApp').service('blogService', blogService)
-  blogService.$inject = ['$http', '$q']
+  blogService.$inject = ['$http', '$q', 'md2html']
 
-  function blogService($http, $q) {
+  function blogService($http, $q, md2html) {
     let blogPath = '/api/blog'
 
     return {
@@ -27,9 +27,13 @@
         url: post,
         headers: {'Content-Type': 'application/json'}
       }
-
       return $http(options)
-        .then(res => res.data)
+        .then(res => {
+          res.data.posts.forEach(post => 
+            md2html(post._id, post.content)
+              .then(content => post.contentHtml = content))
+          return res.data
+        })
     }
 
     function deletePost(id) {
@@ -83,5 +87,28 @@
       return $http(options)
         .then(res => $q.resolve(res.data.id))
     }
+  }
+})();
+
+(function(){
+  angular.module('colonApp').service('md2html', md2html)
+
+  md2html.$inject = ['$q', '$sce']
+
+  function md2html($q, $sce) {
+    const showdownWorker = new Worker('sdWorker.js')
+
+    return (id, md) => 
+      $q((resolve, reject) => {
+        showdownWorker.postMessage({id, md})
+        const timeout = setTimeout(() => reject('timeout'), 2000)
+        showdownWorker.addEventListener('message', (d) => {
+          if (d.data.id === id) { 
+            clearTimeout(timeout)
+            const html = $sce.trustAsHtml(d.data.html)
+            resolve(html)
+          }
+        })
+      })
   }
 })();

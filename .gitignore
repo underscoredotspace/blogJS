@@ -1,8 +1,8 @@
-node_modules/
-bower_components/
+node_modules
+bower_components
 .DS_Store
 .env
-.grunt/
+.grunt
 .glitch-assets
 _SpecRunner.html
-coverage/
+coverage

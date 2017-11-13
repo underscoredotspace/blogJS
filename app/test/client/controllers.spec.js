@@ -3,20 +3,19 @@ describe('Client main', () => {
   require('angular-cookies')
   require('angular-route')
   require('angular-sanitize')
-  window.hljs = require('highlightjs')
-  window.showdown = require('showdown')
-  require('ng-showdown')
   require('angular-mocks')
   require('../../client/src/00-config.js')
-  require('../../client/src/01-main.js')
+  require('../../client/src/01-controllers.js')
   require('../../client/src/06-localDraft-service.js')
 
-  let promiseOk, promiseResolve, $rootScope, $controller, $location, $filter, $q, $showdown
+  let promiseOk, promiseResolve, $rootScope, $controller, $location, $filter, $q, $scope
 
   const mockStorage = {
     setItem: jest.fn(),
     removeItem: jest.fn(),
-    getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}')
+    getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}'),
+    length: 0,
+    key: jest.fn()
   }
 
   window.localStorage = mockStorage
@@ -37,6 +36,7 @@ describe('Client main', () => {
     new: jest.fn().mockImplementation(fakePromise)
   }
 
+  const md2html = jest.fn()
 
   function fakePromise() {
     if (promiseOk) {
@@ -52,6 +52,7 @@ describe('Client main', () => {
     promiseOk = true
     promiseResolve = 'ok'
     jest.clearAllMocks()
+    mockStorage.length = 0
 
     angular.mock.module('colonApp')
 
@@ -61,7 +62,10 @@ describe('Client main', () => {
       $location = $injector.get('$location')
       $filter = $injector.get('$filter')
       $q = $injector.get('$q')
+      $scope = $rootScope.$new()
     })
+
+    md2html.mockReturnValue($q.resolve('html'))
   })
 
   describe('blogController', () => {
@@ -187,7 +191,7 @@ describe('Client main', () => {
   describe('editController', () => {
     test('Redirect to /login when not logged in', () => {
       expect.assertions(1)
-      const controller = $controller('edit', {authService, blogService})
+      const controller = $controller('edit', {authService, blogService, md2html, $scope})
       $rootScope.$digest()
       expect($location.path()).toBe('/login')
     })
@@ -198,7 +202,7 @@ describe('Client main', () => {
       mockStorage.getItem.mockReturnValueOnce(null)
       const $routeParams = {id:okOID}
       promiseResolve = {posts: [{title: 'title', content: 'content'}]}
-      const controller = $controller('edit', {authService, blogService, $routeParams})
+      const controller = $controller('edit', {authService, blogService, md2html, $routeParams, $scope})
       $rootScope.$digest()
       expect(controller.submitPost).toBeInstanceOf(Function)
       expect(blogService.get).toHaveBeenCalledWith({id: okOID})
@@ -211,7 +215,7 @@ describe('Client main', () => {
       authService.loggedin = true
       mockStorage.getItem.mockReturnValueOnce(JSON.stringify({id:okOID, title:'title', content: 'content'}))
       const $routeParams = {id:okOID}
-      const controller = $controller('edit', {authService, blogService, $routeParams})
+      const controller = $controller('edit', {authService, blogService, md2html, $routeParams, $scope})
       $rootScope.$digest()
       expect(blogService.get).not.toHaveBeenCalled()
       expect(controller.blogpost.title).toBe('title')
@@ -225,7 +229,7 @@ describe('Client main', () => {
         .mockReturnValueOnce(null)
       const blogPost = {_id: '123', title: 'title', content: 'content'}
       authService.loggedin = true
-      const controller = $controller('edit', {authService, blogService})
+      const controller = $controller('edit', {authService, blogService, md2html, $scope})
       controller.blogpost = blogPost
       $rootScope.$digest()
       controller.submitPost(controller.blogpost)
@@ -239,11 +243,11 @@ describe('Client main', () => {
       authService.loggedin = true
       mockStorage.getItem
         .mockReturnValueOnce(null)
-        .mockReturnValueOnce({id:123, test:'something'})
+        .mockReturnValueOnce(JSON.stringify({id:123, test:'something'}))
         .mockReturnValueOnce(null)
       const $routeParams = {id:okOID}
       promiseResolve = {posts: [{title: 'title', content: 'content'}]}
-      const controller = $controller('edit', {authService, blogService, $routeParams})
+      const controller = $controller('edit', {authService, blogService, md2html, $routeParams, $scope})
       $rootScope.$digest()
       promiseResolve = okOID
       controller.submitPost(controller.blogpost)
@@ -252,11 +256,11 @@ describe('Client main', () => {
       expect($location.path()).toBe(`/post/${okOID}`)
     })
 
-    test('save localDraft', () => {
+    test('save localDraft from /new', () => {
       expect.assertions(2)
       authService.loggedin = true
       const blogPost = {title: 'title', content: 'content'}
-      const controller = $controller('edit', {authService, blogService})
+      const controller = $controller('edit', {authService, blogService, md2html, $scope})
       $rootScope.$digest()
       controller.blogpost = blogPost
       controller.lsSave(blogPost, {'$valid':true})
@@ -265,11 +269,26 @@ describe('Client main', () => {
       expect(controller.saved).toBeTruthy()
     })
 
+    test('load localDraft from /new', () => {
+      expect.assertions(2)
+      authService.loggedin = true
+      mockStorage.length = 2
+      mockStorage.getItem
+        .mockReturnValueOnce(JSON.stringify({'_id':'ef123', test:'something'}))
+        .mockReturnValueOnce(JSON.stringify({'_id':'d-123', test:'something new'}))
+      const controller = $controller('edit', {authService, blogService, md2html, $scope})
+      $rootScope.$digest()
+      controller.loadDraft('d-123')
+      $rootScope.$digest()
+      expect(mockStorage.getItem).toHaveBeenCalledWith('d-123')
+      expect(controller.saved).toBeTruthy()
+    })
+
     test('localDraft not saved as post is not valid yet', () => {
       expect.assertions(2)
       authService.loggedin = true
       const blogPost = {title: 'title', content: 'content'}
-      const controller = $controller('edit', {authService, blogService})
+      const controller = $controller('edit', {authService, blogService, md2html, $scope})
       $rootScope.$digest()
       controller.blogpost = blogPost
       controller.lsSave(blogPost, {'$valid':false})
@@ -282,7 +301,7 @@ describe('Client main', () => {
       expect.assertions(2)
       authService.loggedin = true
       const blogPost = {title: 'title', content: 'content'}
-      const controller = $controller('edit', {authService, blogService})
+      const controller = $controller('edit', {authService, blogService, md2html, $scope})
       $rootScope.$digest()
       controller.blogpost = blogPost
       mockStorage.setItem.mockImplementationOnce(() => {
@@ -298,7 +317,7 @@ describe('Client main', () => {
       expect.assertions(2)
       authService.loggedin = true
       
-      const controller = $controller('edit', {authService, blogService})
+      const controller = $controller('edit', {authService, blogService, md2html, $scope})
       $rootScope.$digest()
       mockStorage.setItem.mockClear()
       controller.lsEnabled = false

@@ -1,23 +1,16 @@
 (function() {
-  angular.module('colonApp', ['ngRoute', 'ngCookies', 'ng-showdown'])
+  angular.module('colonApp', ['ngRoute', 'ngCookies'])
 })();
 
 (function() {
   angular.module('colonApp')
-    .constant('showdown', window.showdown)
-    .constant('hljs', window.hljs)
 })();
 
 (function(){
     angular.module('colonApp').config(config)
-    config.$inject = ['$routeProvider', '$showdownProvider', 'showdown', 'hljs']
+    config.$inject = ['$routeProvider']
 
-    function config($routeProvider, $showdownProvider, showdown, hljs) {
-      routerConfig($routeProvider)
-      showdownConfig($showdownProvider, showdown, hljs)
-    }
-
-    function routerConfig($routeProvider) {
+    function config($routeProvider) {
       $routeProvider
       .when('/about', {
         templateUrl: 'part/about.html'
@@ -67,30 +60,5 @@
         controllerAs: 'vm'
       })
       .otherwise({redirectTo:'/home'})
-    }
-
-    function showdownConfig($showdownProvider, showdown, hljs) {
-      showdown.extension('codehighlight', codeHighlight)
-      $showdownProvider.loadExtension('codehighlight')
-
-      function codeHighlight() {
-        function htmlunencode (text) {
-          return text.replace(/&amp;/g, '&')
-            .replace(/&lt;/g, '<')
-            .replace(/&gt;/g, '>')
-        }
-        
-        function filterFunc (text, converter, options) {
-          const [left, right] = ['<code\\b[^>]*>', '</code>']
-
-          function replacement(wholeMatch, match, left, right) {
-            match = htmlunencode(match)
-            return `${left}${hljs.highlightAuto(match).value}${right}`
-          }
-          return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, 'g')
-        }
-
-        return [{type: 'output', filter: filterFunc}]
-      }
     }
 })();

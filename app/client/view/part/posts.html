@@ -1,7 +1,7 @@
 <div>
   <div class="blog-post part" data-ng-repeat="blogpost in vm.blogposts | orderBy:'-_id'">
     <h1>{{blogpost.title}}</h1>
-    <div data-markdown-to-html="blogpost.content"></div>
+    <div data-ng-bind-html="blogpost.contentHtml"></div>
     <div class="blog-post-date">
       <a href="#" data-ng-href="/#!/post/{{blogpost._id}}">{{blogpost.date|date:'d MMMM y'}}</a>
     </div>

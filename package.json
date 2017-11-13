@@ -10,7 +10,7 @@
     "url": "https://github.com/underscoredotspace/blogJS/issues"
   },
   "scripts": {
-    "build": "grunt min",
+    "build": "grunt min & grunt lib",
     "build:watch": "grunt",
     "start": "pm2 start app/server",
     "start:watch": "nodemon app/server",
