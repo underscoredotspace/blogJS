@@ -2,13 +2,22 @@ require('angular')
 require('angular-cookies')
 require('angular-route')
 require('angular-sanitize')
-window.showdown = require('showdown')
-require('ng-showdown')
-require('highlightjs')
 require('angular-mocks')
 require('../../client/src/00-config.js')
 require('../../client/src/01-main.js')
 require('../../client/src/03-blog-service.js')
+
+class Worker {
+  constructor(filename) {
+    this.file = filename
+  }
+
+  postMessage(message) {
+    this.message = message
+  }
+
+  // addEve
+}
 
 describe('blogService: Completes API calls for blog posts', () => {
   let blogService, $httpBackend, $rootScope

@@ -1,4 +1,4 @@
-<div class="blog-post" ng-model-options="{debounce:500}"><form name="newPost">
+<div class="blog-post" ng-model-options="{debounce:500}" data-ng-keypress="vm.saved=false"><form name="newPost">
 	<input placeholder="Heading" data-ng-model="vm.blogpost.title" class="newpost-title" required data-ng-minlength="5" data-ng-change="vm.lsSave(vm.blogpost, newPost)"><br>
 	<textarea placeholder="Post Text" data-ng-model="vm.blogpost.content" class="newpost-content" required data-ng-minlength="5" data-ng-change="vm.lsSave(vm.blogpost, newPost)"></textarea><br>
 	<button data-ng-click="vm.submitPost(vm.blogpost)" data-ng-disabled="newPost.$invalid">Submit</button>
@@ -14,6 +14,6 @@
 
 <div class="blog-post" data-ng-hide="newPost.$invalid">
 	<h1 data-ng-bind="vm.blogpost.title"></h1>
-  <div markdown-to-html="vm.blogpost.content"></div>
+  <div data-ng-bind-html="vm.contentHtml"></div>
   <div class="blog-post-date"><a href="/#!/new">{{vm.blogpost.date|date:'d MMMM y'}}</a></div>
 </div>
