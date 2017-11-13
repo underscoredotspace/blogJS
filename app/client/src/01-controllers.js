@@ -149,12 +149,10 @@
         vm.drafts = drafts.filter(draft => draft._id.substr(0,2 === 'd-'))
         
         vm.loadDraft = id => {
-          if (id !== '') {
-            localDraft.load(id).then(draft => {
-              vm.blogpost = draft
-              vm.saved = true
-            }).catch(console.error)
-          }
+          localDraft.load(id).then(draft => {
+            vm.blogpost = draft
+            vm.saved = true
+          }).catch(console.error)
         }
       }).catch(console.error)
     }

@@ -29,11 +29,9 @@
       }
       return $http(options)
         .then(res => {
-          res.data.posts.forEach(post => {
-            md2html(post._id, post.content).then(content => {
-              post.contentHtml = content
-            })
-          })
+          res.data.posts.forEach(post => 
+            md2html(post._id, post.content)
+              .then(content => post.contentHtml = content))
           return res.data
         })
     }
@@ -100,8 +98,8 @@
   function md2html($q, $sce) {
     const showdownWorker = new Worker('sdWorker.js')
 
-    return (id, md) => {
-      return $q((resolve, reject) => {
+    return (id, md) => 
+      $q((resolve, reject) => {
         showdownWorker.postMessage({id, md})
         const timeout = setTimeout(() => reject('timeout'), 2000)
         showdownWorker.addEventListener('message', (d) => {
@@ -112,6 +110,5 @@
           }
         })
       })
-    }
   }
 })();

@@ -11,6 +11,8 @@ An environment variables must be set prior to run; `MONGO_ADDR` is the  **full**
 ``MONGO_ADDR="mongodb://user:password@server:port/dbname"
 ``
 
+run `yarn install & yarn build` before starting up with `yarn start`. 
+
 ## OTP Setup
 On first run an admin code will be written to the console, which is required to reveal the QR code needed to complete setup. 
 

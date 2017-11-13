@@ -13,7 +13,9 @@ describe('Client main', () => {
   const mockStorage = {
     setItem: jest.fn(),
     removeItem: jest.fn(),
-    getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}')
+    getItem: jest.fn().mockReturnValue('{\"test\":\"ok\"}'),
+    length: 0,
+    key: jest.fn()
   }
 
   window.localStorage = mockStorage
@@ -50,6 +52,7 @@ describe('Client main', () => {
     promiseOk = true
     promiseResolve = 'ok'
     jest.clearAllMocks()
+    mockStorage.length = 0
 
     angular.mock.module('colonApp')
 
@@ -240,7 +243,7 @@ describe('Client main', () => {
       authService.loggedin = true
       mockStorage.getItem
         .mockReturnValueOnce(null)
-        .mockReturnValueOnce({id:123, test:'something'})
+        .mockReturnValueOnce(JSON.stringify({id:123, test:'something'}))
         .mockReturnValueOnce(null)
       const $routeParams = {id:okOID}
       promiseResolve = {posts: [{title: 'title', content: 'content'}]}
@@ -253,7 +256,7 @@ describe('Client main', () => {
       expect($location.path()).toBe(`/post/${okOID}`)
     })
 
-    test('save localDraft', () => {
+    test('save localDraft from /new', () => {
       expect.assertions(2)
       authService.loggedin = true
       const blogPost = {title: 'title', content: 'content'}
@@ -263,6 +266,21 @@ describe('Client main', () => {
       controller.lsSave(blogPost, {'$valid':true})
       $rootScope.$digest()
       expect(blogPost._id.substr(0,2)).toBe('d-')
+      expect(controller.saved).toBeTruthy()
+    })
+
+    test('load localDraft from /new', () => {
+      expect.assertions(2)
+      authService.loggedin = true
+      mockStorage.length = 2
+      mockStorage.getItem
+        .mockReturnValueOnce(JSON.stringify({'_id':'ef123', test:'something'}))
+        .mockReturnValueOnce(JSON.stringify({'_id':'d-123', test:'something new'}))
+      const controller = $controller('edit', {authService, blogService, md2html, $scope})
+      $rootScope.$digest()
+      controller.loadDraft('d-123')
+      $rootScope.$digest()
+      expect(mockStorage.getItem).toHaveBeenCalledWith('d-123')
       expect(controller.saved).toBeTruthy()
     })
 

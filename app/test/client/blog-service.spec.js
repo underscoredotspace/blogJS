@@ -18,6 +18,10 @@ window.Worker = class Worker {
 
   addEventListener(event, callback) {
     this.event = event
+    callback({data: {
+      id: '123',
+      html: '<html></html>'
+    }})
   }
 }
 
