@@ -12,7 +12,7 @@
   "scripts": {
     "build": "grunt min & grunt lib",
     "build:watch": "grunt",
-    "start": "pm2 start app/server",
+    "start": "pm2 start app/server --watch",
     "start:watch": "nodemon app/server",
     "dev": "yarn build:watch & yarn start:watch",
     "test": "jest",
@@ -23,7 +23,7 @@
   "jest": {
     "collectCoverage": true,
     "collectCoverageFrom": [
-      "app/client/src/*.js",
+      "app/client/src/**/*.js",
       "app/server/*.js",
       "app/server/**/*.js"
     ],
@@ -41,6 +41,7 @@
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
+    "grunt-contrib-cssmin": "^2.2.1",
     "highlightjs": "^9.10.0",
     "jshint": "^2.9.5",
     "mongoose": "^4.11.3",

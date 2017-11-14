@@ -6,3 +6,4 @@ bower_components
 .glitch-assets
 _SpecRunner.html
 coverage
+**/*.min.*

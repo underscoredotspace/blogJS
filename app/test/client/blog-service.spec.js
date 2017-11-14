@@ -3,9 +3,9 @@ require('angular-cookies')
 require('angular-route')
 require('angular-sanitize')
 require('angular-mocks')
-require('../../client/src/00-config.js')
-require('../../client/src/01-controllers.js')
-require('../../client/src/03-blog-service.js')
+require('../../client/src/ngApp/00-config.js')
+require('../../client/src/ngApp/01-controllers.js')
+require('../../client/src/ngApp/03-blog-service.js')
 
 window.Worker = class Worker {
   constructor(filename) {

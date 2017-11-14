@@ -4,7 +4,7 @@ describe('showdownConfig', () => {
   require('angular-route')
   require('angular-sanitize')
   require('angular-mocks')
-  require('../../client/src/00-config.js')
+  require('../../client/src/ngApp/00-config.js')
 
   beforeEach(() => {
     angular.mock.module('colonApp')

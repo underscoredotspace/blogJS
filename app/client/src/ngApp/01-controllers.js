@@ -146,7 +146,7 @@
       }
       // get list of drafts from localStorage
       localDraft.list().then(drafts => {
-        vm.drafts = drafts.filter(draft => draft._id.substr(0,2 === 'd-'))
+        vm.drafts = drafts.filter(draft => draft._id.substr(0,2) === 'd-')
         
         vm.loadDraft = id => {
           localDraft.load(id).then(draft => {

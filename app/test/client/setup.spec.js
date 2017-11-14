@@ -6,9 +6,9 @@ window.showdown = require('showdown')
 require('ng-showdown')
 require('highlightjs')
 require('angular-mocks')
-require('../../client/src/00-config.js')
-require('../../client/src/01-controllers.js')
-require('../../client/src/05-setup.js')
+require('../../client/src/ngApp/00-config.js')
+require('../../client/src/ngApp/01-controllers.js')
+require('../../client/src/ngApp/05-setup.js')
 
 describe('Setup', () => {
   beforeEach(() => {

@@ -2,7 +2,7 @@ require('angular')
 require('angular-cookies')
 require('angular-mocks')
 angular.module('colonApp', ['ngCookies'])
-require('../../client/src/04-auth-service.js')
+require('../../client/src/ngApp/04-auth-service.js')
 
 describe('authService: Controls authentication', () => {
   let authService, $httpBackend, $cookies

@@ -96,15 +96,13 @@
   md2html.$inject = ['$q', '$sce']
 
   function md2html($q, $sce) {
-    const showdownWorker = new Worker('sdWorker.js')
+    const showdownWorker = new Worker('md2html-Worker.min.js')
 
     return (id, md) => 
       $q((resolve, reject) => {
         showdownWorker.postMessage({id, md})
-        const timeout = setTimeout(() => reject('timeout'), 2000)
         showdownWorker.addEventListener('message', (d) => {
           if (d.data.id === id) { 
-            clearTimeout(timeout)
             const html = $sce.trustAsHtml(d.data.html)
             resolve(html)
           }

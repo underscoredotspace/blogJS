@@ -1,12 +1,9 @@
 const worker = this
-worker.importScripts(
-  'https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.1/showdown.js', 
-  'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js'
-)
+worker.importScripts('lib-showdown.min.js')
 
 worker.showdown.extension('codehighlight', codeHighlight)
 
-const converter = new worker.showdown.Converter({ extensions: ['codehighlight'] });
+const converter = new worker.showdown.Converter({ extensions: ['codehighlight'] })
 
 function codeHighlight() {
   function htmlunencode (text) {

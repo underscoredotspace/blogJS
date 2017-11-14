@@ -14,7 +14,7 @@ describe('Draft localStorage Service', () => {
   require('angular-mocks')
 
   const colonApp = angular.module('colonApp', [])
-  require('../../client/src/06-localDraft-service.js')
+  require('../../client/src/ngApp/06-localDraft-service.js')
 
   let localDraft, $rootScope, $controller
 
