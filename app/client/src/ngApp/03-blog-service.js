@@ -77,6 +77,8 @@
         return $q.reject('Title or content too short')
       }
 
+      delete blogpost._id
+
       const options = {
         method: 'POST',
         url: blogPath,

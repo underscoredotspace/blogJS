@@ -7,3 +7,5 @@ bower_components
 _SpecRunner.html
 coverage
 **/*.min.*
+*.log
+app/client/build

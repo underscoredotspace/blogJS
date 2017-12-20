@@ -34,7 +34,6 @@ function authService($http, $cookies, $q, $rootScope, $location) {
   }
     
   function isLoggedIn() {
-    if ($location.host() === 'localhost') {return true}
     return angular.isDefined($cookies.get('qqBlog'))
   }
 }
