@@ -11,7 +11,7 @@
 # Pie in the Sky
 - Templating so others can use this as a framework
 - Deployment upon successful tests
-- Caching
+- Caching (sessionStore?)
 - Better, more complete Docker setup
 
 # Development

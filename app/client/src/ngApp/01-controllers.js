@@ -45,10 +45,13 @@
       page = Number($routeParams.page)
     }
 
-    blogService.get({id, page})
+    init()
+
+    function init() {
+      blogService.get({id, page})
       .then(blog => {
         vm.blogposts = blog.posts
-
+        
         if (!id) {
           if (!page) {page = '1'}
           if (blog.more) {vm.next = Number(page) + 1}
@@ -56,13 +59,15 @@
         }
       })
       .catch(err => console.error)
-
+    }
+      
     vm.postDelete = id => {
       // TODO: request confirmation
       blogService.delete(id)
         .then(() => {
           vm.blogposts = $filter('filter')(vm.blogposts, {'_id': '!' + id})
           $location.path('/home')
+          init()
         })
         .catch(console.error)
     }
