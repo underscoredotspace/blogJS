@@ -62,6 +62,8 @@
     }
       
     vm.postDelete = id => {
+      if(!window.confirm('Are you sure you want to delete?')) {return}
+
       // TODO: request confirmation
       blogService.delete(id)
         .then(() => {

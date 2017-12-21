@@ -19,6 +19,8 @@ describe('Client main', () => {
   }
 
   window.localStorage = mockStorage
+
+  window.confirm = jest.fn()
   
   const authService = {
     loggedin: false,
@@ -165,17 +167,30 @@ describe('Client main', () => {
       expect($location.path()).toBe('/edit/595f70031e019e7f2a7aa121')
     })
 
-    test('test delete while at post/:id', () => {
+    test('delete while at post/:id', () => {
+      window.confirm.mockReturnValueOnce(true)
       expect.assertions(1)
       promiseResolve = {posts:['test']}
       const routeParams = {id:'595f70031e019e7f2a7aa121'}
       const controller = $controller('post', {blogService, $routeParams:routeParams})
       controller.postDelete('595f70031e019e7f2a7aa121')
       $rootScope.$digest()
-      expect($location.path()).toBe('/home')
+      expect(blogService.delete).toHaveBeenCalledWith('595f70031e019e7f2a7aa121')
+    })
+
+    test('don\'t delete while at post/:id', () => {
+      window.confirm.mockReturnValueOnce(false)
+      expect.assertions(1)
+      promiseResolve = {posts:['test']}
+      const routeParams = {id:'595f70031e019e7f2a7aa121'}
+      const controller = $controller('post', {blogService, $routeParams:routeParams})
+      controller.postDelete('595f70031e019e7f2a7aa121')
+      $rootScope.$digest()
+      expect(blogService.delete).not.toHaveBeenCalled()
     })
 
     test('delete while at home', () => {
+      window.confirm.mockReturnValueOnce(true)
       expect.assertions(1)
       promiseResolve = {posts:[
         {_id: '595f70031e019e7f2a7aa121'},
@@ -184,7 +199,20 @@ describe('Client main', () => {
       const controller = $controller('post', {blogService})
       controller.postDelete('595f70031e019e7f2a7aa121')
       $rootScope.$digest()
-      expect(controller.blogposts.length).toBe(1)
+      expect(blogService.delete).toHaveBeenCalledWith('595f70031e019e7f2a7aa121')
+    })
+
+    test('don\'t delete while at home', () => {
+      window.confirm.mockReturnValueOnce(false)
+      expect.assertions(1)
+      promiseResolve = {posts:[
+        {_id: '595f70031e019e7f2a7aa121'},
+        {_id: '595f70031e019e7f2a7aa128'}
+      ]}
+      const controller = $controller('post', {blogService})
+      controller.postDelete('595f70031e019e7f2a7aa121')
+      $rootScope.$digest()
+      expect(blogService.delete).not.toHaveBeenCalled()
     })
   })
 
