@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+if (!process.env.MONGO_ADDR) {throw (new Error('MONGO_ADDR env var is missing'))}
 
 mongoose.Promise = global.Promise
 

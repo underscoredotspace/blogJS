@@ -1,4 +1,6 @@
 describe('mongoose connection', () => {
+  process.env.MONGO_ADDR = 'test'
+  
   const mockMongoose = {
     connect: jest.fn()
   }

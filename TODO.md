@@ -1,7 +1,10 @@
 ## Client
 - [ ] Get route set up with related controler rather than in config
-- [ ] Make client tests slightly less mental
+- [X] Make client tests slightly less mental
 - [ ] Nice error messages
+- [ ] Move login link from top
+- [ ] Links to GitHub, Twitter etc
+- [ ] Floating header
 
 # New Posts/Admin
 - [ ] Manual save of drafts to DB
@@ -15,4 +18,9 @@
 - Better, more complete Docker setup
 
 # Development
-- [ ] Minify CSS
+- [ ] Parcel/WebPack for client
+- [ ] Standard
+- [ ] Remove Angular
+  - [ ] NeekoRouter
+  - [ ] Error handling/logging
+- [ ] Move MD > HTML conversion to server
