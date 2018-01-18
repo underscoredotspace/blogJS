@@ -98,7 +98,7 @@
   md2html.$inject = ['$q', '$sce']
 
   function md2html($q, $sce) {
-    const showdownWorker = new Worker('md2html-Worker.min.js')
+    const showdownWorker = new Worker('../md2html-Worker.js')
 
     return (id, md) => 
       $q((resolve, reject) => {

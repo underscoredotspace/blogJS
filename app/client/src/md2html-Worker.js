@@ -1,9 +1,9 @@
-const worker = this
-worker.importScripts('lib-showdown.min.js')
+import showdown from 'showdown'
+import hljs from 'highlightjs'
 
-worker.showdown.extension('codehighlight', codeHighlight)
+showdown.extension('codehighlight', codeHighlight)
 
-const converter = new worker.showdown.Converter({ extensions: ['codehighlight'] })
+const converter = new showdown.Converter({ extensions: ['codehighlight'] })
 
 function codeHighlight() {
   function htmlunencode (text) {
@@ -17,9 +17,9 @@ function codeHighlight() {
 
     function replacement(wholeMatch, match, left, right) {
       match = htmlunencode(match)
-      return `${left}${worker.hljs.highlightAuto(match).value}${right}`
+      return `${left}${hljs.highlightAuto(match).value}${right}`
     }
-    return worker.showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, 'g')
+    return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, 'g')
   }
 
   return [{type: 'output', filter: filterFunc}]

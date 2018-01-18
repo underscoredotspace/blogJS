@@ -6,10 +6,8 @@ db.connect()
 const express = require('express')
 const app = express()
 
-app.use(
-  express.static('app/client/build'),
-  express.static('app/client/view')
-)
+app.use(express.static('dist'))
+app.use('/part', express.static('app/client/view/part'))
 
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')

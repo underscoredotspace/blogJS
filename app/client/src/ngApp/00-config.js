@@ -2,10 +2,6 @@
   angular.module('colonApp', ['ngRoute', 'ngCookies'])
 })();
 
-(function() {
-  angular.module('colonApp')
-})();
-
 (function(){
     angular.module('colonApp').config(config)
     config.$inject = ['$routeProvider']
