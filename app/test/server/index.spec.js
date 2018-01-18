@@ -32,7 +32,7 @@ describe('server/index', () => {
   })
 
   test('Server running', () => {
-    expect.assertions(2)
+    expect.assertions(1)
     return request('http://localhost:3000').get('/banana').then(res => {
       expect(res.status).toBe(404)
     })
