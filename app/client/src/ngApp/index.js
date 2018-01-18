@@ -1,10 +1,10 @@
-import 'angular'
-import 'angular-route'
-import 'angular-cookies'
+require('angular')
+require('angular-route')
+require('angular-cookies')
 
-import './00-config'
-import './01-controllers'
-import './03-blog-service'
-import './04-auth-service'
-import './05-setup'
-import './06-localDraft-service'
+require('./00-config')
+require('./01-controllers')
+require('./03-blog-service')
+require('./04-auth-service')
+require('./05-setup')
+require('./06-localDraft-service')

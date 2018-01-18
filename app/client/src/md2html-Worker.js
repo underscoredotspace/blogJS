@@ -1,5 +1,5 @@
-import showdown from 'showdown'
-import hljs from 'highlightjs'
+const showdown = require ('showdown')
+const hljs = require('highlightjs')
 
 showdown.extension('codehighlight', codeHighlight)
 
