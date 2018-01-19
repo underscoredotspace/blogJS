@@ -10,16 +10,14 @@
     "url": "https://github.com/underscoredotspace/blogJS/issues"
   },
   "scripts": {
-    "build": "grunt min & grunt lib",
-    "build:watch": "grunt",
-    "start": "pm2 start app/server --watch",
-    "start:watch": "nodemon app/server",
-    "stop": "pm2 stop app/server",
-    "dev": "yarn build:watch & yarn start:watch",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
+    "dev": "yarn parcel:start & nodemon app/server",
+    "start": "yarn build && pm2 start app/server --watch",
+    "test:build": "nodemon app/server",
+    "stop": "yarn build & pm2 stop app/server",
+    "test": "jest --watchAll",
     "test:ci": "jest -i --coverage && cat coverage/lcov.info | coveralls",
-    "cover:view": "open coverage/lcov-report/index.html"
+    "parcel:start": "parcel ./app/client/view/index.html --public-url ./ --no-hmr",
+    "build": "parcel build ./app/client/view/index.html --public-url ./"
   },
   "jest": {
     "collectCoverage": true,
@@ -42,26 +40,23 @@
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
-    "grunt-contrib-cssmin": "^2.2.1",
     "highlightjs": "^9.10.0",
-    "jshint": "^2.9.5",
-    "mongoose": "^4.11.3",
+    "mongoose": "4",
     "ng-showdown": "^1.1.0",
     "otp.js": "^1.1.0",
-    "otplib": "^6.0.3",
-    "pm2": "^2.6.1",
-    "qrcode": "^0.9.0",
+    "otplib": "^7.0.0",
+    "parcel-bundler": "^1.4.1",
+    "qrcode": "^1.2.0",
     "showdown": "^1.7.1",
-    "uuid": "^3.1.0"
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "angular-mocks": "^1.6.5",
-    "coveralls": "^2.13.1",
-    "grunt": "^1.0.1",
-    "grunt-contrib-uglify": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
-    "grunt-contrib-watch": "^1.0.0",
-    "jest": "^20.0.4",
+    "coveralls": "^3.0.0",
+    "jest": "^22.1.3",
     "nodemon": "^1.11.0",
+    "pm2": "^2.6.1",
+    "superagent": "^3.8.2",
     "supertest": "^3.0.0"
   },
   "repository": {

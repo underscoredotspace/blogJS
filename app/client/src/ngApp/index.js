@@ -1,0 +1,10 @@
+require('angular')
+require('angular-route')
+require('angular-cookies')
+
+require('./00-config')
+require('./01-controllers')
+require('./03-blog-service')
+require('./04-auth-service')
+require('./05-setup')
+require('./06-localDraft-service')

@@ -32,19 +32,11 @@ describe('server/index', () => {
   })
 
   test('Server running', () => {
-    expect.assertions(2)
-    return Promise.all(
-    [
-      request('http://localhost:3000').get('/').then(res => {
-        expect(res.status).toBe(200)
-      })
-    ],[
-      request('http://localhost:3000').get('/banana').then(res => {
-        expect(res.status).toBe(404)
-      })
-    ]
-  )
-})
+    expect.assertions(1)
+    return request('http://localhost:3000').get('/banana').then(res => {
+      expect(res.status).toBe(404)
+    })
+  })
 
   test('Server handles errors gracefully', () => {
     expect.assertions(2)

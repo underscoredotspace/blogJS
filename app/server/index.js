@@ -6,13 +6,13 @@ db.connect()
 const express = require('express')
 const app = express()
 
-app.use(
-  express.static('app/client/build'),
-  express.static('app/client/view')
-)
+app.use(express.static('dist'))
+app.use('/part', express.static('app/client/view/part'))
 
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
+
+if (!process.env.COOKIE_SECRET) {throw (new Error('COOKIE_SECRET env var missing'))}
 
 app.use(
   cookieParser(process.env.COOKIE_SECRET),
@@ -28,20 +28,17 @@ app.use((req, res) => {
 
 const startExpress = (expressApp, port = process.env.PORT) =>  new Promise((resolve, reject) => {
   if (!expressApp || !expressApp.hasOwnProperty('listen')) {
-    reject({err: 'Express app required'})
+    return reject({err: 'Express app required'})
+  }
+  const listen = expressApp.listen(port)  
+  if (listen && listen.listening) {
+    return resolve(listen)
   } else {
-    const listen = expressApp.listen(port)  
-    if (listen && listen.listening) {
-      resolve(listen)
-    } else {
-      let timeout = setTimeout(() => {
-        reject({err: 'timeout'})
-      }, 1000)
-      listen.on('error', err => {
-        clearTimeout(timeout)
-        reject(err)
-      })
-    }
+    let timeout = setTimeout(() => reject({err: 'timeout'}), 1000)
+    listen.on('error', err => {
+      clearTimeout(timeout)
+      return reject(err)
+    })
   }
 })
 

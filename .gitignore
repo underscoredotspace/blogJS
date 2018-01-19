@@ -1,10 +1,9 @@
 node_modules
-bower_components
 .DS_Store
 .env
 .grunt
-.glitch-assets
-_SpecRunner.html
 coverage
 **/*.min.*
 *.log
+.cache
+dist
