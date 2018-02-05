@@ -1,4 +1,4 @@
-<div>
+<article class="post">
   <div class="blog-post part" data-ng-repeat="blogpost in vm.blogposts | orderBy:'-_id'">
     <h1>{{blogpost.title}}</h1>
     <div data-ng-bind-html="blogpost.contentHtml"></div>
@@ -15,4 +15,4 @@
     <div>&nbsp;</div>
     <a id="blog-page-next" data-ng-show="vm.next" data-ng-href="/#!/home/{{vm.next}}">Next</a>
   </div>
-</div>
+</article>

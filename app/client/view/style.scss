@@ -1,0 +1,256 @@
+$c-head: #151515;
+$c-body: #222426;
+$c-text: #f5f5f5;
+$c-pink: #ff69b4;
+$c-orange: #ffb368;
+$c-yellow: #ffff68;
+$c-green: #69FFB4;
+$c-blue: #68b3ff;
+$max-width: 800px;
+$break-big: 700px;
+
+body {
+  font-family: 'Source Sans Pro';
+  background: $c-body;
+  color: $c-text;
+  margin: 0;
+}
+
+.wrapper {
+  margin: 0 auto;
+}
+
+//mobile
+@media (max-width: $break-big) {
+  .wrapper {
+    display: grid;
+    grid-template-columns: 2.5rem auto;
+    grid-template-rows: 2.5rem auto 2rem;
+  }
+    
+  #logo {
+    background: $c-pink;
+  }
+  
+  header {
+    font-size: 1rem;
+    font-family: 'Quicksand';
+    text-align: center;
+    background-color: $c-head;
+    display: grid;
+    align-items: center;
+    padding-bottom: 2px;
+  }
+  
+  #logo, header {
+    z-index: 1;
+  }
+  
+  input#menuvis {
+    display: none;
+    &:checked {
+      ~ #menu {
+        transform: translateY(0);
+      }
+
+      ~ #menu>#menu-control>label>svg {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  
+  #menu {
+    position: absolute;
+    top: 2.5rem;
+    width: 100%;
+    transition-duration: 0.3s;
+    transition-property: transform;
+    transform: translateY(calc(-100% + 1rem));
+  }
+  
+  nav {
+    z-index: -1;
+    display: grid;
+    grid-template-columns: 1fr minmax(2rem,6rem);
+    box-shadow: inset 0 5px 10px black;
+    background: $c-head;
+    padding: 10px 20px;
+  }
+  
+  #menu-control {
+    display: grid;
+    height: 1rem;
+    > label {
+      text-align: center;
+    }
+    &:hover {
+      background: rgba(64,64,64,0.2);
+    }
+  }
+  
+  .menu-icon {
+    height: 1rem;
+    width: 1rem;
+    transition-duration: 0.3s;
+    transition-property: transform;
+  }
+  
+  .here {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 8rem);
+    grid-gap: 5px;
+    padding: 5px;
+    align-items: center;    
+    > a {
+      color: $c-orange;
+    }
+  }
+  
+  .icon {
+    fill: $c-green;
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .there {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 2rem);
+    justify-content: space-around;
+    align-content: center;
+  }
+  
+  main {
+    padding-top: 1rem;
+    margin: 0 20px;
+  }
+  
+  footer {
+    text-align: right;
+    padding-top: 1rem;
+  }
+  
+  main, footer {
+    grid-column: 1/-1;
+  }
+}
+
+//desktop
+@media (min-width: ($break-big + 1px)) {
+  .wrapper {
+    display: grid;
+    grid-template-columns: 100px minmax(auto, ($max-width - 100px));
+    grid-template-rows: 100px auto 50px;
+    max-width: $max-width;
+  }
+
+  header {
+    font-size: 2.25rem;
+  }
+
+  #menu-control {
+    display: none;
+  }
+
+  nav {
+    display: grid;
+    margin: 15px auto;
+    > div {
+      margin-bottom: 20px;
+      text-align: center;
+      > a {
+        display: block;
+        padding: 5px 0;
+      }
+    }
+  }
+
+  main {
+    margin: 30px 20px 0 20px;
+  }
+
+  footer {
+    grid-column: 1/-1;
+  }
+}
+
+#logo {
+  background: $c-pink;
+}
+
+header {
+  display: grid;
+  align-items: center;
+  text-align: center;
+  font-family: 'Quicksand';
+  font-weight: bolder;
+  background: $c-head;
+}
+
+.here{
+  > a {
+    color: $c-orange;
+  }
+}
+
+.icon {
+  height: 2em;
+  width: 2em;
+  fill: $c-green;
+}
+
+input#menuvis {
+  display: none;
+}
+
+main {
+  text-align: justify;
+}
+
+footer {
+  text-align: right;
+  align-self: end;
+}
+
+a {
+  text-decoration: none;
+  color: $c-pink;
+  &:hover {
+    text-decoration: $c-green underline wavy;
+  }
+}
+
+p {
+  margin-top: 0;
+}
+
+h1, h2, h3, h4, h5 {
+  margin: 5px 0 0;
+}
+
+code, pre {
+  background:#000;
+}
+
+pre {
+  overflow-x: auto;
+}
+
+code {
+  display: inline;
+  font-size:0.85rem;
+  font-family:Fira Code,Source Code Pro,monospace;
+  &:after,&:before {
+    content:"\00a0"
+  }
+}
+pre code:after, pre code:before {
+  content:normal;
+}
+
+main {
+  min-width: 0;
+}
+
+img {
+  max-width: 100%;
+}
